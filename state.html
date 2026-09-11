@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>National Judicial Cause-List System | Jurisdiction Access</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        canvas { user-select: none; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col justify-between">
+
+    <div class="h-1.5 w-full bg-gradient-to-r from-amber-500 via-white to-emerald-600"></div>
+
+    <header class="bg-white border-b border-slate-200">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-lg bg-slate-900 text-white flex items-center justify-center text-xl shadow-sm border border-slate-700">
+                    ⚖️
+                </div>
+                <div>
+                    <div class="flex items-center space-x-2">
+                        <span class="font-bold text-lg text-slate-900 tracking-tight">NYAY-PRAVAH</span>
+                        <span class="text-[11px] bg-slate-100 text-slate-700 px-2 py-0.5 rounded font-semibold border border-slate-300">
+                            e-Courts National Portal
+                        </span>
+                    </div>
+                    <p class="text-xs text-slate-500">Department of Justice • National Judicial Data Grid (NJDG)</p>
+                </div>
+            </div>
+            <div class="hidden sm:block text-right text-xs text-slate-500">
+                <span class="font-semibold text-slate-700">District Complex Gateway</span>
+                <p class="mono text-[11px]">Phase 1 Deployment</p>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-2xl mx-auto w-full px-4 py-8 sm:py-12 space-y-6">
+
+        <div class="space-y-1.5">
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+                Judicial Jurisdiction Gateway
+            </h1>
+            <p class="text-sm text-slate-600">
+                Select your State or Union Territory to proceed to the designated District & Sessions Court complex docket system.
+            </p>
+        </div>
+
+        <div class="bg-white rounded-xl border border-slate-200 p-6 sm:p-8 shadow-sm space-y-6">
+            
+            <div class="space-y-2 relative">
+                <label for="stateSearchInput" class="block text-xs font-bold uppercase tracking-wider text-slate-600">
+                    State / Union Territory
+                </label>
+                <div class="relative">
+                    <i data-lucide="search" class="w-5 h-5 text-slate-400 absolute left-3.5 top-3 pointer-events-none"></i>
+                    <input 
+                        id="stateSearchInput" 
+                        type="text" 
+                        placeholder="Click to browse or type state name..."
+                        autocomplete="off"
+                        onfocus="openDropdown()" 
+                        oninput="filterStates(this.value)" 
+                        class="w-full bg-slate-50 border border-slate-300 rounded-lg pl-10 pr-10 py-2.5 text-sm font-medium text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:bg-white transition"
+                    >
+                    <button onclick="toggleDropdown()" type="button" class="absolute right-3 top-3 text-slate-400 hover:text-slate-600">
+                        <i data-lucide="chevron-down" class="w-4 h-4"></i>
+                    </button>
+                </div>
+
+                <div id="stateDropdownMenu" class="hidden absolute left-0 right-0 top-full mt-1 max-h-60 overflow-y-auto bg-white border border-slate-200 rounded-lg shadow-xl z-50 divide-y divide-slate-100">
+                </div>
+            </div>
+
+            <div id="stateNotice" class="hidden p-3.5 rounded-lg text-xs font-medium">
+            </div>
+
+            <div class="bg-slate-50 border border-slate-200 rounded-lg p-4 space-y-3">
+                <div class="flex items-center justify-between">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-600">
+                        Security Verification (CAPTCHA)
+                    </label>
+                    <span class="text-[11px] text-slate-400">Case-sensitive</span>
+                </div>
+
+                <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                    <div class="flex items-center space-x-2 bg-slate-200 p-1 rounded-lg border border-slate-300">
+                        <canvas id="captchaCanvas" width="180" height="46" class="rounded bg-slate-100"></canvas>
+                        <button onclick="generateDistortedCaptcha(true)" type="button" class="p-2 hover:bg-slate-300 rounded text-slate-600 transition" title="Generate New Captcha">
+                            <i data-lucide="rotate-cw" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+
+                    <div class="w-full sm:flex-1">
+                        <input 
+                            id="captchaInput" 
+                            type="text" 
+                            maxlength="6"
+                            placeholder="Enter 6 characters" 
+                            oninput="hideCaptchaError()"
+                            class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 placeholder-slate-400 mono font-semibold focus:outline-none focus:ring-2 focus:ring-slate-900"
+                        >
+                    </div>
+                </div>
+
+                <div id="captchaError" class="text-xs text-red-600 font-semibold hidden flex items-center space-x-1.5 bg-red-50 p-2 rounded border border-red-200">
+                    <i data-lucide="alert-circle" class="w-4 h-4"></i>
+                    <span>Error! Incorrect code. Please try again.</span>
+                </div>
+            </div>
+
+            <button 
+                id="proceedBtn" 
+                onclick="validateAndNavigate()" 
+                class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 rounded-lg text-sm transition flex items-center justify-center space-x-2 shadow-sm cursor-pointer"
+            >
+                <span>Proceed to Judicial Login</span>
+                <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </button>
+        </div>
+
+        <div class="text-xs text-slate-500 space-y-2 text-center pt-2">
+            <div class="bg-blue-50/50 border border-blue-100 p-3 rounded-lg max-w-md mx-auto text-left">
+                <span class="font-bold text-blue-900 block mb-1">Phase 1 Pilot Registry (Master Admins):</span>
+                <ul class="list-disc pl-4 text-[11px] text-blue-800 space-y-0.5">
+                    <li><strong>Maharashtra:</strong> Chief Clerk Aaron (ID: 676968)</li>
+                    <li><strong>Kerala:</strong> Chief Clerk Cyrus (ID: 678567)</li>
+                </ul>
+            </div>
+            <p>Access restricted to authorized judicial officers, sheristedars, and bench registry clerks.</p>
+        </div>
+
+    </main>
+
+    <footer class="bg-white border-t border-slate-200 py-3.5 text-center text-xs text-slate-500">
+        Nyay-Pravah // National Cause-List & Adjournment Optimization Portal
+    </footer>
+
+    <script>
+        const ALL_REGIONS = [
+            "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh", 
+            "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand", 
+            "Karnataka", "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur", 
+            "Meghalaya", "Mizoram", "Nagaland", "Odisha", "Punjab", 
+            "Rajasthan", "Sikkim", "Tamil Nadu", "Telangana", "Tripura", 
+            "Uttar Pradesh", "Uttarakhand", "West Bengal",
+            "Andaman and Nicobar Islands (UT)", "Chandigarh (UT)", 
+            "Dadra & Nagar Haveli and Daman & Diu (UT)", "Delhi (NCT)", 
+            "Jammu and Kashmir (UT)", "Ladakh (UT)", "Lakshadweep (UT)", "Puducherry (UT)"
+        ];
+
+        const PILOT_CONFIGS = {
+            "Maharashtra": { state: "Maharashtra", complex: "Bombay High Court & Maharashtra District Complexes" },
+            "Kerala": { state: "Kerala", complex: "Kerala High Court & Ernakulam District Complexes" }
+        };
+
+        let selectedState = "";
+        let generatedCaptchaText = "";
+
+        window.addEventListener('DOMContentLoaded', () => {
+            renderDropdownItems(ALL_REGIONS);
+            generateDistortedCaptcha(true);
+            lucide.createIcons();
+            document.addEventListener('click', (e) => {
+                const searchBox = document.getElementById('stateSearchInput');
+                const menu = document.getElementById('stateDropdownMenu');
+                if (!searchBox.contains(e.target) && !menu.contains(e.target)) menu.classList.add('hidden');
+            });
+        });
+
+        function generateDistortedCaptcha(clearError = false) {
+            const canvas = document.getElementById('captchaCanvas');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "#f8fafc";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < 6; i++) {
+                ctx.strokeStyle = `rgba(${Math.floor(Math.random()*150)}, ${Math.floor(Math.random()*150)}, ${Math.floor(Math.random()*150)}, 0.3)`;
+                ctx.beginPath();
+                ctx.moveTo(Math.random() * canvas.width, Math.random() * canvas.height);
+                ctx.lineTo(Math.random() * canvas.width, Math.random() * canvas.height);
+                ctx.stroke();
+            }
+            const charset = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789";
+            let code = "";
+            for (let i = 0; i < 6; i++) code += charset.charAt(Math.floor(Math.random() * charset.length));
+            generatedCaptchaText = code;
+
+            const fonts = ["22px 'JetBrains Mono'", "bold 23px 'Inter'", "bold 24px 'Courier New'"];
+            for (let i = 0; i < code.length; i++) {
+                ctx.save();
+                ctx.font = fonts[Math.floor(Math.random() * fonts.length)];
+                ctx.fillStyle = `rgb(${Math.floor(Math.random() * 80)}, ${Math.floor(Math.random() * 80)}, ${Math.floor(Math.random() * 120)})`;
+                ctx.translate(20 + (i * 24), 32 + (Math.random() * 6 - 3));
+                ctx.rotate((Math.random() * 40 - 20) * Math.PI / 180);
+                ctx.fillText(code[i], 0, 0);
+                ctx.restore();
+            }
+            document.getElementById('captchaInput').value = "";
+            if (clearError) hideCaptchaError();
+        }
+
+        function hideCaptchaError() { document.getElementById('captchaError').classList.add('hidden'); }
+
+        function renderDropdownItems(items) {
+            const menu = document.getElementById('stateDropdownMenu');
+            menu.innerHTML = "";
+            if (items.length === 0) return menu.innerHTML = `<div class="p-3 text-xs text-slate-400">No matching jurisdiction found</div>`;
+            items.forEach(region => {
+                const cleanName = region.replace(" (UT)", "").replace(" (NCT)", "");
+                const isPilot = !!PILOT_CONFIGS[cleanName];
+                const btn = document.createElement('button');
+                btn.type = "button";
+                btn.className = "w-full text-left px-4 py-2.5 text-xs sm:text-sm hover:bg-slate-50 flex items-center justify-between";
+                btn.onclick = () => selectState(cleanName);
+                btn.innerHTML = `<span class="font-medium ${isPilot ? 'text-slate-900 font-bold' : 'text-slate-700'}">${region}</span>
+                                 ${isPilot ? '<span class="text-[10px] bg-slate-900 text-white font-semibold px-2 py-0.5 rounded">Phase 1</span>' : ''}`;
+                menu.appendChild(btn);
+            });
+        }
+
+        function openDropdown() { renderDropdownItems(ALL_REGIONS); document.getElementById('stateDropdownMenu').classList.remove('hidden'); }
+        function toggleDropdown() { document.getElementById('stateDropdownMenu').classList.contains('hidden') ? openDropdown() : document.getElementById('stateDropdownMenu').classList.add('hidden'); }
+        function filterStates(keyword) { openDropdown(); renderDropdownItems(ALL_REGIONS.filter(item => item.toLowerCase().includes(keyword.toLowerCase()))); }
+
+        function selectState(stateName) {
+            selectedState = stateName;
+            document.getElementById('stateSearchInput').value = stateName;
+            document.getElementById('stateDropdownMenu').classList.add('hidden');
+            const noticeBox = document.getElementById('stateNotice');
+            noticeBox.classList.remove('hidden');
+
+            if (PILOT_CONFIGS[stateName]) {
+                noticeBox.className = "p-3 rounded-lg text-xs bg-emerald-50 border border-emerald-200 text-emerald-900 flex items-center justify-between";
+                noticeBox.innerHTML = `<div class="flex items-center space-x-2"><i data-lucide="check-circle" class="w-4 h-4 text-emerald-600"></i><span><strong>${stateName}</strong> connected.</span></div><span class="font-bold text-emerald-700 uppercase text-[10px]">Active</span>`;
+            } else {
+                noticeBox.className = "p-3 rounded-lg text-xs bg-amber-50 border border-amber-200 text-amber-900 flex items-start space-x-2";
+                noticeBox.innerHTML = `<i data-lucide="alert-circle" class="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0"></i><div><strong>Phase 2 is in development for ${stateName}.</strong><div class="text-amber-800 mt-0.5">Please select <strong>Maharashtra</strong> or <strong>Kerala</strong>.</div></div>`;
+            }
+            lucide.createIcons();
+        }
+
+        function validateAndNavigate() {
+            const enteredCaptcha = document.getElementById('captchaInput').value.trim();
+            if (!selectedState || !PILOT_CONFIGS[selectedState]) return alert("Please select Maharashtra or Kerala to proceed.");
+            if (enteredCaptcha !== generatedCaptchaText) {
+                document.getElementById('captchaError').classList.remove('hidden');
+                generateDistortedCaptcha(false); 
+                return;
+            }
+            localStorage.setItem('nyay_jurisdiction', JSON.stringify(PILOT_CONFIGS[selectedState]));
+            window.location.href = "login.html";
+        }
+    </script>
+</body>
+</html>
