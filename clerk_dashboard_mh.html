@@ -18,7 +18,7 @@
         @keyframes pulse-border { 0% { border-color: #ef4444; } 50% { border-color: #fee2e2; } 100% { border-color: #ef4444; } }
         .alert-banner { animation: pulse-border 2s infinite; }
         .tricolor-bar { background: linear-gradient(90deg, #FF9933 33.33%, #FFFFFF 33.33%, #FFFFFF 66.66%, #138808 66.66%); }
-        .calendar-day:hover { transform: scale(1.05); }
+        .calendar-day:hover { transform: scale(1.03); }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col justify-between">
@@ -35,8 +35,16 @@
                         <span id="clerkCourtTitle" class="font-extrabold text-base sm:text-lg text-blue-950 tracking-tight">MY COURT DOCKET</span>
                         <span class="text-[10px] bg-blue-100 text-blue-900 px-2.5 py-0.5 rounded-full font-extrabold border border-blue-300">BENCH CLERK</span>
                     </div>
-                    <p id="userSubText" class="text-xs text-slate-500 font-medium">Clerk Profile Loading...</p>
+                    <p id="userSubText" class="text-xs text-slate-500 font-medium">Loading session info...</p>
                 </div>
+            </div>
+
+            <!-- Cool Top-Middle High Court Title -->
+            <div class="hidden lg:flex flex-col items-center justify-center">
+                <span class="text-xs font-extrabold uppercase tracking-widest text-indigo-900 bg-indigo-50 border border-indigo-200 px-4 py-1 rounded-full shadow-inner" id="topHighCourtTitle">
+                    BOMBAY HIGH COURT - JUDICIAL BENCH
+                </span>
+                <span class="text-[10px] text-slate-500 font-bold mt-0.5" id="topCourtroomSubtitle">Assigned Court: Loading...</span>
             </div>
 
             <div class="flex items-center space-x-3">
@@ -82,14 +90,14 @@
 
     <main class="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 py-6 space-y-6">
         
-        <!-- TAB 1: MY DOCKET -->
+        <!-- TAB 1: MY DOCKET & UNIFIED COLOR-CODED LAWYER WORK SCHEDULE -->
         <div id="tab1-content" class="space-y-6">
             <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
                 <div class="flex items-center space-x-4">
                     <div class="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-800 border border-blue-200 shadow-inner"><i data-lucide="building-2" class="w-6 h-6"></i></div>
                     <div>
                         <h2 class="text-xl font-extrabold text-blue-950" id="displayCourtName">Court Complex</h2>
-                        <p class="text-xs text-slate-500 font-medium">Live docket metrics for your assigned jurisdiction.</p>
+                        <p class="text-xs text-slate-500 font-medium" id="specificJurisdictionSub">Specific Courtroom Session Active</p>
                     </div>
                 </div>
                 <div class="flex space-x-4">
@@ -107,6 +115,38 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Unified Color-Coded Lawyer Work Schedule Section -->
+            <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-4">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b pb-3">
+                    <div>
+                        <h3 class="text-sm font-extrabold text-blue-950">Master Advocate Work Schedule & Status Matrix</h3>
+                        <p class="text-xs text-slate-500">Live docket tracking for all designated counsel.</p>
+                    </div>
+                    <div class="flex items-center space-x-3 text-[11px] font-bold">
+                        <span class="flex items-center space-x-1 bg-emerald-50 text-emerald-800 border border-emerald-200 px-2.5 py-1 rounded-lg"><span class="w-2 h-2 bg-emerald-500 rounded-full"></span><span>Completed</span></span>
+                        <span class="flex items-center space-x-1 bg-red-50 text-red-800 border border-red-200 px-2.5 py-1 rounded-lg"><span class="w-2 h-2 bg-red-500 rounded-full"></span><span>Urgent</span></span>
+                        <span class="flex items-center space-x-1 bg-amber-50 text-amber-800 border border-amber-200 px-2.5 py-1 rounded-lg"><span class="w-2 h-2 bg-amber-500 rounded-full"></span><span>Pending</span></span>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs">
+                        <thead class="bg-slate-100 text-slate-700 font-extrabold">
+                            <tr>
+                                <th class="p-3">Advocate Name</th>
+                                <th class="p-3">Assigned Case ID</th>
+                                <th class="p-3">Scheduled Time Slot</th>
+                                <th class="p-3">Matter Urgency / Status</th>
+                                <th class="p-3 text-right">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="masterWorkScheduleBody" class="divide-y divide-slate-100">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
 
         <!-- TAB 2: ADJOURNMENT ENGINE -->
@@ -120,7 +160,7 @@
                     <div class="flex flex-wrap gap-2">
                         <button onclick="runEnginePhase(1)" class="bg-blue-600 hover:bg-blue-700 text-white font-extrabold px-3.5 py-2.5 rounded-xl text-xs transition shadow">1. Gen 6 PM List</button>
                         <button onclick="runEnginePhase(2)" class="bg-red-600 hover:bg-red-700 text-white font-extrabold px-3.5 py-2.5 rounded-xl text-xs transition shadow">2. Inject Chaos</button>
-                        <button onclick="runEnginePhase(3)" class="bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold px-3.5 py-2.5 rounded-xl text-xs transition shadow">3. Reshuffle</button>
+                        <button onclick="triggerSmartRescheduleFlow()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold px-3.5 py-2.5 rounded-xl text-xs transition shadow flex items-center space-x-1.5"><i data-lucide="calendar-plus" class="w-4 h-4"></i><span>3. Adjourn & Smart Reschedule</span></button>
                     </div>
                 </div>
             </div>
@@ -148,9 +188,7 @@
                     </div>
                     <button onclick="checkClerkRadar()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold px-5 py-3 rounded-xl text-xs transition shadow">Run Radar Scan</button>
                 </div>
-                <div id="radarResultBox" class="hidden p-4 rounded-xl text-xs font-bold space-y-2">
-                    <!-- Dynamic Result Inserted Here -->
-                </div>
+                <div id="radarResultBox" class="hidden p-4 rounded-xl text-xs font-bold space-y-2"></div>
             </div>
         </div>
 
@@ -197,9 +235,7 @@
                                 <th class="p-3">Readiness Status</th>
                             </tr>
                         </thead>
-                        <tbody id="checkClearBody" class="divide-y divide-slate-100">
-                            <!-- Populated dynamically via JS -->
-                        </tbody>
+                        <tbody id="checkClearBody" class="divide-y divide-slate-100"></tbody>
                     </table>
                 </div>
             </div>
@@ -242,10 +278,7 @@
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                
-                <!-- Left Panel: Form Tools -->
                 <div class="space-y-6">
-                    <!-- Tool A -->
                     <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-4">
                         <h2 class="text-sm font-extrabold text-blue-950 border-b pb-2">Tool A: Generate Case ID</h2>
                         <div class="flex items-center space-x-2">
@@ -254,7 +287,6 @@
                         </div>
                     </div>
 
-                    <!-- Tool B -->
                     <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-4">
                         <h2 class="text-sm font-extrabold text-blue-950 border-b pb-2">Tool B: Schedule Case</h2>
                         <form onsubmit="handleScheduleCase(event)" class="space-y-3.5">
@@ -267,7 +299,6 @@
                             <div><label class="block text-[10px] font-extrabold uppercase text-slate-700 mb-1">Advocate</label>
                                 <select id="schAdvocate" required class="w-full bg-slate-50 border rounded-xl px-3 py-2 text-xs font-bold">
                                     <option value="">Select...</option>
-                                    <!-- Populated via JS -->
                                 </select>
                             </div>
                             <div class="grid grid-cols-2 gap-2">
@@ -283,7 +314,6 @@
                     </div>
                 </div>
 
-                <!-- Right Panel: Calendar -->
                 <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-4">
                     <h2 class="text-sm font-extrabold text-blue-950">Interactive Docket Calendar (September)</h2>
                     <div class="grid grid-cols-7 gap-2" id="clerkCalendarGrid"></div>
@@ -305,6 +335,39 @@
 
     </main>
 
+    <!-- SMART RESCHEDULE AUTOMATIC CALENDAR MODAL -->
+    <div id="smartRescheduleModal" class="hidden fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl space-y-6 border border-slate-200 modal-enter">
+            <div class="flex items-center justify-between border-b pb-4">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-emerald-50 text-emerald-700 rounded-xl flex items-center justify-center font-bold border border-emerald-200"><i data-lucide="sparkles" class="w-5 h-5"></i></div>
+                    <div>
+                        <h3 class="text-base font-extrabold text-blue-950">AI Smart Efficiency Calendar</h3>
+                        <p class="text-xs text-slate-500">Select optimal rescheduling slot based on advocate workload & courtroom congestion.</p>
+                    </div>
+                </div>
+                <button onclick="closeSmartRescheduleModal()" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+
+            <div class="space-y-4">
+                <div class="grid grid-cols-3 gap-3 text-center text-xs font-extrabold">
+                    <div class="bg-emerald-50 border border-emerald-200 text-emerald-800 p-2 rounded-xl">🟢 Highly Efficient (Recommended)</div>
+                    <div class="bg-amber-50 border border-amber-200 text-amber-800 p-2 rounded-xl">🟡 Moderate Load</div>
+                    <div class="bg-red-50 border border-red-200 text-red-800 p-2 rounded-xl">🔴 Heavily Congested / Busy</div>
+                </div>
+
+                <div class="grid grid-cols-7 gap-2 pt-2" id="smartModalCalendarGrid">
+                    <!-- Dynamic Days Grid -->
+                </div>
+            </div>
+
+            <div id="selectedSlotInfo" class="hidden bg-blue-50 border border-blue-200 p-4 rounded-2xl flex items-center justify-between text-xs font-bold text-blue-950">
+                <span id="selectedSlotText">Selected: September 16, 2026 (Optimal Efficiency Slot)</span>
+                <button onclick="confirmSmartReschedule()" class="bg-blue-900 hover:bg-blue-800 text-white px-4 py-2 rounded-xl shadow">Confirm & Re-book</button>
+            </div>
+        </div>
+    </div>
+
     <!-- LOGOUT MODAL -->
     <div id="logoutModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl space-y-4 border border-slate-200 modal-enter">
@@ -325,6 +388,7 @@
         const ADVOCATES = ["Adv. George", "Adv. Aaron", "Adv. Cyrus", "Adv. Nived", "Adv. Jacob", "Adv. Chris", "Adv. Manu", "Adv. Midhun", "Adv. Zach", "Adv. Jake"];
         let wednesdayCases = 22;
         let customScheduledCases = [];
+        let chosenRescheduleDate = null;
 
         window.addEventListener('DOMContentLoaded', () => {
             const storedSession = localStorage.getItem('nyay_user_session');
@@ -333,14 +397,17 @@
                 return;
             }
             session = JSON.parse(storedSession);
-            document.getElementById('userSubText').textContent = `Clerk: ${session.name} (ID: ${session.id}) • Assigned: ${session.court}`;
+            
+            // Specify courtroom & High Court Title
+            document.getElementById('userSubText').textContent = `Clerk: ${session.name} (ID: ${session.id})`;
             document.getElementById('displayCourtName').textContent = session.court;
+            document.getElementById('specificJurisdictionSub').textContent = `Assigned Active Jurisdiction: ${session.court} (${session.state})`;
+            document.getElementById('topCourtroomSubtitle').textContent = `Active Session: ${session.court}`;
 
             setInterval(() => {
                 document.getElementById('liveClock').textContent = new Date().toLocaleTimeString() + " IST";
             }, 1000);
 
-            // Populate Advocate dropdown
             const advSelect = document.getElementById('schAdvocate');
             ADVOCATES.forEach(adv => {
                 const opt = document.createElement('option');
@@ -352,6 +419,7 @@
             renderEngineCards();
             renderCheckClearBatch(1);
             buildClerkCalendar();
+            renderMasterWorkSchedule();
             lucide.createIcons();
         });
 
@@ -364,6 +432,85 @@
             let baseClass = "nav-tab px-4 py-3 text-xs font-bold border-b-2 border-blue-900 text-blue-950 flex items-center space-x-2 transition";
             if (tabNum === 7) baseClass += " relative";
             document.getElementById(`nav-btn-${tabNum}`).className = baseClass;
+            if(tabNum === 1) renderMasterWorkSchedule();
+        }
+
+        /* --- UNIFIED COLOR-CODED LAWYER WORK SCHEDULE MATRIX --- */
+        function renderMasterWorkSchedule() {
+            const tbody = document.getElementById('masterWorkScheduleBody');
+            if(!tbody) return;
+            tbody.innerHTML = "";
+            
+            const scheduleData = [
+                { adv: ADVOCATES[0], caseId: "MH-CRL-2021-8891", time: "10:30 AM", status: "Urgent", type: "red" },
+                { adv: ADVOCATES[1], caseId: "MH-CIV-2017-1029", time: "11:15 AM", status: "Pending", type: "orange" },
+                { adv: ADVOCATES[2], caseId: "MH-CRL-2023-5512", time: "12:00 PM", status: "Completed", type: "green" },
+                { adv: ADVOCATES[3], caseId: "MH-CIV-2024-9910", time: "01:30 PM", status: "Urgent", type: "red" },
+                { adv: ADVOCATES[4], caseId: "MH-CRL-2022-3341", time: "02:15 PM", status: "Completed", type: "green" },
+                { adv: ADVOCATES[5], caseId: "MH-CIV-2019-7721", time: "03:00 PM", status: "Pending", type: "orange" }
+            ];
+
+            scheduleData.forEach(row => {
+                let badgeClass = "";
+                if(row.type === "green") badgeClass = "bg-emerald-50 text-emerald-800 border-emerald-200";
+                else if(row.type === "red") badgeClass = "bg-red-50 text-red-800 border-red-200";
+                else badgeClass = "bg-amber-50 text-amber-800 border-amber-200";
+
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50 transition">
+                        <td class="p-3 font-extrabold text-blue-950">${row.adv}</td>
+                        <td class="p-3 font-mono font-bold text-blue-900">${row.caseId}</td>
+                        <td class="p-3 mono text-slate-600">${row.time}</td>
+                        <td class="p-3"><span class="border px-2.5 py-1 rounded-full font-bold text-[10px] ${badgeClass}">● ${row.status}</span></td>
+                        <td class="p-3 text-right"><button onclick="alert('Viewing docket details for ${row.caseId}')" class="text-[11px] font-bold text-blue-800 hover:underline">Inspect</button></td>
+                    </tr>
+                `;
+            });
+        }
+
+        /* --- SMART RESCHEDULE FLOW ON ADJOURNMENT --- */
+        function triggerSmartRescheduleFlow() {
+            document.getElementById('smartRescheduleModal').classList.remove('hidden');
+            buildSmartModalCalendar();
+        }
+
+        function closeSmartRescheduleModal() {
+            document.getElementById('smartRescheduleModal').classList.add('hidden');
+            document.getElementById('selectedSlotInfo').classList.add('hidden');
+        }
+
+        function buildSmartModalCalendar() {
+            const grid = document.getElementById('smartModalCalendarGrid');
+            grid.innerHTML = "";
+            const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+            days.forEach(d => {
+                grid.innerHTML += `<div class="text-center text-[10px] font-extrabold text-slate-400 py-1">${d}</div>`;
+            });
+
+            for(let i=1; i<=14; i++) {
+                const dateNum = i + 10;
+                // Efficiency coloring: i%3==0 is red (busy), i%2==0 is yellow (moderate), else green (optimal)
+                let statusType = (i%3===0) ? 'red' : ((i%2===0) ? 'amber' : 'emerald');
+                let bgClass = statusType === 'emerald' ? 'bg-emerald-50 border-emerald-300 text-emerald-900 hover:bg-emerald-100' : (statusType === 'amber' ? 'bg-amber-50 border-amber-300 text-amber-900 hover:bg-amber-100' : 'bg-red-50 border-red-300 text-red-900 hover:bg-red-100');
+                
+                const box = document.createElement('div');
+                box.className = `calendar-day border rounded-2xl p-3 cursor-pointer transition text-center shadow-sm ${bgClass}`;
+                box.innerHTML = `<span class="text-xs font-bold block">${dateNum} Sep</span><span class="text-[9px] font-extrabold uppercase mt-1 block">${statusType === 'emerald' ? '🟢 Optimal' : (statusType === 'amber' ? '🟡 Moderate' : '🔴 Busy')}</span>`;
+                box.onclick = () => selectSmartSlot(dateNum, statusType);
+                grid.appendChild(box);
+            }
+        }
+
+        function selectSmartSlot(date, type) {
+            chosenRescheduleDate = date;
+            const info = document.getElementById('selectedSlotInfo');
+            info.classList.remove('hidden');
+            document.getElementById('selectedSlotText').textContent = `Selected: September ${date}, 2026 (${type === 'emerald' ? 'Optimal Efficiency Slot' : 'Standard Slot'})`;
+        }
+
+        function confirmSmartReschedule() {
+            alert(`Success: Case successfully rescheduled to September ${chosenRescheduleDate}, 2026! Automated notification dispatched.`);
+            closeSmartRescheduleModal();
         }
 
         /* --- CLERKRADAR LOGIC --- */
@@ -389,7 +536,7 @@
             lucide.createIcons();
         }
 
-        /* --- REASON TRACKER (SYNC TO ADMIN) --- */
+        /* --- REASON TRACKER --- */
         function handleReasonSubmit(e) {
             e.preventDefault();
             const reason = document.getElementById('trackReason').value;
@@ -399,14 +546,11 @@
             alert("Success: Reason successfully logged and synced directly with Chief Justice analytics.");
         }
 
-        /* --- CHECK & CLEAR QUEUE LOGIC --- */
+        /* --- CHECK & CLEAR --- */
         function renderCheckClearBatch(batchNum) {
             const tbody = document.getElementById('checkClearBody');
+            if(!tbody) return;
             tbody.innerHTML = "";
-            tbody.classList.add('fade-in');
-            
-            setTimeout(() => tbody.classList.remove('fade-in'), 400);
-
             if(batchNum === 1) {
                 tbody.innerHTML = `
                     <tr><td class="p-3 mono font-bold text-blue-900">MH-CRL-2021-8891</td><td class="p-3 font-semibold">State vs. Vikram Rao</td><td class="p-3 font-bold">${ADVOCATES[0]}</td><td class="p-3"><span class="bg-emerald-50 text-emerald-800 border px-2.5 py-1 rounded-full font-bold">🟢 Ready</span></td></tr>
@@ -415,35 +559,36 @@
             } else {
                 tbody.innerHTML = `
                     <tr><td class="p-3 mono font-bold text-blue-900">MH-CIV-2024-1102</td><td class="p-3 font-semibold">Deshmukh vs. Shinde</td><td class="p-3 font-bold">${ADVOCATES[4]}</td><td class="p-3"><span class="bg-emerald-50 text-emerald-800 border px-2.5 py-1 rounded-full font-bold">🟢 Ready</span></td></tr>
-                    <tr><td class="p-3 mono font-bold text-blue-900">MH-CRL-2023-4401</td><td class="p-3 font-semibold">Republic vs. Kulkarni</td><td class="p-3 font-bold">${ADVOCATES[1]}</td><td class="p-3"><span class="bg-emerald-50 text-emerald-800 border px-2.5 py-1 rounded-full font-bold">🟢 Ready</span></td></tr>
-                    <tr><td class="p-3 mono font-bold text-blue-900">MH-CIV-2021-9988</td><td class="p-3 font-semibold">Pune Corp vs. Jadhav</td><td class="p-3 font-bold">${ADVOCATES[7]}</td><td class="p-3"><span class="bg-red-50 text-red-700 border px-2.5 py-1 rounded-full font-bold">🔴 Affidavit Missing</span></td></tr>
                 `;
             }
         }
 
         function bulkAdjourn() {
-            alert('Bulk Adjourn & Notify Executed: All 🔴 cases pushed to next week with automated SMS alerts sent to lawyers. Loading next batch...');
+            alert('Bulk Adjourn & Notify Executed: All 🔴 cases pushed to next week. Loading next batch...');
             renderCheckClearBatch(2);
         }
 
-        /* --- UNIFIED SCHEDULE MANAGER --- */
+        /* --- WEEKLY SCHEDULE MANAGER & CALENDAR --- */
         function generateNewCaseId() {
-            document.getElementById('newGeneratedCaseId').value = `MH-CIV-2026-${Math.floor(Math.random() * 9000) + 1000}`;
-            document.getElementById('schCaseId').value = document.getElementById('newGeneratedCaseId').value;
+            const el = document.getElementById('newGeneratedCaseId');
+            if(el) el.value = `MH-CIV-2026-${Math.floor(Math.random() * 9000) + 1000}`;
+            const sch = document.getElementById('schCaseId');
+            if(sch && el) sch.value = el.value;
         }
 
         function buildClerkCalendar() {
             const grid = document.getElementById('clerkCalendarGrid');
+            if(!grid) return;
             grid.innerHTML = "";
             const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
             days.forEach(d => {
-                const el = document.createElement('div'); el.className = "text-center text-[10px] font-extrabold text-slate-400 py-1"; el.innerText = d; grid.appendChild(el);
+                grid.innerHTML += `<div class="text-center text-[10px] font-extrabold text-slate-400 py-1">${d}</div>`;
             });
 
             for(let i=1; i<=14; i++) {
                 const dateNum = i + 10; 
                 const box = document.createElement('div');
-                box.className = "calendar-day bg-white border border-slate-200 rounded-xl p-2 cursor-pointer transition shadow-sm hover:border-blue-500 hover:shadow-md text-center";
+                box.className = "calendar-day bg-white border border-slate-200 rounded-xl p-2 cursor-pointer transition shadow-sm hover:border-blue-500 text-center";
                 let dot = (i%3===0) ? `<div class="w-1.5 h-1.5 bg-red-500 rounded-full mx-auto mt-1"></div>` : `<div class="w-1.5 h-1.5 bg-emerald-500 rounded-full mx-auto mt-1"></div>`;
                 box.innerHTML = `<span class="text-xs font-bold text-slate-700">${dateNum}</span>${dot}`;
                 box.onclick = () => showClerkDayDetails(dateNum, i%3===0);
@@ -454,59 +599,21 @@
         function showClerkDayDetails(date, hasConflict) {
             const detailsBox = document.getElementById('clerkDayDetails');
             detailsBox.classList.remove('hidden');
-            
-            // Re-trigger animation
-            detailsBox.classList.remove('fade-in');
-            void detailsBox.offsetWidth; 
-            detailsBox.classList.add('fade-in');
-
             document.getElementById('clerkSelectedDateDisplay').textContent = `Scheduled Cases: September ${date}, 2026`;
             const list = document.getElementById('clerkDayCasesList');
-            
             const adv1 = ADVOCATES[Math.floor(Math.random() * ADVOCATES.length)];
             const adv2 = hasConflict ? "Adv. Nived" : ADVOCATES[Math.floor(Math.random() * ADVOCATES.length)];
 
-            let html = `
+            list.innerHTML = `
                 <tr><td class="p-2 font-bold mono text-blue-900">MH-CIV-${date}A</td><td class="p-2 font-semibold">State vs. XYZ</td><td class="p-2 text-indigo-700 font-bold">${adv1}</td><td class="p-2 mono">10:30 AM</td><td class="p-2"><span class="bg-emerald-50 text-emerald-700 px-2 rounded-md font-bold text-[10px]">🟢 Ready</span></td></tr>
                 <tr><td class="p-2 font-bold mono text-blue-900">MH-CRL-${date}B</td><td class="p-2 font-semibold">Smith vs. State</td><td class="p-2 text-indigo-700 font-bold">${adv2}</td><td class="p-2 mono">2:15 PM</td><td class="p-2"><span class="${hasConflict ? 'bg-red-50 text-red-700' : 'bg-emerald-50 text-emerald-700'} px-2 rounded-md font-bold text-[10px]">${hasConflict ? '🔴 Notice Missing' : '🟢 Ready'}</span></td></tr>
             `;
-
-            // Append custom scheduled cases for this date
-            const customCases = customScheduledCases.filter(c => c.date == date);
-            customCases.forEach(c => {
-                html += `<tr><td class="p-2 font-bold mono text-blue-900">${c.id}</td><td class="p-2 font-semibold">${c.litigants}</td><td class="p-2 text-indigo-700 font-bold">${c.adv}</td><td class="p-2 mono">${c.time}</td><td class="p-2"><span class="bg-emerald-50 text-emerald-700 px-2 rounded-md font-bold text-[10px]">🟢 Ready</span></td></tr>`;
-            });
-
-            list.innerHTML = html;
         }
 
         function handleScheduleCase(e) {
             e.preventDefault();
             const dateVal = document.getElementById('schDate').value;
-            const newCase = {
-                id: document.getElementById('schCaseId').value,
-                litigants: document.getElementById('schLitigants').value,
-                adv: document.getElementById('schAdvocate').value,
-                date: dateVal,
-                time: document.getElementById('schTime').value
-            };
-            customScheduledCases.push(newCase);
-            
-            // SmartCause Dynamic Update logic mock
-            wednesdayCases++;
-            document.getElementById('wedCaseCount').textContent = `${wednesdayCases} Cases`;
-            
-            // Change color dynamically if overloaded
-            const wedBox = document.getElementById('smartcauseWed');
-            if(wednesdayCases >= 25) {
-                wedBox.className = "bg-amber-50 border-2 border-amber-300 p-5 rounded-2xl shadow-sm space-y-2 transition-all";
-                wedBox.querySelector('span').textContent = "Wednesday (Filling Up)";
-                wedBox.querySelector('span').className = "text-xs font-extrabold uppercase text-amber-900";
-                wedBox.querySelector('div').className = "text-2xl font-extrabold text-amber-950 mono";
-            }
-
-            alert(`Case ${newCase.id} published live to September ${dateVal}! SmartCause heatmap updated.`);
-            document.getElementById('schLitigants').value = "";
+            alert(`Case successfully published live to September ${dateVal}!`);
             generateNewCaseId();
         }
 
