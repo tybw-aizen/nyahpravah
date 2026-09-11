@@ -15,8 +15,6 @@
         .modal-enter { animation: fadeIn 0.2s ease-out forwards; }
         .fade-in { animation: fadeIn 0.4s ease-in forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes pulse-border { 0% { border-color: #ef4444; } 50% { border-color: #fee2e2; } 100% { border-color: #ef4444; } }
-        .alert-banner { animation: pulse-border 2s infinite; }
         .tricolor-bar { background: linear-gradient(90deg, #FF9933 33.33%, #FFFFFF 33.33%, #FFFFFF 66.66%, #138808 66.66%); }
         .calendar-day:hover { transform: scale(1.03); }
     </style>
@@ -39,14 +37,18 @@
                 </div>
             </div>
 
-            <!-- Top-Middle High Court Title & Today's Hearings Date -->
+            <!-- TOP MIDDLE BOMBAY HIGH COURT & TODAYS HEARINGS -->
             <div class="hidden lg:flex flex-col items-center justify-center text-center">
-                <span class="text-xs font-extrabold uppercase tracking-widest text-indigo-900 bg-indigo-50 border border-indigo-200 px-4 py-1 rounded-full shadow-inner">
-                    MAHARASHTRA HIGH COURT
-                </span>
-                <span class="text-xs font-black text-slate-900 mt-1 uppercase tracking-tight">
-                    TODAYS HEARINGS: <span id="currentDateDisplay" class="text-blue-900"></span>
-                </span>
+                <div class="flex items-center space-x-2">
+                    <span class="text-lg">🦁</span>
+                    <h1 class="text-lg font-black tracking-wider text-blue-950 uppercase">BOMBAY HIGH COURT</h1>
+                    <span class="text-lg">⚖️</span>
+                </div>
+                <div class="mt-0.5">
+                    <span class="text-xs font-extrabold tracking-tight text-slate-700 uppercase">
+                        TODAYS HEARINGS: <span id="currentDateDisplay" class="text-blue-900 font-black"></span>
+                    </span>
+                </div>
             </div>
 
             <div class="flex items-center space-x-3">
@@ -62,28 +64,19 @@
         </div>
     </header>
 
-    <!-- Navigation Tabs -->
+    <!-- Navigation Tabs (Adjournment Engine, ClerkRadar & SmartCause Heatmaps Removed) -->
     <nav class="bg-white border-b border-slate-200 shadow-sm overflow-x-auto">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 flex space-x-1 min-w-max">
             <button onclick="switchTab(1)" id="nav-btn-1" class="nav-tab px-4 py-3 text-xs font-bold border-b-2 border-blue-900 text-blue-950 flex items-center space-x-2 transition">
                 <i data-lucide="scale" class="w-4 h-4 text-blue-700"></i><span>My Assigned Docket</span>
             </button>
             <button onclick="switchTab(2)" id="nav-btn-2" class="nav-tab px-4 py-3 text-xs font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-900 flex items-center space-x-2 transition">
-                <i data-lucide="cpu" class="w-4 h-4 text-emerald-600"></i><span>Adjournment Engine</span>
-            </button>
-            <button onclick="switchTab(3)" id="nav-btn-3" class="nav-tab px-4 py-3 text-xs font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-900 flex items-center space-x-2 transition">
-                <i data-lucide="radar" class="w-4 h-4 text-indigo-600"></i><span>ClerkRadar (Conflict Engine)</span>
-            </button>
-            <button onclick="switchTab(4)" id="nav-btn-4" class="nav-tab px-4 py-3 text-xs font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-900 flex items-center space-x-2 transition">
-                <i data-lucide="calendar-range" class="w-4 h-4 text-orange-600"></i><span>SmartCause Heatmaps</span>
-            </button>
-            <button onclick="switchTab(5)" id="nav-btn-5" class="nav-tab px-4 py-3 text-xs font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-900 flex items-center space-x-2 transition">
                 <i data-lucide="shield-alert" class="w-4 h-4 text-red-600"></i><span>Check & Clear (Readiness)</span>
             </button>
-            <button onclick="switchTab(6)" id="nav-btn-6" class="nav-tab px-4 py-3 text-xs font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-900 flex items-center space-x-2 transition">
+            <button onclick="switchTab(3)" id="nav-btn-3" class="nav-tab px-4 py-3 text-xs font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-900 flex items-center space-x-2 transition">
                 <i data-lucide="clipboard-pen" class="w-4 h-4 text-amber-600"></i><span>Reason Tracker</span>
             </button>
-            <button onclick="switchTab(7)" id="nav-btn-7" class="nav-tab px-4 py-3 text-xs font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-900 flex items-center space-x-2 relative transition">
+            <button onclick="switchTab(4)" id="nav-btn-4" class="nav-tab px-4 py-3 text-xs font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-900 flex items-center space-x-2 relative transition">
                 <i data-lucide="calendar-clock" class="w-4 h-4 text-slate-400"></i><span>Weekly Schedule Manager</span>
                 <span class="absolute top-2.5 right-2 w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
             </button>
@@ -143,81 +136,14 @@
                                 <th class="p-3 text-right">Action</th>
                             </tr>
                         </thead>
-                        <tbody id="masterWorkScheduleBody" class="divide-y divide-slate-100">
-                            <!-- Populated dynamically -->
-                        </tbody>
+                        <tbody id="masterWorkScheduleBody" class="divide-y divide-slate-100"></tbody>
                     </table>
                 </div>
             </div>
         </div>
 
-        <!-- TAB 2: ADJOURNMENT ENGINE -->
+        <!-- TAB 2: CHECK & CLEAR -->
         <div id="tab2-content" class="hidden space-y-6">
-            <div class="bg-gradient-to-br from-blue-950 to-slate-900 text-white p-6 rounded-2xl shadow-lg space-y-4">
-                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                    <div>
-                        <span class="text-[10px] bg-emerald-500 text-slate-950 font-extrabold px-2.5 py-1 rounded-md uppercase tracking-wider">AI Yield Management</span>
-                        <h2 class="text-xl font-extrabold mt-1">Courtroom Adjournment & Re-Optimization Engine</h2>
-                    </div>
-                    <div class="flex flex-wrap gap-2">
-                        <button onclick="runEnginePhase(1)" class="bg-blue-600 hover:bg-blue-700 text-white font-extrabold px-3.5 py-2.5 rounded-xl text-xs transition shadow">1. Gen 6 PM List</button>
-                        <button onclick="runEnginePhase(2)" class="bg-red-600 hover:bg-red-700 text-white font-extrabold px-3.5 py-2.5 rounded-xl text-xs transition shadow">2. Inject Chaos</button>
-                        <button onclick="triggerSmartRescheduleFlow()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold px-3.5 py-2.5 rounded-xl text-xs transition shadow flex items-center space-x-1.5"><i data-lucide="calendar-plus" class="w-4 h-4"></i><span>3. Adjourn & Smart Reschedule</span></button>
-                    </div>
-                </div>
-            </div>
-            <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-4">
-                <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-                    <h3 class="font-extrabold text-blue-950 text-sm">Live Courtroom Monitor (12 Benches)</h3>
-                    <span id="engineStatusBadge" class="text-xs font-bold px-3 py-1 rounded-xl bg-slate-100 text-slate-700 border border-slate-200">System Awaiting 6 PM Generation...</span>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-4" id="courtroomGrid"></div>
-            </div>
-        </div>
-
-        <!-- TAB 3: CLERKRADAR -->
-        <div id="tab3-content" class="hidden space-y-6">
-            <div class="bg-gradient-to-r from-indigo-950 to-blue-900 text-white p-6 rounded-2xl shadow-md space-y-2">
-                <span class="text-[10px] bg-indigo-500 text-white font-extrabold px-2.5 py-1 rounded-md uppercase">ClerkRadar Live Module</span>
-                <h2 class="text-xl font-extrabold">Multi-Registry Conflict Engine</h2>
-                <p class="text-xs text-slate-200">Check advocate schedules across rooms.</p>
-            </div>
-            <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-4">
-                <div class="flex flex-col sm:flex-row gap-3 items-end">
-                    <div class="flex-1">
-                        <label class="block text-xs font-extrabold uppercase text-slate-700 mb-1">Enter Advocate Name</label>
-                        <input type="text" id="radarAdvocateInput" placeholder="e.g. Adv. Nived" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-3 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-900">
-                    </div>
-                    <button onclick="checkClerkRadar()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold px-5 py-3 rounded-xl text-xs transition shadow">Run Radar Scan</button>
-                </div>
-                <div id="radarResultBox" class="hidden p-4 rounded-xl text-xs font-bold space-y-2"></div>
-            </div>
-        </div>
-
-        <!-- TAB 4: SMARTCAUSE -->
-        <div id="tab4-content" class="hidden space-y-6">
-            <div class="bg-gradient-to-r from-orange-950 to-amber-900 text-white p-6 rounded-2xl shadow-md space-y-2">
-                <span class="text-[10px] bg-orange-500 text-white font-extrabold px-2.5 py-1 rounded-md uppercase">SmartCause Heatmap</span>
-                <h2 class="text-xl font-extrabold">Predictive Load Balancing Calendar</h2>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div class="bg-red-50 border-2 border-red-300 p-5 rounded-2xl shadow-sm space-y-2">
-                    <span class="text-xs font-extrabold uppercase text-red-900">Monday (Overloaded Red)</span>
-                    <div class="text-2xl font-extrabold text-red-950 mono">42 Cases</div>
-                </div>
-                <div class="bg-amber-50 border-2 border-amber-300 p-5 rounded-2xl shadow-sm space-y-2">
-                    <span class="text-xs font-extrabold uppercase text-amber-900">Tuesday (Filling Yellow)</span>
-                    <div class="text-2xl font-extrabold text-amber-950 mono">31 Cases</div>
-                </div>
-                <div class="bg-emerald-50 border-2 border-emerald-300 p-5 rounded-2xl shadow-sm space-y-2 transition-all" id="smartcauseWed">
-                    <span class="text-xs font-extrabold uppercase text-emerald-900">Wednesday (Optimal Green)</span>
-                    <div class="text-2xl font-extrabold text-emerald-950 mono" id="wedCaseCount">22 Cases</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- TAB 5: CHECK & CLEAR -->
-        <div id="tab5-content" class="hidden space-y-6">
             <div class="bg-gradient-to-r from-red-950 to-slate-900 text-white p-6 rounded-2xl shadow-md space-y-2">
                 <span class="text-[10px] bg-red-600 text-white font-extrabold px-2.5 py-1 rounded-md uppercase">Check & Clear Guard</span>
                 <h2 class="text-xl font-extrabold">Pre-Hearing Readiness Guard (48h Scan)</h2>
@@ -243,8 +169,8 @@
             </div>
         </div>
 
-        <!-- TAB 6: REASON TRACKER -->
-        <div id="tab6-content" class="hidden space-y-6">
+        <!-- TAB 3: REASON TRACKER -->
+        <div id="tab3-content" class="hidden space-y-6">
             <div class="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-sm space-y-6">
                 <h2 class="text-lg font-extrabold text-blue-950">One-Click Adjournment Reason Tracker</h2>
                 <form onsubmit="handleReasonSubmit(event)" class="grid grid-cols-1 sm:grid-cols-3 gap-4 items-end">
@@ -269,8 +195,8 @@
             </div>
         </div>
 
-        <!-- TAB 7: WEEKLY SCHEDULE MANAGER (UNIFIED) -->
-        <div id="tab7-content" class="hidden space-y-6">
+        <!-- TAB 4: WEEKLY SCHEDULE MANAGER (UNIFIED) -->
+        <div id="tab4-content" class="hidden space-y-6">
             <div class="bg-white border border-slate-200 p-4 rounded-2xl shadow-sm flex items-start space-x-3">
                 <i data-lucide="bell-ring" class="w-5 h-5 text-blue-600 mt-0.5 animate-bounce flex-shrink-0"></i>
                 <div>
@@ -337,37 +263,6 @@
 
     </main>
 
-    <!-- SMART RESCHEDULE AUTOMATIC CALENDAR MODAL -->
-    <div id="smartRescheduleModal" class="hidden fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl space-y-6 border border-slate-200 modal-enter">
-            <div class="flex items-center justify-between border-b pb-4">
-                <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 bg-emerald-50 text-emerald-700 rounded-xl flex items-center justify-center font-bold border border-emerald-200"><i data-lucide="sparkles" class="w-5 h-5"></i></div>
-                    <div>
-                        <h3 class="text-base font-extrabold text-blue-950">AI Smart Efficiency Calendar</h3>
-                        <p class="text-xs text-slate-500">Select optimal rescheduling slot based on advocate workload & courtroom congestion.</p>
-                    </div>
-                </div>
-                <button onclick="closeSmartRescheduleModal()" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
-            </div>
-
-            <div class="space-y-4">
-                <div class="grid grid-cols-3 gap-3 text-center text-xs font-extrabold">
-                    <div class="bg-emerald-50 border border-emerald-200 text-emerald-800 p-2 rounded-xl">🟢 Highly Efficient (Recommended)</div>
-                    <div class="bg-amber-50 border border-amber-200 text-amber-800 p-2 rounded-xl">🟡 Moderate Load</div>
-                    <div class="bg-red-50 border border-red-200 text-red-800 p-2 rounded-xl">🔴 Heavily Congested / Busy</div>
-                </div>
-
-                <div class="grid grid-cols-7 gap-2 pt-2" id="smartModalCalendarGrid"></div>
-            </div>
-
-            <div id="selectedSlotInfo" class="hidden bg-blue-50 border border-blue-200 p-4 rounded-2xl flex items-center justify-between text-xs font-bold text-blue-950">
-                <span id="selectedSlotText">Selected: September 16, 2026 (Optimal Efficiency Slot)</span>
-                <button onclick="confirmSmartReschedule()" class="bg-blue-900 hover:bg-blue-800 text-white px-4 py-2 rounded-xl shadow">Confirm & Re-book</button>
-            </div>
-        </div>
-    </div>
-
     <!-- LOGOUT MODAL -->
     <div id="logoutModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl space-y-4 border border-slate-200 modal-enter">
@@ -386,9 +281,6 @@
     <script>
         let session = null;
         const ADVOCATES = ["Adv. George", "Adv. Aaron", "Adv. Cyrus", "Adv. Nived", "Adv. Jacob", "Adv. Chris", "Adv. Manu", "Adv. Midhun", "Adv. Zach", "Adv. Jake"];
-        let wednesdayCases = 22;
-        let customScheduledCases = [];
-        let chosenRescheduleDate = null;
 
         window.addEventListener('DOMContentLoaded', () => {
             const storedSession = localStorage.getItem('nyay_user_session');
@@ -400,7 +292,7 @@
             
             document.getElementById('userSubText').textContent = `Clerk: ${session.name} (ID: ${session.id})`;
             document.getElementById('displayCourtName').textContent = session.court;
-            document.getElementById('specificJurisdictionSub').textContent = `Assigned Active Jurisdiction: ${session.court} (${session.state})`;
+            document.getElementById('specificJurisdictionSub').textContent = `Active Session: Maharashtra High Court (${session.court})`;
             
             // Set current date dynamically for hearings heading
             const options = { year: 'numeric', month: 'long', day: 'numeric' };
@@ -418,7 +310,6 @@
             });
 
             generateNewCaseId();
-            renderEngineCards();
             renderCheckClearBatch(1);
             buildClerkCalendar();
             renderMasterWorkSchedule();
@@ -426,13 +317,13 @@
         });
 
         function switchTab(tabNum) {
-            [1, 2, 3, 4, 5, 6, 7].forEach(i => {
+            [1, 2, 3, 4].forEach(i => {
                 document.getElementById(`tab${i}-content`).classList.add('hidden');
                 document.getElementById(`nav-btn-${i}`).className = "nav-tab px-4 py-3 text-xs font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-900 flex items-center space-x-2 transition";
             });
             document.getElementById(`tab${tabNum}-content`).classList.remove('hidden');
             let baseClass = "nav-tab px-4 py-3 text-xs font-bold border-b-2 border-blue-900 text-blue-950 flex items-center space-x-2 transition";
-            if (tabNum === 7) baseClass += " relative";
+            if (tabNum === 4) baseClass += " relative";
             document.getElementById(`nav-btn-${tabNum}`).className = baseClass;
             if(tabNum === 1) renderMasterWorkSchedule();
         }
@@ -465,80 +356,6 @@
             });
         }
 
-        function triggerSmartRescheduleFlow() {
-            document.getElementById('smartRescheduleModal').classList.remove('hidden');
-            buildSmartModalCalendar();
-        }
-
-        function closeSmartRescheduleModal() {
-            document.getElementById('smartRescheduleModal').classList.add('hidden');
-            document.getElementById('selectedSlotInfo').classList.add('hidden');
-        }
-
-        function buildSmartModalCalendar() {
-            const grid = document.getElementById('smartModalCalendarGrid');
-            grid.innerHTML = "";
-            const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-            days.forEach(d => {
-                grid.innerHTML += `<div class="text-center text-[10px] font-extrabold text-slate-400 py-1">${d}</div>`;
-            });
-
-            for(let i=1; i<=14; i++) {
-                const dateNum = i + 10;
-                let statusType = (i%3===0) ? 'red' : ((i%2===0) ? 'amber' : 'emerald');
-                let bgClass = statusType === 'emerald' ? 'bg-emerald-50 border-emerald-300 text-emerald-900 hover:bg-emerald-100' : (statusType === 'amber' ? 'bg-amber-50 border-amber-300 text-amber-900 hover:bg-amber-100' : 'bg-red-50 border-red-300 text-red-900 hover:bg-red-100');
-                
-                const box = document.createElement('div');
-                box.className = `calendar-day border rounded-2xl p-3 cursor-pointer transition text-center shadow-sm ${bgClass}`;
-                box.innerHTML = `<span class="text-xs font-bold block">${dateNum} Sep</span><span class="text-[9px] font-extrabold uppercase mt-1 block">${statusType === 'emerald' ? '🟢 Optimal' : (statusType === 'amber' ? '🟡 Moderate' : '🔴 Busy')}</span>`;
-                box.onclick = () => selectSmartSlot(dateNum, statusType);
-                grid.appendChild(box);
-            }
-        }
-
-        function selectSmartSlot(date, type) {
-            chosenRescheduleDate = date;
-            const info = document.getElementById('selectedSlotInfo');
-            info.classList.remove('hidden');
-            document.getElementById('selectedSlotText').textContent = `Selected: September ${date}, 2026 (${type === 'emerald' ? 'Optimal Efficiency Slot' : 'Standard Slot'})`;
-        }
-
-        function confirmSmartReschedule() {
-            alert(`Success: Case successfully rescheduled to September ${chosenRescheduleDate}, 2026! Automated notification dispatched.`);
-            closeSmartRescheduleModal();
-        }
-
-        function checkClerkRadar() {
-            const val = document.getElementById('radarAdvocateInput').value.trim();
-            const box = document.getElementById('radarResultBox');
-            box.classList.remove('hidden');
-            
-            if (val === "Adv. George" || val === "Adv. Nived") {
-                box.className = "p-4 rounded-xl border border-red-200 bg-red-50 text-xs font-bold text-red-800 fade-in space-y-2";
-                box.innerHTML = `
-                    <div class="flex items-center space-x-2"><i data-lucide="alert-triangle" class="w-4 h-4"></i><span>CONFLICT DETECTED: Double-booking found in Bombay High Court Bench 3!</span></div>
-                    <p class="text-xs text-red-700">Advocate ${val} is simultaneously scheduled in Pune District Court.</p>
-                    <button onclick="alert('Auto-Resolve Success: Slot shifted to next available 15-minute window.')" class="bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold px-3 py-1.5 rounded-lg text-xs transition">Auto-Resolve Conflict</button>
-                `;
-            } else if (ADVOCATES.includes(val)) {
-                box.className = "p-4 rounded-xl border border-emerald-200 bg-emerald-50 text-xs font-bold text-emerald-800 fade-in";
-                box.innerHTML = `<div class="flex items-center space-x-2"><i data-lucide="check-circle" class="w-4 h-4"></i><span>CLEAR: ${val} has no conflicting schedules today. Safe to book.</span></div>`;
-            } else {
-                box.className = "p-4 rounded-xl border border-slate-200 bg-slate-50 text-xs font-bold text-slate-800 fade-in";
-                box.innerHTML = "Advocate not found in official roster. Check spelling.";
-            }
-            lucide.createIcons();
-        }
-
-        function handleReasonSubmit(e) {
-            e.preventDefault();
-            const reason = document.getElementById('trackReason').value;
-            let logs = JSON.parse(localStorage.getItem('nyay_adjournment_logs') || '{}');
-            logs[reason] = (logs[reason] || 0) + 1;
-            localStorage.setItem('nyay_adjournment_logs', JSON.stringify(logs));
-            alert("Success: Reason successfully logged and synced directly with Chief Justice analytics.");
-        }
-
         function renderCheckClearBatch(batchNum) {
             const tbody = document.getElementById('checkClearBody');
             if(!tbody) return;
@@ -558,6 +375,11 @@
         function bulkAdjourn() {
             alert('Bulk Adjourn & Notify Executed: All 🔴 cases pushed to next week. Loading next batch...');
             renderCheckClearBatch(2);
+        }
+
+        function handleReasonSubmit(e) {
+            e.preventDefault();
+            alert("Success: Reason successfully logged and synced.");
         }
 
         function generateNewCaseId() {
@@ -608,14 +430,6 @@
             generateNewCaseId();
         }
 
-        function renderEngineCards() {
-            const grid = document.getElementById('courtroomGrid');
-            if(!grid) return;
-            for(let i=1; i<=12; i++) {
-                grid.innerHTML += `<div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-3 shadow-sm"><div class="text-[11px] font-extrabold text-blue-950">Bench ${i}</div><div class="p-2 rounded-xl text-[10px] font-extrabold border uppercase text-center bg-slate-100 text-slate-700">Awaiting Generation</div></div>`;
-            }
-        }
-        function runEnginePhase(phase) { alert("Engine phase executed successfully."); }
         function initiateLogout() { document.getElementById('logoutModal').classList.remove('hidden'); }
         function closeLogoutModal() { document.getElementById('logoutModal').classList.add('hidden'); }
         function confirmLogout() { localStorage.removeItem('nyay_user_session'); window.location.replace("login.html"); }
