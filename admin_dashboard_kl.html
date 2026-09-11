@@ -68,7 +68,7 @@
             </div>
         </div>
 
-        <!-- TAB 2: MASTER SCHEDULE CALENDAR (NEW) -->
+        <!-- TAB 2: MASTER SCHEDULE CALENDAR -->
         <div id="tab2-content" class="hidden space-y-6">
             <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-4">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -85,14 +85,12 @@
                     </select>
                 </div>
 
-                <!-- Access Error State -->
                 <div id="calendarAccessError" class="hidden bg-red-50 border border-red-200 p-6 rounded-xl text-center space-y-2">
                     <i data-lucide="lock" class="w-8 h-8 text-red-500 mx-auto"></i>
                     <h3 class="text-sm font-extrabold text-red-950">Access Restricted: Session Not Registered Yet</h3>
                     <p class="text-xs text-red-800">A bench clerk must be registered and log in to initialize this docket calendar.</p>
                 </div>
 
-                <!-- Active Calendar View -->
                 <div id="calendarContainer" class="hidden space-y-4">
                     <div class="grid grid-cols-7 gap-2" id="adminCalendarGrid"></div>
                     <div id="adminDayDetails" class="hidden mt-4 p-4 bg-slate-50 rounded-xl border border-slate-200">
@@ -112,9 +110,7 @@
         <div id="tab3-content" class="hidden space-y-6">
             <div class="bg-white p-6 rounded-2xl border shadow-sm">
                 <h2 class="text-lg font-extrabold text-blue-950 mb-4">Live Adjournment Reason Analytics</h2>
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" id="analyticsGrid">
-                    <!-- Rendered by JS -->
-                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" id="analyticsGrid"></div>
             </div>
         </div>
 
@@ -148,13 +144,30 @@
                     <div><label class="block text-xs font-extrabold mb-1">ID (6-Digit)</label><input type="text" id="newUserId" required maxlength="6" class="w-full bg-slate-50 border rounded-xl px-3 py-2 text-xs font-semibold mono"></div>
                     <div><label class="block text-xs font-extrabold mb-1">Court</label>
                         <select id="newUserCourt" required class="w-full bg-slate-50 border rounded-xl px-3 py-2 text-xs font-semibold">
+                            <option value="Kerala High Court">Kerala High Court</option>
                             <option value="Ernakulam District Court">Ernakulam District Court</option>
                             <option value="Thiruvananthapuram District Court">Thiruvananthapuram District Court</option>
                         </select>
                     </div>
-                    <button type="submit" class="bg-blue-900 text-white font-extrabold py-2 rounded-xl text-xs">Register</button>
+                    <button type="submit" class="bg-blue-900 text-white font-extrabold py-2 rounded-xl text-xs shadow">Register</button>
                 </form>
-                <div class="mt-6"><h3 class="font-extrabold text-sm border-b pb-2 mb-2">Active Personnel</h3><tbody id="personnelTableBody"></tbody></div>
+                
+                <div class="mt-6">
+                    <h3 class="font-extrabold text-sm border-b pb-2 mb-2 text-blue-950">Active Personnel Directory</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-slate-100 text-slate-700 font-extrabold">
+                                <tr>
+                                    <th class="p-2">Clerk ID</th>
+                                    <th class="p-2">Full Name</th>
+                                    <th class="p-2">Assigned Court Complex</th>
+                                    <th class="p-2 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="personnelTableBody" class="divide-y divide-slate-100 bg-white"></tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
     </main>
@@ -168,6 +181,7 @@
             
             setInterval(() => { document.getElementById('liveClock').textContent = new Date().toLocaleTimeString() + " IST"; }, 1000);
             renderAnalytics();
+            renderPersonnelTable();
             lucide.createIcons();
         });
 
@@ -179,9 +193,11 @@
             document.getElementById(`tab${tabNum}-content`).classList.remove('hidden');
             document.getElementById(`nav-btn-${tabNum}`).className = "nav-tab px-4 py-3 text-xs font-bold border-b-2 border-blue-900 text-blue-950 flex items-center space-x-2 transition";
             
-            if(tabNum === 3) renderAnalytics(); // Refresh analytics on tab open
+            if(tabNum === 3) renderAnalytics();
+            if(tabNum === 6) renderPersonnelTable();
         }
 
+        /* --- CALENDAR LOGIC --- */
         function checkCourtAccess(courtName) {
             const err = document.getElementById('calendarAccessError');
             const cont = document.getElementById('calendarContainer');
@@ -190,7 +206,6 @@
             const dynamicUsers = JSON.parse(localStorage.getItem('nyay_dynamic_users') || '{}');
             let isRegistered = false;
             
-            // Meera is registered to Kerala High Court by default
             if(courtName === "Kerala High Court") isRegistered = true;
             else {
                 for (let id in dynamicUsers) {
@@ -201,12 +216,9 @@
             }
 
             if(isRegistered) {
-                err.classList.add('hidden');
-                cont.classList.remove('hidden');
-                buildAdminCalendar(courtName);
+                err.classList.add('hidden'); cont.classList.remove('hidden'); buildAdminCalendar(courtName);
             } else {
-                err.classList.remove('hidden');
-                cont.classList.add('hidden');
+                err.classList.remove('hidden'); cont.classList.add('hidden');
             }
         }
 
@@ -215,20 +227,14 @@
             grid.innerHTML = "";
             const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
             days.forEach(d => {
-                const el = document.createElement('div');
-                el.className = "text-center text-[10px] font-extrabold text-slate-400 py-1";
-                el.innerText = d;
-                grid.appendChild(el);
+                const el = document.createElement('div'); el.className = "text-center text-[10px] font-extrabold text-slate-400 py-1"; el.innerText = d; grid.appendChild(el);
             });
 
             for(let i=1; i<=14; i++) {
                 const dateNum = i + 10; 
                 const box = document.createElement('div');
                 box.className = "calendar-day bg-white border border-slate-200 rounded-xl p-3 cursor-pointer transition shadow-sm hover:border-blue-500 hover:shadow-md text-center";
-                
-                // Add dot indicators based on day
                 let dot = (i%3===0) ? `<div class="w-1.5 h-1.5 bg-red-500 rounded-full mx-auto mt-1"></div>` : `<div class="w-1.5 h-1.5 bg-emerald-500 rounded-full mx-auto mt-1"></div>`;
-                
                 box.innerHTML = `<span class="text-xs font-bold text-slate-700">${dateNum}</span>${dot}`;
                 box.onclick = () => showAdminDayDetails(dateNum, courtName, i%3===0);
                 grid.appendChild(box);
@@ -239,29 +245,16 @@
             document.getElementById('adminDayDetails').classList.remove('hidden');
             document.getElementById('adminSelectedDateDisplay').textContent = `Cases for Sep ${date}, 2026 - ${court}`;
             const list = document.getElementById('adminDayCasesList');
-            
-            // Mock dynamic cases using our designated roster
             const adv1 = ADVOCATES[Math.floor(Math.random() * ADVOCATES.length)];
             const adv2 = hasConflict ? "Adv. George" : ADVOCATES[Math.floor(Math.random() * ADVOCATES.length)];
 
             list.innerHTML = `
-                <tr>
-                    <td class="p-2 font-bold mono text-blue-900">KL-CIV-${date}A</td>
-                    <td class="p-2 font-semibold">State vs. XYZ</td>
-                    <td class="p-2 text-indigo-700 font-bold">${adv1}</td>
-                    <td class="p-2 mono">10:30 AM</td>
-                    <td class="p-2"><span class="bg-emerald-50 text-emerald-700 px-2 rounded-md font-bold text-[10px]">🟢 Ready</span></td>
-                </tr>
-                <tr>
-                    <td class="p-2 font-bold mono text-blue-900">KL-CRL-${date}B</td>
-                    <td class="p-2 font-semibold">Smith vs. State</td>
-                    <td class="p-2 text-indigo-700 font-bold">${adv2}</td>
-                    <td class="p-2 mono">2:15 PM</td>
-                    <td class="p-2"><span class="${hasConflict ? 'bg-red-50 text-red-700' : 'bg-emerald-50 text-emerald-700'} px-2 rounded-md font-bold text-[10px]">${hasConflict ? '🔴 Notice Missing' : '🟢 Ready'}</span></td>
-                </tr>
+                <tr><td class="p-2 font-bold mono text-blue-900">KL-CIV-${date}A</td><td class="p-2 font-semibold">State vs. XYZ</td><td class="p-2 text-indigo-700 font-bold">${adv1}</td><td class="p-2 mono">10:30 AM</td><td class="p-2"><span class="bg-emerald-50 text-emerald-700 px-2 rounded-md font-bold text-[10px]">🟢 Ready</span></td></tr>
+                <tr><td class="p-2 font-bold mono text-blue-900">KL-CRL-${date}B</td><td class="p-2 font-semibold">Smith vs. State</td><td class="p-2 text-indigo-700 font-bold">${adv2}</td><td class="p-2 mono">2:15 PM</td><td class="p-2"><span class="${hasConflict ? 'bg-red-50 text-red-700' : 'bg-emerald-50 text-emerald-700'} px-2 rounded-md font-bold text-[10px]">${hasConflict ? '🔴 Notice Missing' : '🟢 Ready'}</span></td></tr>
             `;
         }
 
+        /* --- CLERKRADAR --- */
         function runAdminRadar() {
             const val = document.getElementById('radarAdminSearch').value.trim();
             const res = document.getElementById('adminRadarResult');
@@ -279,11 +272,11 @@
             lucide.createIcons();
         }
 
+        /* --- ANALYTICS --- */
         function renderAnalytics() {
             const logs = JSON.parse(localStorage.getItem('nyay_adjournment_logs') || '{}');
             const baseStats = { "Lawyer Absent": 120, "Witness Missing": 85, "Incomplete Filing": 60, "Court Ran Out of Time": 40 };
             
-            // Add dynamic logs to base stats
             let total = 0;
             for(let key in baseStats) {
                 if(logs[key]) baseStats[key] += logs[key];
@@ -309,14 +302,66 @@
             }
         }
 
+        /* --- REGISTRY MANAGEMENT --- */
+        function renderPersonnelTable() {
+            const tbody = document.getElementById('personnelTableBody');
+            tbody.innerHTML = "";
+            const dynamicUsers = JSON.parse(localStorage.getItem('nyay_dynamic_users') || '{}');
+            let html = '';
+            
+            for (let id in dynamicUsers) {
+                if (dynamicUsers[id].state === "Kerala") {
+                    html += `
+                        <tr class="hover:bg-slate-50 transition">
+                            <td class="p-2 font-bold mono text-blue-900">${id}</td>
+                            <td class="p-2 font-semibold text-slate-800">${dynamicUsers[id].name}</td>
+                            <td class="p-2 text-slate-600">${dynamicUsers[id].court}</td>
+                            <td class="p-2 text-right space-x-1">
+                                <button onclick="editClerk('${id}')" class="text-[10px] font-bold bg-slate-100 text-slate-700 px-2 py-1 rounded hover:bg-slate-200 transition">Edit</button>
+                                <button onclick="revokeClerk('${id}')" class="text-[10px] font-bold bg-red-50 text-red-700 px-2 py-1 rounded hover:bg-red-100 transition">Revoke</button>
+                            </td>
+                        </tr>
+                    `;
+                }
+            }
+            if(!html) html = '<tr><td colspan="4" class="p-4 text-center text-xs text-slate-500">No active subordinate clerks found.</td></tr>';
+            tbody.innerHTML = html;
+        }
+
         function handleAddNewUser(e) {
             e.preventDefault();
             const id = document.getElementById('newUserId').value;
             let dynamic = JSON.parse(localStorage.getItem('nyay_dynamic_users') || '{}');
             dynamic[id] = { name: document.getElementById('newUserName').value, role: "Bench Clerk", state: "Kerala", court: document.getElementById('newUserCourt').value };
             localStorage.setItem('nyay_dynamic_users', JSON.stringify(dynamic));
-            alert("Clerk Registered.");
-            checkCourtAccess(document.getElementById('adminCourtSelect').value); // Re-eval access
+            
+            document.getElementById('newUserName').value = '';
+            document.getElementById('newUserId').value = '';
+            
+            alert("Clerk Registered Successfully.");
+            renderPersonnelTable();
+            checkCourtAccess(document.getElementById('adminCourtSelect').value);
+        }
+
+        function editClerk(id) {
+            let dynamic = JSON.parse(localStorage.getItem('nyay_dynamic_users') || '{}');
+            if(!dynamic[id]) return;
+            const newName = prompt("Enter updated name for Clerk:", dynamic[id].name);
+            if(newName && newName.trim() !== "") {
+                dynamic[id].name = newName.trim();
+                localStorage.setItem('nyay_dynamic_users', JSON.stringify(dynamic));
+                renderPersonnelTable();
+            }
+        }
+
+        function revokeClerk(id) {
+            if(confirm(`Security Warning: Are you sure you want to permanently revoke system access for Clerk ID: ${id}?`)) {
+                let dynamic = JSON.parse(localStorage.getItem('nyay_dynamic_users') || '{}');
+                delete dynamic[id];
+                localStorage.setItem('nyay_dynamic_users', JSON.stringify(dynamic));
+                renderPersonnelTable();
+                checkCourtAccess(document.getElementById('adminCourtSelect').value);
+            }
         }
 
         function initiateLogout() { localStorage.removeItem('nyay_user_session'); window.location.href = "login.html"; }
