@@ -39,12 +39,14 @@
                 </div>
             </div>
 
-            <!-- Cool Top-Middle High Court Title -->
-            <div class="hidden lg:flex flex-col items-center justify-center">
-                <span class="text-xs font-extrabold uppercase tracking-widest text-indigo-900 bg-indigo-50 border border-indigo-200 px-4 py-1 rounded-full shadow-inner" id="topHighCourtTitle">
-                    BOMBAY HIGH COURT - JUDICIAL BENCH
+            <!-- Top-Middle High Court Title & Today's Hearings Date -->
+            <div class="hidden lg:flex flex-col items-center justify-center text-center">
+                <span class="text-xs font-extrabold uppercase tracking-widest text-indigo-900 bg-indigo-50 border border-indigo-200 px-4 py-1 rounded-full shadow-inner">
+                    MAHARASHTRA HIGH COURT
                 </span>
-                <span class="text-[10px] text-slate-500 font-bold mt-0.5" id="topCourtroomSubtitle">Assigned Court: Loading...</span>
+                <span class="text-xs font-black text-slate-900 mt-1 uppercase tracking-tight">
+                    TODAYS HEARINGS: <span id="currentDateDisplay" class="text-blue-900"></span>
+                </span>
             </div>
 
             <div class="flex items-center space-x-3">
@@ -356,9 +358,7 @@
                     <div class="bg-red-50 border border-red-200 text-red-800 p-2 rounded-xl">🔴 Heavily Congested / Busy</div>
                 </div>
 
-                <div class="grid grid-cols-7 gap-2 pt-2" id="smartModalCalendarGrid">
-                    <!-- Dynamic Days Grid -->
-                </div>
+                <div class="grid grid-cols-7 gap-2 pt-2" id="smartModalCalendarGrid"></div>
             </div>
 
             <div id="selectedSlotInfo" class="hidden bg-blue-50 border border-blue-200 p-4 rounded-2xl flex items-center justify-between text-xs font-bold text-blue-950">
@@ -398,11 +398,13 @@
             }
             session = JSON.parse(storedSession);
             
-            // Specify courtroom & High Court Title
             document.getElementById('userSubText').textContent = `Clerk: ${session.name} (ID: ${session.id})`;
             document.getElementById('displayCourtName').textContent = session.court;
             document.getElementById('specificJurisdictionSub').textContent = `Assigned Active Jurisdiction: ${session.court} (${session.state})`;
-            document.getElementById('topCourtroomSubtitle').textContent = `Active Session: ${session.court}`;
+            
+            // Set current date dynamically for hearings heading
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('currentDateDisplay').textContent = new Date().toLocaleDateString('en-US', options);
 
             setInterval(() => {
                 document.getElementById('liveClock').textContent = new Date().toLocaleTimeString() + " IST";
@@ -435,7 +437,6 @@
             if(tabNum === 1) renderMasterWorkSchedule();
         }
 
-        /* --- UNIFIED COLOR-CODED LAWYER WORK SCHEDULE MATRIX --- */
         function renderMasterWorkSchedule() {
             const tbody = document.getElementById('masterWorkScheduleBody');
             if(!tbody) return;
@@ -451,11 +452,7 @@
             ];
 
             scheduleData.forEach(row => {
-                let badgeClass = "";
-                if(row.type === "green") badgeClass = "bg-emerald-50 text-emerald-800 border-emerald-200";
-                else if(row.type === "red") badgeClass = "bg-red-50 text-red-800 border-red-200";
-                else badgeClass = "bg-amber-50 text-amber-800 border-amber-200";
-
+                let badgeClass = row.type === "green" ? "bg-emerald-50 text-emerald-800 border-emerald-200" : (row.type === "red" ? "bg-red-50 text-red-800 border-red-200" : "bg-amber-50 text-amber-800 border-amber-200");
                 tbody.innerHTML += `
                     <tr class="hover:bg-slate-50 transition">
                         <td class="p-3 font-extrabold text-blue-950">${row.adv}</td>
@@ -468,7 +465,6 @@
             });
         }
 
-        /* --- SMART RESCHEDULE FLOW ON ADJOURNMENT --- */
         function triggerSmartRescheduleFlow() {
             document.getElementById('smartRescheduleModal').classList.remove('hidden');
             buildSmartModalCalendar();
@@ -489,7 +485,6 @@
 
             for(let i=1; i<=14; i++) {
                 const dateNum = i + 10;
-                // Efficiency coloring: i%3==0 is red (busy), i%2==0 is yellow (moderate), else green (optimal)
                 let statusType = (i%3===0) ? 'red' : ((i%2===0) ? 'amber' : 'emerald');
                 let bgClass = statusType === 'emerald' ? 'bg-emerald-50 border-emerald-300 text-emerald-900 hover:bg-emerald-100' : (statusType === 'amber' ? 'bg-amber-50 border-amber-300 text-amber-900 hover:bg-amber-100' : 'bg-red-50 border-red-300 text-red-900 hover:bg-red-100');
                 
@@ -513,7 +508,6 @@
             closeSmartRescheduleModal();
         }
 
-        /* --- CLERKRADAR LOGIC --- */
         function checkClerkRadar() {
             const val = document.getElementById('radarAdvocateInput').value.trim();
             const box = document.getElementById('radarResultBox');
@@ -536,7 +530,6 @@
             lucide.createIcons();
         }
 
-        /* --- REASON TRACKER --- */
         function handleReasonSubmit(e) {
             e.preventDefault();
             const reason = document.getElementById('trackReason').value;
@@ -546,7 +539,6 @@
             alert("Success: Reason successfully logged and synced directly with Chief Justice analytics.");
         }
 
-        /* --- CHECK & CLEAR --- */
         function renderCheckClearBatch(batchNum) {
             const tbody = document.getElementById('checkClearBody');
             if(!tbody) return;
@@ -568,7 +560,6 @@
             renderCheckClearBatch(2);
         }
 
-        /* --- WEEKLY SCHEDULE MANAGER & CALENDAR --- */
         function generateNewCaseId() {
             const el = document.getElementById('newGeneratedCaseId');
             if(el) el.value = `MH-CIV-2026-${Math.floor(Math.random() * 9000) + 1000}`;
