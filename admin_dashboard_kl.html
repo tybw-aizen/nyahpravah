@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kerala Master Admin | Nyay-Pravah</title>
-    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap');
@@ -14,32 +12,32 @@
         .mono { font-family: 'JetBrains Mono', monospace; }
         .modal-enter { animation: fadeIn 0.2s ease-out forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        .tricolor-bar { background: linear-gradient(90deg, #FF9933 33.33%, #FFFFFF 33.33%, #FFFFFF 66.66%, #138808 66.66%); }
+        .calendar-day:hover { transform: scale(1.05); }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col justify-between">
 
-    <div class="h-1.5 w-full bg-gradient-to-r from-amber-500 via-white to-emerald-600"></div>
+    <div class="h-2 w-full tricolor-bar border-b border-slate-200"></div>
 
-    <!-- Header -->
-    <header class="bg-white border-b border-slate-200 sticky top-0 z-40">
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between">
             <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 rounded-lg bg-slate-900 text-white flex items-center justify-center text-xl shadow-sm border border-slate-700">⚖️</div>
+                <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-blue-900 to-slate-900 text-white flex items-center justify-center text-xl shadow-md border border-blue-800">⚖️</div>
                 <div>
                     <div class="flex items-center space-x-2">
-                        <span class="font-bold text-base sm:text-lg text-slate-900 tracking-tight">KERALA COMMAND CENTER</span>
-                        <span class="text-[10px] bg-amber-100 text-amber-800 px-2 py-0.5 rounded font-bold border border-amber-300">MASTER ADMIN</span>
+                        <span class="font-extrabold text-base sm:text-lg text-blue-950 tracking-tight">KERALA JUDICIAL COMMAND</span>
+                        <span class="text-[10px] bg-amber-100 text-amber-900 px-2.5 py-0.5 rounded-full font-extrabold border border-amber-300">MASTER ADMIN</span>
                     </div>
-                    <p id="userSubText" class="text-xs text-slate-500">Chief Administrator: Cyrus (ID: 678567)</p>
+                    <p id="userSubText" class="text-xs text-slate-500 font-medium">Chief Administrator: Cyrus (ID: 678567)</p>
                 </div>
             </div>
-
             <div class="flex items-center space-x-3">
                 <div class="hidden md:block text-right text-xs">
-                    <span class="text-slate-500 block">System Time</span>
+                    <span class="text-slate-500 font-medium block">System Time</span>
                     <span id="liveClock" class="mono font-bold text-slate-700">00:00:00 IST</span>
                 </div>
-                <button onclick="initiateLogout()" class="bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 px-3 py-1.5 rounded-lg text-xs font-bold flex items-center space-x-1.5 transition">
+                <button onclick="initiateLogout()" class="bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 px-3.5 py-2 rounded-xl text-xs font-extrabold flex items-center space-x-1.5 transition shadow-sm">
                     <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
                     <span>Secure Logout</span>
                 </button>
@@ -47,431 +45,281 @@
         </div>
     </header>
 
-    <!-- Navigation Tabs -->
-    <nav class="bg-white border-b border-slate-200 shadow-sm">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 flex space-x-1 overflow-x-auto">
-            <button onclick="switchTab(1)" id="nav-btn-1" class="nav-tab px-4 py-3 text-xs font-bold border-b-2 border-slate-900 text-slate-900 flex items-center space-x-2">
-                <i data-lucide="layout-dashboard" class="w-4 h-4"></i><span>State Overview (28 Courts)</span>
-            </button>
-            <button onclick="switchTab(2)" id="nav-btn-2" class="nav-tab px-4 py-3 text-xs font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-900 flex items-center space-x-2">
-                <i data-lucide="check-square" class="w-4 h-4"></i><span>Master Schedule & Approvals</span>
-            </button>
-            <button onclick="switchTab(3)" id="nav-btn-3" class="nav-tab px-4 py-3 text-xs font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-900 flex items-center space-x-2">
-                <i data-lucide="users-round" class="w-4 h-4"></i><span>Registry Management</span>
-            </button>
+    <nav class="bg-white border-b border-slate-200 shadow-sm overflow-x-auto">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 flex space-x-1 min-w-max">
+            <button onclick="switchTab(1)" id="nav-btn-1" class="nav-tab px-4 py-3 text-xs font-bold border-b-2 border-blue-900 text-blue-950 flex items-center space-x-2 transition"><i data-lucide="layout-dashboard" class="w-4 h-4 text-blue-700"></i><span>State Overview</span></button>
+            <button onclick="switchTab(2)" id="nav-btn-2" class="nav-tab px-4 py-3 text-xs font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-900 flex items-center space-x-2 transition"><i data-lucide="calendar-check" class="w-4 h-4 text-indigo-600"></i><span>Master Schedule Calendar</span></button>
+            <button onclick="switchTab(3)" id="nav-btn-3" class="nav-tab px-4 py-3 text-xs font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-900 flex items-center space-x-2 transition"><i data-lucide="pie-chart" class="w-4 h-4 text-emerald-600"></i><span>Adjournment Analytics</span></button>
+            <button onclick="switchTab(4)" id="nav-btn-4" class="nav-tab px-4 py-3 text-xs font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-900 flex items-center space-x-2 transition"><i data-lucide="radar" class="w-4 h-4 text-indigo-600"></i><span>ClerkRadar Engine</span></button>
+            <button onclick="switchTab(5)" id="nav-btn-5" class="nav-tab px-4 py-3 text-xs font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-900 flex items-center space-x-2 transition"><i data-lucide="calendar-range" class="w-4 h-4 text-orange-600"></i><span>SmartCause Heatmaps</span></button>
+            <button onclick="switchTab(6)" id="nav-btn-6" class="nav-tab px-4 py-3 text-xs font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-900 flex items-center space-x-2 transition"><i data-lucide="users-round" class="w-4 h-4 text-slate-400"></i><span>Registry Management</span></button>
         </div>
     </nav>
 
-    <!-- Main Content Area -->
     <main class="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 py-6 space-y-6">
         
-        <!-- ================= TAB 1: STATE HUD & 28 COURTS ================= -->
+        <!-- TAB 1: OVERVIEW -->
         <div id="tab1-content" class="space-y-6">
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-1">
-                    <div class="flex items-center justify-between text-slate-500">
-                        <span class="text-xs font-bold uppercase tracking-wider">Active Courts Online</span>
-                        <i data-lucide="building-2" class="w-4 h-4 text-slate-400"></i>
-                    </div>
-                    <div class="text-2xl font-extrabold text-slate-900 mono">28 / 28</div>
-                    <p class="text-[11px] text-emerald-600 font-semibold">100% District & High Court Coverage</p>
-                </div>
-                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-1">
-                    <div class="flex items-center justify-between text-slate-500">
-                        <span class="text-xs font-bold uppercase tracking-wider">Today's Docket Volume</span>
-                        <i data-lucide="file-text" class="w-4 h-4 text-slate-400"></i>
-                    </div>
-                    <div class="text-2xl font-extrabold text-slate-900 mono">9,410 Hearings</div>
-                    <p class="text-[11px] text-blue-600 font-semibold">Bail matters prioritized before 11:00 AM</p>
-                </div>
-                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-1">
-                    <div class="flex items-center justify-between text-slate-500">
-                        <span class="text-xs font-bold uppercase tracking-wider">Live Adjournment Risk</span>
-                        <i data-lucide="trending-down" class="w-4 h-4 text-amber-500"></i>
-                    </div>
-                    <div class="text-2xl font-extrabold text-amber-600 mono">32.1%</div>
-                    <p class="text-[11px] text-slate-500">Optimized down from historical 41%</p>
-                </div>
-                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-1">
-                    <div class="flex items-center justify-between text-slate-500">
-                        <span class="text-xs font-bold uppercase tracking-wider">Judge Idle Time Saved</span>
-                        <i data-lucide="clock" class="w-4 h-4 text-emerald-500"></i>
-                    </div>
-                    <div class="text-2xl font-extrabold text-emerald-700 mono">215 Hours</div>
-                    <p class="text-[11px] text-emerald-600 font-semibold">Via 1:30 PM Re-Optimization Engine</p>
-                </div>
-            </div>
-
-            <div class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm space-y-4">
-                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                    <div>
-                        <h2 class="text-lg font-bold text-slate-900">Kerala Court Complexes Directory</h2>
-                        <p class="text-xs text-slate-500">Real-time status of all 28 district complexes and the Kerala High Court.</p>
-                    </div>
-                    <div class="relative">
-                        <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-2.5"></i>
-                        <input type="text" oninput="filterCourts(this.value)" placeholder="Search court complex..." class="bg-slate-50 border border-slate-300 rounded-lg pl-9 pr-3 py-2 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-slate-900 w-full sm:w-64">
-                    </div>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-xs">
-                        <thead class="bg-slate-100 text-slate-700 font-bold border-b border-slate-200">
-                            <tr>
-                                <th class="p-3">Complex / Bench Name</th>
-                                <th class="p-3">Active Benches</th>
-                                <th class="p-3">Today's Hearings</th>
-                                <th class="p-3">Adjournment Rate</th>
-                                <th class="p-3">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody id="courtTableBody" class="divide-y divide-slate-100">
-                            <!-- Injected by JS -->
-                        </tbody>
-                    </table>
-                </div>
+                <div class="bg-white p-5 rounded-2xl border shadow-sm relative overflow-hidden"><div class="absolute top-0 left-0 right-0 h-1 bg-blue-900"></div><div class="text-xs font-extrabold uppercase text-slate-600 mb-1">Active Courts Online</div><div class="text-2xl font-extrabold text-slate-900 mono">28 / 28</div></div>
+                <div class="bg-white p-5 rounded-2xl border shadow-sm relative overflow-hidden"><div class="absolute top-0 left-0 right-0 h-1 bg-orange-500"></div><div class="text-xs font-extrabold uppercase text-slate-600 mb-1">Today's Docket Volume</div><div class="text-2xl font-extrabold text-slate-900 mono">9,410 Cases</div></div>
+                <div class="bg-white p-5 rounded-2xl border shadow-sm relative overflow-hidden"><div class="absolute top-0 left-0 right-0 h-1 bg-amber-500"></div><div class="text-xs font-extrabold uppercase text-slate-600 mb-1">Live Adjournment Risk</div><div class="text-2xl font-extrabold text-amber-700 mono">32.1%</div></div>
+                <div class="bg-white p-5 rounded-2xl border shadow-sm relative overflow-hidden"><div class="absolute top-0 left-0 right-0 h-1 bg-emerald-600"></div><div class="text-xs font-extrabold uppercase text-slate-600 mb-1">Judge Idle Time Saved</div><div class="text-2xl font-extrabold text-emerald-800 mono">215 Hours</div></div>
             </div>
         </div>
 
-        <!-- ================= TAB 2: SCHEDULE APPROVALS ================= -->
+        <!-- TAB 2: MASTER SCHEDULE CALENDAR (NEW) -->
         <div id="tab2-content" class="hidden space-y-6">
-            <div class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm space-y-4">
-                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
-                        <h2 class="text-lg font-bold text-slate-900">Pending Schedule Verifications</h2>
-                        <p class="text-xs text-slate-500">Review and publish weekly dockets submitted by Kerala court clerks.</p>
+                        <h2 class="text-lg font-extrabold text-blue-950">Master Schedule Viewer</h2>
+                        <p class="text-xs text-slate-500">Inspect live calendars for registered court complexes.</p>
                     </div>
-                    <span id="pendingBadge" class="text-xs font-bold bg-amber-50 text-amber-800 border border-amber-200 px-3 py-1.5 rounded-lg">0 Pending</span>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-xs">
-                        <thead class="bg-slate-100 text-slate-700 font-bold border-b border-slate-200">
-                            <tr>
-                                <th class="p-3">Submitted By</th>
-                                <th class="p-3">Court Complex</th>
-                                <th class="p-3">Schedule Window</th>
-                                <th class="p-3">Assigned Judges</th>
-                                <th class="p-3 text-right">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="approvalsTableBody" class="divide-y divide-slate-100">
-                            <!-- Injected by JS -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm space-y-4">
-                <h2 class="text-lg font-bold text-slate-900">Master Schedule Inspector (Published Dockets)</h2>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-xs">
-                        <thead class="bg-slate-100 text-slate-700 font-bold border-b border-slate-200">
-                            <tr>
-                                <th class="p-3">Court Complex</th>
-                                <th class="p-3">Schedule Window</th>
-                                <th class="p-3">Assigned Judges</th>
-                                <th class="p-3">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody id="publishedTableBody" class="divide-y divide-slate-100">
-                            <!-- Injected by JS -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- ================= TAB 3: REGISTRY ADMIN ================= -->
-        <div id="tab3-content" class="hidden space-y-6">
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <!-- Add User Form -->
-                <div class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm space-y-4">
-                    <h2 class="text-base font-bold text-slate-900 flex items-center space-x-2">
-                        <i data-lucide="user-plus" class="w-4 h-4 text-slate-700"></i><span>Onboard New Bench Clerk</span>
-                    </h2>
-                    <form onsubmit="handleAddNewUser(event)" class="space-y-3.5">
-                        <div>
-                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Clerk Full Name</label>
-                            <input type="text" id="newUserName" required placeholder="e.g., Anjali Nair" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-slate-900">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Generated ID (6-Digit)</label>
-                            <input type="text" id="newUserId" required maxlength="6" placeholder="e.g., 445566" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs font-medium mono focus:outline-none focus:ring-2 focus:ring-slate-900">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Password</label>
-                            <input type="password" id="newUserPass" required placeholder="••••••••" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-slate-900">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Assigned Court Complex</label>
-                            <select id="newUserCourt" required class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-slate-900">
-                                <option value="">Select 1-to-1 Court Complex...</option>
-                                <option value="Kerala High Court">Kerala High Court</option>
-                                <option value="Ernakulam District Court">Ernakulam District Court</option>
-                                <option value="Thiruvananthapuram District Court">Thiruvananthapuram District Court</option>
-                                <option value="Kozhikode District Court">Kozhikode District Court</option>
-                                <option value="Thrissur District Court">Thrissur District Court</option>
-                            </select>
-                        </div>
-                        <button type="submit" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 rounded-lg text-xs transition flex items-center justify-center space-x-1.5">
-                            <span>Register & Provision Access</span>
-                        </button>
-                    </form>
+                    <select id="adminCourtSelect" onchange="checkCourtAccess(this.value)" class="bg-slate-50 border border-slate-300 rounded-xl px-4 py-2 text-xs font-bold focus:ring-2 focus:ring-blue-900">
+                        <option value="">Select a Court Complex...</option>
+                        <option value="Kerala High Court">Kerala High Court</option>
+                        <option value="Ernakulam District Court">Ernakulam District Court</option>
+                        <option value="Thiruvananthapuram District Court">Thiruvananthapuram District Court</option>
+                        <option value="Kozhikode District Court">Kozhikode District Court</option>
+                    </select>
                 </div>
 
-                <!-- Active Personnel Directory -->
-                <div class="lg:col-span-2 bg-white rounded-xl border border-slate-200 p-6 shadow-sm space-y-4">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <h2 class="text-base font-bold text-slate-900">Active Personnel Directory (Kerala)</h2>
-                            <p class="text-xs text-slate-500">Manage subordinate bench clerks and revoke access securely via 2FA OTP.</p>
-                        </div>
-                        <span id="clerkCountBadge" class="text-xs font-bold bg-slate-100 text-slate-800 px-2.5 py-1 rounded"></span>
-                    </div>
-                    <div class="overflow-x-auto">
+                <!-- Access Error State -->
+                <div id="calendarAccessError" class="hidden bg-red-50 border border-red-200 p-6 rounded-xl text-center space-y-2">
+                    <i data-lucide="lock" class="w-8 h-8 text-red-500 mx-auto"></i>
+                    <h3 class="text-sm font-extrabold text-red-950">Access Restricted: Session Not Registered Yet</h3>
+                    <p class="text-xs text-red-800">A bench clerk must be registered and log in to initialize this docket calendar.</p>
+                </div>
+
+                <!-- Active Calendar View -->
+                <div id="calendarContainer" class="hidden space-y-4">
+                    <div class="grid grid-cols-7 gap-2" id="adminCalendarGrid"></div>
+                    <div id="adminDayDetails" class="hidden mt-4 p-4 bg-slate-50 rounded-xl border border-slate-200">
+                        <h3 class="text-sm font-extrabold text-blue-950 mb-3" id="adminSelectedDateDisplay"></h3>
                         <table class="w-full text-left text-xs">
-                            <thead class="bg-slate-100 text-slate-700 font-bold border-b border-slate-200">
-                                <tr>
-                                    <th class="p-3">Clerk ID</th>
-                                    <th class="p-3">Name</th>
-                                    <th class="p-3">Jurisdiction / Assigned Court</th>
-                                    <th class="p-3 text-right">Action</th>
-                                </tr>
+                            <thead class="bg-slate-200 text-slate-700 font-extrabold">
+                                <tr><th class="p-2">Case ID</th><th class="p-2">Litigants</th><th class="p-2">Advocate</th><th class="p-2">Time / Bench</th><th class="p-2">Status</th></tr>
                             </thead>
-                            <tbody id="personnelTableBody" class="divide-y divide-slate-100">
-                                <!-- Injected by JS -->
-                            </tbody>
+                            <tbody id="adminDayCasesList" class="divide-y divide-slate-100 bg-white"></tbody>
                         </table>
                     </div>
                 </div>
             </div>
         </div>
 
+        <!-- TAB 3: ADJOURNMENT ANALYTICS -->
+        <div id="tab3-content" class="hidden space-y-6">
+            <div class="bg-white p-6 rounded-2xl border shadow-sm">
+                <h2 class="text-lg font-extrabold text-blue-950 mb-4">Live Adjournment Reason Analytics</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" id="analyticsGrid">
+                    <!-- Rendered by JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 4: CLERKRADAR -->
+        <div id="tab4-content" class="hidden space-y-6">
+            <div class="bg-white rounded-2xl border p-6 shadow-sm space-y-4">
+                <h2 class="text-lg font-extrabold text-blue-950">Statewide Conflict Engine Tracker</h2>
+                <div class="flex space-x-3">
+                    <input type="text" id="radarAdminSearch" placeholder="Search Advocate (e.g., Adv. George)" class="flex-1 bg-slate-50 border border-slate-300 rounded-xl px-4 py-2 text-xs font-bold">
+                    <button onclick="runAdminRadar()" class="bg-indigo-600 text-white font-extrabold px-4 py-2 rounded-xl text-xs">Scan</button>
+                </div>
+                <div id="adminRadarResult" class="hidden p-4 rounded-xl border border-red-200 bg-red-50 text-xs font-bold text-red-800"></div>
+            </div>
+        </div>
+
+        <!-- TAB 5: SMARTCAUSE -->
+        <div id="tab5-content" class="hidden space-y-6">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div class="bg-red-50 border border-red-200 p-5 rounded-2xl"><div class="text-xs font-extrabold uppercase text-red-800">Monday (Overloaded)</div><div class="text-2xl font-extrabold text-red-900 mono">39 Cases</div></div>
+                <div class="bg-amber-50 border border-amber-200 p-5 rounded-2xl"><div class="text-xs font-extrabold uppercase text-amber-800">Tuesday (Filling Up)</div><div class="text-2xl font-extrabold text-amber-900 mono">29 Cases</div></div>
+                <div class="bg-emerald-50 border border-emerald-200 p-5 rounded-2xl"><div class="text-xs font-extrabold uppercase text-emerald-800">Wednesday (Optimal)</div><div class="text-2xl font-extrabold text-emerald-900 mono">19 Cases</div></div>
+            </div>
+        </div>
+
+        <!-- TAB 6: REGISTRY MANAGEMENT -->
+        <div id="tab6-content" class="hidden space-y-6">
+            <div class="bg-white rounded-2xl border p-6 shadow-sm space-y-4">
+                <h2 class="text-base font-extrabold text-blue-950">Onboard New Bench Clerk</h2>
+                <form onsubmit="handleAddNewUser(event)" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+                    <div><label class="block text-xs font-extrabold mb-1">Name</label><input type="text" id="newUserName" required class="w-full bg-slate-50 border rounded-xl px-3 py-2 text-xs font-semibold"></div>
+                    <div><label class="block text-xs font-extrabold mb-1">ID (6-Digit)</label><input type="text" id="newUserId" required maxlength="6" class="w-full bg-slate-50 border rounded-xl px-3 py-2 text-xs font-semibold mono"></div>
+                    <div><label class="block text-xs font-extrabold mb-1">Court</label>
+                        <select id="newUserCourt" required class="w-full bg-slate-50 border rounded-xl px-3 py-2 text-xs font-semibold">
+                            <option value="Ernakulam District Court">Ernakulam District Court</option>
+                            <option value="Thiruvananthapuram District Court">Thiruvananthapuram District Court</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="bg-blue-900 text-white font-extrabold py-2 rounded-xl text-xs">Register</button>
+                </form>
+                <div class="mt-6"><h3 class="font-extrabold text-sm border-b pb-2 mb-2">Active Personnel</h3><tbody id="personnelTableBody"></tbody></div>
+            </div>
+        </div>
     </main>
 
-    <!-- LOGOUT MODAL -->
-    <div id="logoutModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl space-y-4 border border-slate-200 modal-enter">
-            <div class="flex items-center space-x-3 text-amber-600">
-                <i data-lucide="log-out" class="w-6 h-6"></i>
-                <h3 class="text-base font-bold text-slate-900">Secure Session Termination</h3>
-            </div>
-            <p class="text-xs text-slate-600">Are you sure you want to securely log out of the National Judicial Portal?</p>
-            <div class="flex space-x-2 pt-2">
-                <button onclick="closeLogoutModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2 rounded-lg text-xs transition">Cancel</button>
-                <button onclick="confirmLogout()" class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-2 rounded-lg text-xs transition">Confirm Logout</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- 2FA OTP MODAL -->
-    <div id="deleteOtpModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl space-y-4 border border-slate-200 modal-enter">
-            <div class="flex items-center space-x-3 text-red-600">
-                <i data-lucide="shield-alert" class="w-6 h-6"></i>
-                <h3 class="text-base font-bold text-slate-900">Security 2FA Verification</h3>
-            </div>
-            <p class="text-xs text-slate-600">Revoking user access is a destructive administrative action. A verification OTP has been sent to <span class="font-bold text-slate-900">kerala@judiciary.com</span>.</p>
-            <div class="bg-blue-50 p-3 rounded-lg border border-blue-200 text-center">
-                <span class="text-[10px] text-blue-700 uppercase font-bold block">Simulated Deletion OTP</span>
-                <span id="displayDeletionOtp" class="text-xl font-bold mono tracking-widest text-blue-900"></span>
-            </div>
-            <div>
-                <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1 text-center">Enter 6-Digit Deletion OTP</label>
-                <input type="text" id="enteredDeletionOtp" maxlength="6" placeholder="------" class="w-full bg-white border border-slate-300 rounded-lg py-2.5 text-center font-bold mono text-lg text-slate-900 focus:outline-none focus:ring-2 focus:ring-red-600">
-            </div>
-            <div class="flex space-x-2 pt-2">
-                <button onclick="closeDeleteModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2 rounded-lg text-xs transition">Cancel</button>
-                <button onclick="confirmDeleteUser()" class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-2 rounded-lg text-xs transition">Verify & Revoke</button>
-            </div>
-        </div>
-    </div>
-
     <script>
-        let session = null;
-        let userIdToDelete = null;
-        let generatedDelOtp = "";
-
-        const KERALA_COURTS = [
-            { name: "Kerala High Court (Ernakulam)", benches: 16, cases: 1240, adjRate: "25.4%", status: "Live" },
-            { name: "Ernakulam District & Sessions Court", benches: 12, cases: 890, adjRate: "34.2%", status: "Live" },
-            { name: "Thiruvananthapuram District Court", benches: 10, cases: 760, adjRate: "36.8%", status: "Live" },
-            { name: "Kozhikode District Court", benches: 8, cases: 540, adjRate: "32.1%", status: "Live" },
-            { name: "Thrissur District Court", benches: 9, cases: 610, adjRate: "31.5%", status: "Live" }
-        ];
-
+        const ADVOCATES = ["Adv. George", "Adv. Aaron", "Adv. Cyrus", "Adv. Nived", "Adv. Jacob", "Adv. Chris", "Adv. Manu", "Adv. Midhun", "Adv. Zach", "Adv. Jake"];
+        
         window.addEventListener('DOMContentLoaded', () => {
-            const storedSession = localStorage.getItem('nyay_user_session');
-            if (!storedSession) return window.location.href = "login.html";
-            session = JSON.parse(storedSession);
-
-            if (session.state !== "Kerala" || session.role !== "Master Admin") {
-                return window.location.href = "login.html";
-            }
-
-            setInterval(() => {
-                const now = new Date();
-                document.getElementById('liveClock').textContent = now.toLocaleTimeString() + " IST";
-            }, 1000);
-
-            renderCourtGrid("");
-            renderPersonnelTable();
-            renderApprovals();
+            const session = JSON.parse(localStorage.getItem('nyay_user_session'));
+            if (!session || session.role !== "Master Admin") window.location.href = "login.html";
+            
+            setInterval(() => { document.getElementById('liveClock').textContent = new Date().toLocaleTimeString() + " IST"; }, 1000);
+            renderAnalytics();
             lucide.createIcons();
         });
 
         function switchTab(tabNum) {
-            [1, 2, 3].forEach(i => {
+            [1, 2, 3, 4, 5, 6].forEach(i => {
                 document.getElementById(`tab${i}-content`).classList.add('hidden');
-                document.getElementById(`nav-btn-${i}`).className = "nav-tab px-4 py-3 text-xs font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-900 flex items-center space-x-2";
+                document.getElementById(`nav-btn-${i}`).className = "nav-tab px-4 py-3 text-xs font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-900 flex items-center space-x-2 transition";
             });
             document.getElementById(`tab${tabNum}-content`).classList.remove('hidden');
-            document.getElementById(`nav-btn-${tabNum}`).className = "nav-tab px-4 py-3 text-xs font-bold border-b-2 border-slate-900 text-slate-900 flex items-center space-x-2";
-        }
-
-        function renderCourtGrid(query) {
-            const tbody = document.getElementById('courtTableBody');
-            tbody.innerHTML = "";
-            KERALA_COURTS.filter(c => c.name.toLowerCase().includes(query.toLowerCase())).forEach(c => {
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-50 transition";
-                tr.innerHTML = `
-                    <td class="p-3 font-bold text-slate-900">${c.name}</td>
-                    <td class="p-3 mono">${c.benches} Benches</td>
-                    <td class="p-3 mono font-semibold">${c.cases} Hearings</td>
-                    <td class="p-3 mono text-amber-600">${c.adjRate}</td>
-                    <td class="p-3"><span class="bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded font-bold">${c.status}</span></td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        /* --- APPROVALS LOGIC (Kerala Sandbox) --- */
-        function renderApprovals() {
-            const allSchedules = JSON.parse(localStorage.getItem('nyay_kl_schedules') || '[]');
+            document.getElementById(`nav-btn-${tabNum}`).className = "nav-tab px-4 py-3 text-xs font-bold border-b-2 border-blue-900 text-blue-950 flex items-center space-x-2 transition";
             
-            const pendingTbody = document.getElementById('approvalsTableBody');
-            const publishedTbody = document.getElementById('publishedTableBody');
-            pendingTbody.innerHTML = ""; publishedTbody.innerHTML = "";
-            let pendingCount = 0;
-
-            allSchedules.forEach(item => {
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-50 transition";
-                if (item.status === "Pending Verification") {
-                    pendingCount++;
-                    tr.innerHTML = `
-                        <td class="p-3 font-semibold text-slate-800">${item.clerk}</td>
-                        <td class="p-3 font-bold text-slate-900">${item.court}</td>
-                        <td class="p-3 mono text-slate-600">${item.window}</td>
-                        <td class="p-3 text-slate-700 text-[10px] uppercase">${item.judges}</td>
-                        <td class="p-3 text-right">
-                            <button onclick="publishSchedule('${item.id}')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded text-xs font-bold transition">Verify & Publish</button>
-                        </td>
-                    `;
-                    pendingTbody.appendChild(tr);
-                } else {
-                    tr.innerHTML = `
-                        <td class="p-3 font-bold text-slate-900">${item.court}</td>
-                        <td class="p-3 mono text-slate-600">${item.window}</td>
-                        <td class="p-3 text-slate-700 text-[10px] uppercase">${item.judges}</td>
-                        <td class="p-3"><span class="bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded font-bold">Published Live</span></td>
-                    `;
-                    publishedTbody.appendChild(tr);
-                }
-            });
-
-            if (pendingCount === 0) pendingTbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-xs text-slate-500">No pending schedules in inbox.</td></tr>`;
-            if (allSchedules.filter(s=>s.status!=="Pending Verification").length === 0) publishedTbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-xs text-slate-500">No published schedules yet.</td></tr>`;
-            
-            const badge = document.getElementById('pendingBadge');
-            badge.textContent = `${pendingCount} Pending`;
-            badge.className = pendingCount > 0 ? "text-xs font-bold bg-amber-50 text-amber-800 border border-amber-200 px-3 py-1.5 rounded-lg" : "text-xs font-bold bg-slate-50 text-slate-600 border border-slate-200 px-3 py-1.5 rounded-lg";
+            if(tabNum === 3) renderAnalytics(); // Refresh analytics on tab open
         }
 
-        function publishSchedule(id) {
-            let allSchedules = JSON.parse(localStorage.getItem('nyay_kl_schedules') || '[]');
-            allSchedules = allSchedules.map(s => s.id === id ? { ...s, status: "Published Live" } : s);
-            localStorage.setItem('nyay_kl_schedules', JSON.stringify(allSchedules));
-            alert("Success! Weekly schedule verified and published live to the Kerala Docket.");
-            renderApprovals();
-        }
+        function checkCourtAccess(courtName) {
+            const err = document.getElementById('calendarAccessError');
+            const cont = document.getElementById('calendarContainer');
+            if(!courtName) { err.classList.add('hidden'); cont.classList.add('hidden'); return; }
 
-        /* --- REGISTRY LOGIC --- */
-        function renderPersonnelTable() {
-            const tbody = document.getElementById('personnelTableBody');
-            tbody.innerHTML = "";
             const dynamicUsers = JSON.parse(localStorage.getItem('nyay_dynamic_users') || '{}');
-            let count = 0;
-
-            Object.keys(dynamicUsers).forEach(id => {
-                const u = dynamicUsers[id];
-                if (u.state === "Kerala") {
-                    count++;
-                    const tr = document.createElement('tr');
-                    tr.className = "hover:bg-slate-50 transition";
-                    tr.innerHTML = `
-                        <td class="p-3 mono font-bold text-slate-900">${id}</td>
-                        <td class="p-3 font-semibold text-slate-800">${u.name}</td>
-                        <td class="p-3 font-medium text-slate-700"><i data-lucide="building" class="w-3 h-3 inline mr-1 text-slate-400"></i>${u.court}</td>
-                        <td class="p-3 text-right">
-                            <button onclick="initiateDeleteUser('${id}')" class="bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 px-2.5 py-1 rounded text-xs font-bold transition">Revoke Access</button>
-                        </td>
-                    `;
-                    tbody.appendChild(tr);
+            let isRegistered = false;
+            
+            // Meera is registered to Kerala High Court by default
+            if(courtName === "Kerala High Court") isRegistered = true;
+            else {
+                for (let id in dynamicUsers) {
+                    if (dynamicUsers[id].state === "Kerala" && dynamicUsers[id].court === courtName) {
+                        isRegistered = true; break;
+                    }
                 }
+            }
+
+            if(isRegistered) {
+                err.classList.add('hidden');
+                cont.classList.remove('hidden');
+                buildAdminCalendar(courtName);
+            } else {
+                err.classList.remove('hidden');
+                cont.classList.add('hidden');
+            }
+        }
+
+        function buildAdminCalendar(courtName) {
+            const grid = document.getElementById('adminCalendarGrid');
+            grid.innerHTML = "";
+            const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+            days.forEach(d => {
+                const el = document.createElement('div');
+                el.className = "text-center text-[10px] font-extrabold text-slate-400 py-1";
+                el.innerText = d;
+                grid.appendChild(el);
             });
-            document.getElementById('clerkCountBadge').textContent = `${count} Active Minor Clerks`;
+
+            for(let i=1; i<=14; i++) {
+                const dateNum = i + 10; 
+                const box = document.createElement('div');
+                box.className = "calendar-day bg-white border border-slate-200 rounded-xl p-3 cursor-pointer transition shadow-sm hover:border-blue-500 hover:shadow-md text-center";
+                
+                // Add dot indicators based on day
+                let dot = (i%3===0) ? `<div class="w-1.5 h-1.5 bg-red-500 rounded-full mx-auto mt-1"></div>` : `<div class="w-1.5 h-1.5 bg-emerald-500 rounded-full mx-auto mt-1"></div>`;
+                
+                box.innerHTML = `<span class="text-xs font-bold text-slate-700">${dateNum}</span>${dot}`;
+                box.onclick = () => showAdminDayDetails(dateNum, courtName, i%3===0);
+                grid.appendChild(box);
+            }
+        }
+
+        function showAdminDayDetails(date, court, hasConflict) {
+            document.getElementById('adminDayDetails').classList.remove('hidden');
+            document.getElementById('adminSelectedDateDisplay').textContent = `Cases for Sep ${date}, 2026 - ${court}`;
+            const list = document.getElementById('adminDayCasesList');
+            
+            // Mock dynamic cases using our designated roster
+            const adv1 = ADVOCATES[Math.floor(Math.random() * ADVOCATES.length)];
+            const adv2 = hasConflict ? "Adv. George" : ADVOCATES[Math.floor(Math.random() * ADVOCATES.length)];
+
+            list.innerHTML = `
+                <tr>
+                    <td class="p-2 font-bold mono text-blue-900">KL-CIV-${date}A</td>
+                    <td class="p-2 font-semibold">State vs. XYZ</td>
+                    <td class="p-2 text-indigo-700 font-bold">${adv1}</td>
+                    <td class="p-2 mono">10:30 AM</td>
+                    <td class="p-2"><span class="bg-emerald-50 text-emerald-700 px-2 rounded-md font-bold text-[10px]">🟢 Ready</span></td>
+                </tr>
+                <tr>
+                    <td class="p-2 font-bold mono text-blue-900">KL-CRL-${date}B</td>
+                    <td class="p-2 font-semibold">Smith vs. State</td>
+                    <td class="p-2 text-indigo-700 font-bold">${adv2}</td>
+                    <td class="p-2 mono">2:15 PM</td>
+                    <td class="p-2"><span class="${hasConflict ? 'bg-red-50 text-red-700' : 'bg-emerald-50 text-emerald-700'} px-2 rounded-md font-bold text-[10px]">${hasConflict ? '🔴 Notice Missing' : '🟢 Ready'}</span></td>
+                </tr>
+            `;
+        }
+
+        function runAdminRadar() {
+            const val = document.getElementById('radarAdminSearch').value.trim();
+            const res = document.getElementById('adminRadarResult');
+            res.classList.remove('hidden');
+            if(val === "Adv. George" || val === "Adv. Nived") {
+                res.innerHTML = `<i data-lucide="alert-triangle" class="inline w-4 h-4 mr-1"></i> CONFLICT: ${val} is double-booked across Kerala High Court and Ernakulam District Court. Auto-Resolve initiated by bench clerk.`;
+                res.className = "p-4 rounded-xl border border-red-200 bg-red-50 text-xs font-bold text-red-800";
+            } else if(ADVOCATES.includes(val)) {
+                res.innerHTML = `<i data-lucide="check-circle" class="inline w-4 h-4 mr-1"></i> CLEAN: ${val} has no conflicting time blocks today.`;
+                res.className = "p-4 rounded-xl border border-emerald-200 bg-emerald-50 text-xs font-bold text-emerald-800";
+            } else {
+                res.innerHTML = "Advocate not found in active daily roster.";
+                res.className = "p-4 rounded-xl border border-slate-200 bg-slate-50 text-xs font-bold text-slate-800";
+            }
             lucide.createIcons();
+        }
+
+        function renderAnalytics() {
+            const logs = JSON.parse(localStorage.getItem('nyay_adjournment_logs') || '{}');
+            const baseStats = { "Lawyer Absent": 120, "Witness Missing": 85, "Incomplete Filing": 60, "Court Ran Out of Time": 40 };
+            
+            // Add dynamic logs to base stats
+            let total = 0;
+            for(let key in baseStats) {
+                if(logs[key]) baseStats[key] += logs[key];
+                total += baseStats[key];
+            }
+
+            const colors = ["red", "amber", "blue", "slate"];
+            const grid = document.getElementById('analyticsGrid');
+            grid.innerHTML = "";
+            let i = 0;
+            for(let key in baseStats) {
+                const perc = ((baseStats[key] / total) * 100).toFixed(1);
+                const color = colors[i % colors.length];
+                grid.innerHTML += `
+                    <div class="bg-slate-50 p-4 rounded-xl border shadow-inner">
+                        <span class="text-[10px] font-bold text-slate-500 uppercase">${key}</span>
+                        <div class="text-xl font-extrabold text-${color}-600 mono my-1">${perc}%</div>
+                        <div class="w-full bg-slate-200 h-1.5 rounded-full"><div class="bg-${color}-600 h-full" style="width: ${perc}%"></div></div>
+                        <div class="text-[10px] text-slate-400 mt-1 font-mono">${baseStats[key]} cases logged</div>
+                    </div>
+                `;
+                i++;
+            }
         }
 
         function handleAddNewUser(e) {
             e.preventDefault();
-            const name = document.getElementById('newUserName').value.trim();
-            const id = document.getElementById('newUserId').value.trim();
-            const pass = document.getElementById('newUserPass').value.trim();
-            const court = document.getElementById('newUserCourt').value;
-
+            const id = document.getElementById('newUserId').value;
             let dynamic = JSON.parse(localStorage.getItem('nyay_dynamic_users') || '{}');
-            if (dynamic[id] || id === "676968" || id === "678567") return alert("Error: User ID already exists in system registry.");
-
-            dynamic[id] = { name: name, pass: pass, role: "Bench Clerk", state: "Kerala", court: court };
+            dynamic[id] = { name: document.getElementById('newUserName').value, role: "Bench Clerk", state: "Kerala", court: document.getElementById('newUserCourt').value };
             localStorage.setItem('nyay_dynamic_users', JSON.stringify(dynamic));
-            alert(`Success! Bench Clerk ${name} (ID: ${id}) bound strictly to ${court}.`);
-            
-            document.getElementById('newUserName').value = ""; document.getElementById('newUserId').value = "";
-            document.getElementById('newUserPass').value = ""; document.getElementById('newUserCourt').selectedIndex = 0;
-            renderPersonnelTable();
+            alert("Clerk Registered.");
+            checkCourtAccess(document.getElementById('adminCourtSelect').value); // Re-eval access
         }
 
-        function initiateDeleteUser(id) {
-            userIdToDelete = id;
-            generatedDelOtp = Math.floor(100000 + Math.random() * 900000).toString();
-            document.getElementById('displayDeletionOtp').textContent = generatedDelOtp;
-            document.getElementById('enteredDeletionOtp').value = "";
-            document.getElementById('deleteOtpModal').classList.remove('hidden');
-        }
-
-        function closeDeleteModal() { document.getElementById('deleteOtpModal').classList.add('hidden'); userIdToDelete = null; }
-
-        function confirmDeleteUser() {
-            if (document.getElementById('enteredDeletionOtp').value.trim() !== generatedDelOtp) return alert("Incorrect Deletion OTP. Cancellation protocol engaged.");
-            
-            let dynamic = JSON.parse(localStorage.getItem('nyay_dynamic_users') || '{}');
-            if (dynamic[userIdToDelete]) {
-                delete dynamic[userIdToDelete];
-                localStorage.setItem('nyay_dynamic_users', JSON.stringify(dynamic));
-                alert("2FA Verified. User access successfully permanently revoked.");
-            }
-            closeDeleteModal(); renderPersonnelTable();
-        }
-
-        /* --- LOGOUT LOGIC --- */
-        function initiateLogout() { document.getElementById('logoutModal').classList.remove('hidden'); }
-        function closeLogoutModal() { document.getElementById('logoutModal').classList.add('hidden'); }
-        function confirmLogout() {
-            localStorage.removeItem('nyay_user_session');
-            window.location.href = "login.html";
-        }
+        function initiateLogout() { localStorage.removeItem('nyay_user_session'); window.location.href = "login.html"; }
     </script>
 </body>
 </html>
