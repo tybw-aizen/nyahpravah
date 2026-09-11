@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Judicial Login | OTP Verification</title>
+    <title>National Judicial Gateway | Login</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Lucide Icons -->
@@ -12,6 +12,7 @@
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap');
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
         .mono { font-family: 'JetBrains Mono', monospace; }
+        canvas { user-select: none; }
         @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         .animate-slide-in { animation: slideIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         .tricolor-bar { background: linear-gradient(90deg, #FF9933 33.33%, #FFFFFF 33.33%, #FFFFFF 66.66%, #138808 66.66%); }
@@ -28,108 +29,135 @@
                 <div>
                     <div class="flex items-center space-x-2">
                         <span class="font-extrabold text-lg text-blue-950 tracking-tight">NYAY-PRAVAH</span>
-                        <span id="headerStateBadge" class="text-[10px] bg-blue-50 text-blue-800 px-2.5 py-0.5 rounded-full font-extrabold border border-blue-200 uppercase">JUDICIAL PORTAL</span>
+                        <span class="text-[10px] bg-blue-50 text-blue-800 px-2.5 py-0.5 rounded-full font-extrabold border border-blue-200 uppercase">NATIONAL JUDICIAL PORTAL</span>
                     </div>
-                    <p class="text-xs text-slate-500 font-medium">Authorized Personnel Gateway</p>
+                    <p class="text-xs text-slate-500 font-medium">Department of Justice • e-Courts Gateway</p>
                 </div>
             </div>
-            <div class="text-right">
-                <a href="state.html" class="text-xs font-bold text-blue-900 hover:text-blue-950 flex items-center space-x-1 bg-blue-50 hover:bg-blue-100 px-3.5 py-2 rounded-xl border border-blue-200 transition shadow-sm">
-                    <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i><span>Change State</span>
-                </a>
+            <div class="text-right text-xs text-slate-500 font-semibold">
+                <span>Secure Entry Portal</span>
             </div>
         </div>
     </header>
 
-    <main class="flex-1 max-w-md mx-auto w-full px-4 py-10 sm:py-16">
+    <main class="flex-1 max-w-md mx-auto w-full px-4 py-10">
         <div class="bg-white rounded-2xl border border-slate-200 shadow-xl shadow-slate-100 overflow-hidden relative">
             <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-orange-500 via-blue-900 to-emerald-600"></div>
             
             <div class="bg-slate-50/75 border-b border-slate-200 p-6 text-center">
-                <h1 class="text-xl font-extrabold text-blue-950" id="loginTitle">District Court Login</h1>
-                <p class="text-xs text-slate-500 mt-1 font-medium" id="loginSubtitle">Please enter your verified ID</p>
+                <h1 class="text-xl font-extrabold text-blue-950">Judicial System Login</h1>
+                <p class="text-xs text-slate-500 mt-1 font-medium">Enter credentials, select courtroom, and solve verification</p>
             </div>
 
-            <!-- STEP 1: CREDENTIALS -->
-            <div id="step1-credentials" class="p-6 sm:p-8 space-y-5">
-                <form onsubmit="handleCredentialSubmit(event)" class="space-y-4">
+            <!-- STEP 1: CREDENTIALS & COURT & CAPTCHA -->
+            <div id="step1-credentials" class="p-6 sm:p-8 space-y-4">
+                <form onsubmit="handleCredentialSubmit(event)" class="space-y-3.5">
                     <div>
-                        <label class="block text-xs font-extrabold uppercase tracking-wider text-slate-700 mb-1.5">Verified User ID</label>
+                        <label class="block text-xs font-extrabold uppercase tracking-wider text-slate-700 mb-1">User ID</label>
                         <div class="relative">
                             <i data-lucide="user" class="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5 pointer-events-none"></i>
-                            <input id="userId" type="text" required placeholder="Enter your ID" oninput="hideError()" class="w-full bg-slate-50 border border-slate-300 rounded-xl pl-10 pr-3 py-3 text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-900 focus:bg-white transition shadow-inner">
+                            <input id="userId" type="text" required placeholder="Enter ID" class="w-full bg-slate-50 border border-slate-300 rounded-xl pl-10 pr-3 py-2.5 text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-900">
                         </div>
                     </div>
+
                     <div>
-                        <label class="block text-xs font-extrabold uppercase tracking-wider text-slate-700 mb-1.5">Password</label>
+                        <label class="block text-xs font-extrabold uppercase tracking-wider text-slate-700 mb-1">Password</label>
                         <div class="relative">
                             <i data-lucide="lock" class="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5 pointer-events-none"></i>
-                            <input id="userPass" type="password" required placeholder="••••••••" oninput="hideError()" class="w-full bg-slate-50 border border-slate-300 rounded-xl pl-10 pr-3 py-3 text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-900 focus:bg-white transition shadow-inner">
+                            <input id="userPass" type="password" required placeholder="••••••••" class="w-full bg-slate-50 border border-slate-300 rounded-xl pl-10 pr-10 py-2.5 text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-900">
+                            <button type="button" onclick="togglePasswordVisibility()" class="absolute right-3.5 top-3 text-slate-400 hover:text-slate-600">
+                                <i id="eyeIcon" data-lucide="eye" class="w-4 h-4"></i>
+                            </button>
                         </div>
                     </div>
-                    <div id="credentialError" class="hidden text-xs text-red-600 font-semibold flex items-start space-x-1.5 bg-red-50 p-3 rounded-xl border border-red-200">
-                        <i data-lucide="alert-circle" class="w-4 h-4 mt-0.5 flex-shrink-0"></i>
-                        <span id="credentialErrorText">Invalid ID or Password.</span>
+
+                    <!-- Courtroom Selection Input -->
+                    <div>
+                        <label class="block text-xs font-extrabold uppercase tracking-wider text-slate-700 mb-1">Assigned Courtroom / Bench</label>
+                        <div class="relative">
+                            <i data-lucide="building-2" class="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5 pointer-events-none"></i>
+                            <select id="userCourtSelect" required class="w-full bg-slate-50 border border-slate-300 rounded-xl pl-10 pr-3 py-2.5 text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-900">
+                                <option value="">Select Courtroom / Jurisdiction...</option>
+                                <option value="Kerala High Court">Kerala High Court (Bench 1)</option>
+                                <option value="Ernakulam District Court">Ernakulam District Court (Court 4)</option>
+                                <option value="Bombay High Court">Bombay High Court (Bench 3)</option>
+                                <option value="Pune District Court">Pune District Court (Court 2)</option>
+                            </select>
+                        </div>
                     </div>
-                    <button type="submit" class="w-full bg-gradient-to-r from-blue-900 to-slate-900 hover:from-blue-800 hover:to-slate-800 text-white font-extrabold py-3.5 rounded-xl text-sm transition flex items-center justify-center space-x-2 shadow-lg shadow-blue-900/20 mt-2">
+
+                    <!-- Standard CAPTCHA Box -->
+                    <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 space-y-2">
+                        <div class="flex items-center justify-between text-xs font-extrabold uppercase text-slate-700">
+                            <span>Security Code</span>
+                            <span class="text-[10px] text-slate-400 font-normal">Case-sensitive</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <canvas id="captchaCanvas" width="140" height="38" class="rounded-lg bg-slate-100 border border-slate-300"></canvas>
+                            <button onclick="generateNormalCaptcha()" type="button" class="p-2 hover:bg-slate-200 rounded-lg text-slate-700 transition" title="Refresh Code">
+                                <i data-lucide="rotate-cw" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                        <input id="captchaInput" type="text" maxlength="6" required placeholder="Enter code" class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-sm text-slate-900 mono font-bold tracking-widest focus:outline-none focus:ring-2 focus:ring-blue-900">
+                    </div>
+
+                    <div id="credentialError" class="hidden text-xs text-red-600 font-semibold bg-red-50 p-2.5 rounded-xl border border-red-200">
+                        <span id="credentialErrorText">Invalid entries. Please check details & CAPTCHA.</span>
+                    </div>
+
+                    <button type="submit" class="w-full bg-gradient-to-r from-blue-900 to-slate-900 hover:from-blue-800 text-white font-extrabold py-3 rounded-xl text-sm transition flex items-center justify-center space-x-2 shadow-lg shadow-blue-900/20 mt-1">
                         <span>Authenticate & Send OTP</span><i data-lucide="arrow-right" class="w-4 h-4"></i>
                     </button>
                 </form>
             </div>
 
             <!-- STEP 2: OTP -->
-            <div id="step2-otp" class="hidden p-6 sm:p-8 space-y-5">
-                <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 flex items-start space-x-3">
+            <div id="step2-otp" class="hidden p-6 sm:p-8 space-y-4">
+                <div class="bg-blue-50 border border-blue-200 rounded-xl p-3.5 flex items-start space-x-3">
                     <i data-lucide="mail-check" class="w-5 h-5 text-blue-700 mt-0.5 flex-shrink-0"></i>
                     <div>
                         <h3 class="text-xs font-extrabold text-blue-950">OTP Sent Successfully</h3>
-                        <p class="text-[11px] text-blue-900 mt-0.5">Sent to official registry email: <br><span id="targetEmailDisplay" class="font-bold mono bg-blue-100 px-1.5 py-0.5 mt-1 inline-block rounded-md border border-blue-200"></span></p>
+                        <p class="text-[11px] text-blue-900 mt-0.5">Official email: <span id="targetEmailDisplay" class="font-bold mono bg-blue-100 px-1.5 py-0.5 rounded border border-blue-200"></span></p>
                     </div>
                 </div>
                 <form onsubmit="handleOtpSubmit(event)" class="space-y-4">
                     <div>
                         <label class="block text-xs font-extrabold uppercase tracking-wider text-slate-700 mb-1.5 text-center">Enter 6-Digit OTP</label>
-                        <input id="otpInput" type="text" maxlength="6" required placeholder="------" oninput="hideOtpError()" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-2xl tracking-[0.5em] text-center font-extrabold mono text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-900 focus:bg-white transition shadow-inner">
+                        <input id="otpInput" type="text" maxlength="6" required placeholder="------" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-2xl tracking-[0.5em] text-center font-extrabold mono text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-900 shadow-inner">
                     </div>
-                    <div id="otpError" class="hidden text-xs text-red-600 font-semibold flex items-center justify-center space-x-1.5 bg-red-50 p-3 rounded-xl border border-red-200">
-                        <i data-lucide="alert-circle" class="w-4 h-4"></i><span>Incorrect OTP.</span>
-                    </div>
-                    <button type="submit" class="w-full bg-gradient-to-r from-emerald-700 to-emerald-800 hover:from-emerald-800 hover:to-emerald-900 text-white font-extrabold py-3.5 rounded-xl text-sm transition flex items-center justify-center space-x-2 shadow-lg shadow-emerald-700/20">
-                        <span>Verify & Access Engine</span><i data-lucide="shield-check" class="w-4 h-4"></i>
+                    <div id="otpError" class="hidden text-xs text-red-600 font-semibold text-center bg-red-50 p-2.5 rounded-xl border border-red-200">Incorrect OTP.</div>
+                    <button type="submit" class="w-full bg-gradient-to-r from-emerald-700 to-emerald-800 text-white font-extrabold py-3 rounded-xl text-sm transition flex items-center justify-center space-x-2 shadow-lg">
+                        <span>Verify & Launch Portal</span><i data-lucide="shield-check" class="w-4 h-4"></i>
                     </button>
                 </form>
                 <div class="text-center pt-1">
-                    <button onclick="resetToStep1()" type="button" class="text-xs font-bold text-slate-600 hover:text-blue-900 transition">← Back to Login</button>
+                    <button onclick="resetToStep1()" type="button" class="text-xs font-bold text-slate-600 hover:text-blue-900">← Back to Login</button>
                 </div>
             </div>
 
         </div>
-        
-        <div class="mt-6 text-center text-[10px] text-slate-400 mono uppercase tracking-wider font-semibold">
-            SECURE 2FA GATEWAY • ALL ACCESS ATTEMPTS ARE LOGGED
-        </div>
     </main>
 
-    <!-- TOAST EMAIL -->
+    <!-- TOAST EMAIL MOCK -->
     <div id="mockEmailToast" class="hidden fixed top-6 right-6 max-w-sm w-full bg-white border border-slate-200 rounded-2xl shadow-2xl overflow-hidden z-50">
         <div class="bg-blue-950 text-white px-4 py-3 flex items-center space-x-2 border-b border-blue-900">
             <i data-lucide="mail" class="w-4 h-4 text-orange-400"></i><span class="text-xs font-extrabold tracking-wide">JUDICIARY MAIL SERVER</span>
         </div>
-        <div class="p-4 bg-slate-50/75">
+        <div class="p-4 bg-slate-50">
             <p class="text-[10px] font-bold text-slate-500 uppercase">To: <span id="toastEmailDisplay"></span></p>
             <p class="text-xs font-extrabold text-slate-900 mt-1">Nyay-Pravah Security Code</p>
             <p class="text-xs text-slate-600 mt-2">Hello <span id="toastName" class="font-bold"></span>, your OTP is:</p>
             <div class="mt-3 text-center">
-                <span id="toastOtpCode" class="text-2xl font-extrabold mono tracking-widest text-blue-950 bg-white border border-slate-300 px-4 py-2.5 rounded-xl inline-block shadow-sm"></span>
+                <span id="toastOtpCode" class="text-2xl font-extrabold mono tracking-widest text-blue-950 bg-white border px-4 py-2 rounded-xl inline-block shadow-sm"></span>
             </div>
-            <div class="text-right mt-3"><button onclick="closeToast()" class="text-[10px] font-bold text-slate-500 hover:text-slate-800">Dismiss</button></div>
+            <div class="text-right mt-3"><button onclick="closeToast()" class="text-[10px] font-bold text-slate-500">Dismiss</button></div>
         </div>
     </div>
 
     <script>
         const MASTER_USERS = {
-            "676968": { name: "Aaron", pass: "Aaron2008", role: "Master Admin", state: "Maharashtra", court: "MH State Command" },
-            "678567": { name: "Cyrus", pass: "Cyrus2008", role: "Master Admin", state: "Kerala", court: "KL State Command" }
+            "676968": { name: "Aaron", pass: "Aaron2008", role: "Master Admin", state: "Maharashtra", court: "Bombay High Court" },
+            "678567": { name: "Cyrus", pass: "Cyrus2008", role: "Master Admin", state: "Kerala", court: "Kerala High Court" }
         };
 
         function initializeDefaultUsers() {
@@ -143,48 +171,84 @@
             localStorage.setItem('nyay_dynamic_users', JSON.stringify(dynamic));
         }
 
-        let activeJurisdiction = null, generatedOTP = null, loggedInUser = null, officialEmail = "";
+        let generatedOTP = null, loggedInUser = null, generatedCaptchaCode = "";
 
         window.addEventListener('DOMContentLoaded', () => {
             lucide.createIcons();
             initializeDefaultUsers();
-            
-            const stored = localStorage.getItem('nyay_jurisdiction');
-            if (stored) {
-                activeJurisdiction = JSON.parse(stored);
-                document.getElementById('headerStateBadge').textContent = `${activeJurisdiction.state} PORTAL`;
-                document.getElementById('loginTitle').textContent = `${activeJurisdiction.state} Login`;
-                document.getElementById('loginSubtitle').textContent = activeJurisdiction.complex;
-            } else {
-                window.location.href = "state.html";
-            }
+            generateNormalCaptcha();
         });
 
-        function hideError() { document.getElementById('credentialError').classList.add('hidden'); }
-        function hideOtpError() { document.getElementById('otpError').classList.add('hidden'); }
-        function showError(msg) { document.getElementById('credentialErrorText').textContent = msg; document.getElementById('credentialError').classList.remove('hidden'); }
+        function generateNormalCaptcha() {
+            const canvas = document.getElementById('captchaCanvas');
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = "#f1f5f9";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789";
+            let code = "";
+            for (let i = 0; i < 5; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
+            generatedCaptchaCode = code;
+
+            const letterSpacing = (canvas.width - 20) / 5;
+            for (let i = 0; i < code.length; i++) {
+                ctx.save();
+                ctx.font = "bold 20px 'JetBrains Mono', monospace";
+                ctx.fillStyle = "#1e3a8a";
+                ctx.translate(10 + (i * letterSpacing), 26);
+                ctx.rotate((Math.random() * 10 - 5) * Math.PI / 180);
+                ctx.fillText(code[i], 0, 0);
+                ctx.restore();
+            }
+            document.getElementById('captchaInput').value = "";
+        }
+
+        function togglePasswordVisibility() {
+            const passInput = document.getElementById('userPass');
+            const eyeIcon = document.getElementById('eyeIcon');
+            if (passInput.type === "password") {
+                passInput.type = "text";
+                eyeIcon.setAttribute("data-lucide", "eye-off");
+            } else {
+                passInput.type = "password";
+                eyeIcon.setAttribute("data-lucide", "eye");
+            }
+            lucide.createIcons();
+        }
 
         function handleCredentialSubmit(e) {
             e.preventDefault();
             const id = document.getElementById('userId').value.trim();
             const pass = document.getElementById('userPass').value.trim();
+            const court = document.getElementById('userCourtSelect').value;
+            const enteredCaptcha = document.getElementById('captchaInput').value.trim();
+
+            if (enteredCaptcha !== generatedCaptchaCode) {
+                document.getElementById('credentialErrorText').textContent = "Incorrect CAPTCHA code entered.";
+                document.getElementById('credentialError').classList.remove('hidden');
+                generateNormalCaptcha();
+                return;
+            }
 
             const dynamicUsers = JSON.parse(localStorage.getItem('nyay_dynamic_users') || '{}');
             const allUsers = { ...MASTER_USERS, ...dynamicUsers };
             const user = allUsers[id];
 
-            if (!user) return showError("Invalid ID. User not found.");
-            if (user.pass !== pass) return showError("Invalid Password.");
-            if (user.state !== activeJurisdiction.state) return showError(`Access Denied: Not authorized for ${activeJurisdiction.state}.`);
+            if (!user || user.pass !== pass) {
+                document.getElementById('credentialErrorText').textContent = "Invalid User ID or Password.";
+                document.getElementById('credentialError').classList.remove('hidden');
+                generateNormalCaptcha();
+                return;
+            }
 
-            hideError();
-            loggedInUser = { id: id, ...user };
-            
-            officialEmail = `${activeJurisdiction.state.toLowerCase()}@judiciary.com`;
+            loggedInUser = { id: id, ...user, court: court }; // Bind chosen courtroom dynamically
+            const state = (court.includes("Kerala") || court.includes("Ernakulam")) ? "Kerala" : "Maharashtra";
+            loggedInUser.state = state;
+
+            const officialEmail = `${state.toLowerCase()}@judiciary.com`;
             document.getElementById('targetEmailDisplay').textContent = officialEmail;
-            
             generatedOTP = Math.floor(100000 + Math.random() * 900000).toString();
-            
+
             document.getElementById('step1-credentials').classList.add('hidden');
             document.getElementById('step2-otp').classList.remove('hidden');
             showMockEmail(user.name, generatedOTP, officialEmail);
@@ -192,16 +256,16 @@
 
         function handleOtpSubmit(e) {
             e.preventDefault();
-            if (document.getElementById('otpInput').value.trim() !== generatedOTP) return document.getElementById('otpError').classList.remove('hidden');
-            
-            hideOtpError();
-            localStorage.setItem('nyay_user_session', JSON.stringify({
-                id: loggedInUser.id, name: loggedInUser.name, role: loggedInUser.role, state: activeJurisdiction.state, court: loggedInUser.court
-            }));
+            if (document.getElementById('otpInput').value.trim() !== generatedOTP) {
+                document.getElementById('otpError').classList.remove('hidden');
+                return;
+            }
 
-            if (activeJurisdiction.state === "Maharashtra") {
+            localStorage.setItem('nyay_user_session', JSON.stringify(loggedInUser));
+
+            if (loggedInUser.state === "Maharashtra") {
                 window.location.href = loggedInUser.role === "Master Admin" ? "admin_dashboard_mh.html" : "clerk_dashboard_mh.html";
-            } else if (activeJurisdiction.state === "Kerala") {
+            } else {
                 window.location.href = loggedInUser.role === "Master Admin" ? "admin_dashboard_kl.html" : "clerk_dashboard_kl.html";
             }
         }
@@ -209,8 +273,8 @@
         function resetToStep1() {
             document.getElementById('step2-otp').classList.add('hidden');
             document.getElementById('step1-credentials').classList.remove('hidden');
-            document.getElementById('userPass').value = ''; document.getElementById('otpInput').value = '';
             closeToast();
+            generateNormalCaptcha();
         }
 
         function showMockEmail(name, otp, email) {
