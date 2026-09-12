@@ -107,7 +107,7 @@
                     </div>
                     <div class="flex items-center space-x-4 text-xs font-extrabold" id="calendarLegend">
                         <span class="flex items-center space-x-1.5 bg-emerald-50 text-emerald-800 border border-emerald-200 px-3 py-1 rounded-xl"><span class="w-2 h-2 bg-emerald-500 rounded-full"></span><span>Free Day</span></span>
-                        <span class="flex items-center space-x-1.5 bg-red-50 text-red-800 border border-red-200 px-3 py-1 rounded-xl"><span class="w-2 h-2 bg-red-500 rounded-full"></span><span>Busy Day</span></span>
+                        <span class="flex items-center space-x-1.5 bg-red-50 text-red-800 border border-red-200 px-3 py-1 rounded-xl"><span class="w-2 h-2 bg-red-500 rounded-full"></span><span>Busy Day (High Volume)</span></span>
                         <span class="flex items-center space-x-1.5 bg-slate-100 text-slate-600 border border-slate-200 px-3 py-1 rounded-xl"><span class="w-2 h-2 bg-slate-400 rounded-full"></span><span>Accessible</span></span>
                     </div>
                 </div>
@@ -222,12 +222,16 @@
         let activeActionCaseId = null;
         let activeActionMode = null; // 'adjourned' or 'next_hearing'
 
-        // Centralized Mock Database for all dates
+        // Centralized Mock Database for all dates (Default Sept 12 has high volume since it's in the red window)
         let globalDatabases = {
             "2026-9-12": [
                 { hearings: "H-01", time: "10:30 AM", assigned_caseid: "MH-CRL-2021-8891", litigant: "State vs. Vikram Rao", assigned_advocate: ADVOCATES[0], case_type: "Criminal Bail", status: "clear", reasons: [] },
                 { hearings: "H-02", time: "11:15 AM", assigned_caseid: "MH-CIV-2017-1029", litigant: "Patil Enterprises vs. MMRDA", assigned_advocate: ADVOCATES[1], case_type: "Civil Suit", status: "unresolved", reasons: ["Witnesses not present"] },
-                { hearings: "H-03", time: "12:00 PM", assigned_caseid: "MH-CRL-2023-5512", litigant: "Kulkarni vs. State of MH", assigned_advocate: ADVOCATES[2], case_type: "Writ Petition", status: "clear", reasons: [] }
+                { hearings: "H-03", time: "12:00 PM", assigned_caseid: "MH-CRL-2023-5512", litigant: "Kulkarni vs. State of MH", assigned_advocate: ADVOCATES[2], case_type: "Writ Petition", status: "clear", reasons: [] },
+                { hearings: "H-04", time: "01:15 PM", assigned_caseid: "MH-COM-2024-3319", litigant: "Reliance vs. Apex Ltd", assigned_advocate: ADVOCATES[3], case_type: "Commercial Dispute", status: "unresolved", reasons: ["Counsel briefing pending"] },
+                { hearings: "H-05", time: "02:00 PM", assigned_caseid: "MH-CIV-2019-4412", litigant: "Deshmukh vs. Shinde", assigned_advocate: ADVOCATES[4], case_type: "Civil Suit", status: "clear", reasons: [] },
+                { hearings: "H-06", time: "03:30 PM", assigned_caseid: "MH-CRL-2022-7788", litigant: "State vs. Khan", assigned_advocate: ADVOCATES[5], case_type: "Criminal Appeal", status: "unresolved", reasons: ["Medical report awaited"] },
+                { hearings: "H-07", time: "04:15 PM", assigned_caseid: "MH-LAN-2021-1102", litigant: "Pune Corp vs. Jadhav", assigned_advocate: ADVOCATES[6], case_type: "Land Acquisition", status: "clear", reasons: [] }
             ]
         };
 
@@ -304,7 +308,6 @@
 
         function findNextFreeFutureDate(advocateName) {
             let refDate = new Date(2026, 8, 12); // Sept 12, 2026
-            // Start searching after the 14-day busy window (Sept 26, 2026 onwards)
             for(let i=14; i<=60; i++) {
                 let d = new Date(refDate);
                 d.setDate(refDate.getDate() + i);
@@ -316,7 +319,7 @@
                 let day = d.getDate();
                 let key = `${y}-${m}-${day}`;
                 
-                let dayCases = globalDatabases[key] || [];
+                let dayCases = getOrCreateDatabaseForDate(y, m, day);
                 let isBusy = dayCases.length >= 5 || dayCases.some(c => c.assigned_advocate === advocateName && c.status !== 'closed');
                 
                 if(!isBusy) {
@@ -326,19 +329,29 @@
             return { year: 2026, month: 8, day: 28 };
         }
 
-        /* --- Generate Random Database for any Date --- */
+        /* --- Generate Mock Database (High volume on Red days, lighter on Green days) --- */
         function getOrCreateDatabaseForDate(year, month, day) {
             let key = `${year}-${month}-${day}`;
             if (!globalDatabases[key]) {
-                let count = Math.floor(Math.random() * 3) + 3; // 3 to 5 cases
+                let today = new Date(2026, 8, 12);
+                let windowEndRed = new Date(2026, 8, 25);
+                let cellDate = new Date(year, month, day);
+
+                let isPastWorkingDay = (cellDate < today);
+                let isInRedWindow = (cellDate >= today && cellDate <= windowEndRed);
+                let isRedDay = isPastWorkingDay || isInRedWindow;
+
+                // Red days get high volume (6 to 9 cases), Green days get light volume (2 to 3 cases)
+                let count = isRedDay ? (Math.floor(Math.random() * 4) + 6) : (Math.floor(Math.random() * 2) + 2);
+                
                 let cases = [];
                 let types = ["Civil Suit", "Criminal Bail", "Writ Petition", "Commercial Dispute", "Land Acquisition", "Criminal Appeal"];
-                let litigantsList = ["Deshmukh vs. Shinde", "State vs. Patil", "Sharma vs. Municipal Corp", "Kulkarni vs. Union of India", "Nair vs. State of MH"];
+                let litigantsList = ["Deshmukh vs. Shinde", "State vs. Patil", "Sharma vs. Municipal Corp", "Kulkarni vs. Union of India", "Nair vs. State of MH", "Verma vs. Builders", "Patel vs. Commissioner"];
                 
                 for(let i=1; i<=count; i++) {
                     let type = types[Math.floor(Math.random() * types.length)];
                     let time = (type === "Criminal Bail") ? `10:${Math.floor(Math.random()*30+10).toString().padStart(2,'0')} AM` : `${Math.floor(Math.random()*5+1)}:${Math.floor(Math.random()*60).toString().padStart(2,'0')} PM`;
-                    let status = Math.random() > 0.5 ? "clear" : "unresolved";
+                    let status = Math.random() > 0.4 ? "clear" : "unresolved";
                     cases.push({
                         hearings: `H-0${i}`,
                         time: time,
@@ -358,11 +371,11 @@
         /* --- Check if Advocate has a scheduling conflict on target date --- */
         function isAdvocateBusyOnDate(advocateName, year, month, day) {
             let key = `${year}-${month}-${day}`;
-            let cases = globalDatabases[key] || [];
+            let cases = getOrCreateDatabaseForDate(year, month, day);
             return cases.some(c => c.assigned_advocate === advocateName && c.status !== 'closed');
         }
 
-        /* --- Smart Calendar Builder with Custom Coloring Constraints --- */
+        /* --- Smart Calendar Builder --- */
         function buildMultiMonthCalendar() {
             const container = document.getElementById('multiMonthCalendarContainer');
             if(!container) return;
@@ -375,22 +388,15 @@
                 { name: "November 2026 (Future +2)", year: 2026, month: 10, days: 30, startDay: 0 }
             ];
 
-            let today = new Date(2026, 8, 12); // September 12, 2026
-
-            // Calculate working days count for the 4 green days following the 14-day red window
-            // Today (Sept 12) + 13 days = Sept 25, 2026.
-            // Next 4 working days after Sept 25: Sept 26 (Sat), Sept 28 (Mon), Sept 29 (Tue), Sept 30 (Wed). (Sept 27 is Sunday).
+            let today = new Date(2026, 8, 12);
             let windowEndRed = new Date(2026, 8, 25);
-            
-            // Helper to count working days between Sept 25 and target date
+
             function countWorkingDaysAfter(targetDate) {
                 let count = 0;
                 let curr = new Date(windowEndRed);
                 curr.setDate(curr.getDate() + 1);
                 while(curr <= targetDate) {
-                    if(curr.getDay() !== 0) { // Not Sunday
-                        count++;
-                    }
+                    if(curr.getDay() !== 0) count++;
                     curr.setDate(curr.getDate() + 1);
                 }
                 return count;
@@ -438,12 +444,11 @@
                             clickAction = `confirmTargetDate(${m.year}, ${m.month}, ${d})`;
                         }
                     } else {
-                        // Normal inspection mode based on requested coloring rules
                         if (isPastWorkingDay || isInRedWindow) {
                             cls = "cal-day-busy bg-red-50 text-red-900 border border-red-300 font-extrabold cursor-pointer relative shadow-sm hover:bg-red-100";
                             tooltipHtml = `
-                                .sup<div class="cal-tooltip absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-48 bg-slate-900 text-white text-[10px] p-2.5 rounded-xl shadow-2xl z-50 pointer-events-none space-y-1 text-left border border-slate-700">
-                                    <p class="font-bold text-red-400 border-b border-slate-800 pb-0.5">Busy Window / Past (${d} ${m.name.split(' ')[0]})</p>
+                                <div class="cal-tooltip absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-48 bg-slate-900 text-white text-[10px] p-2.5 rounded-xl shadow-2xl z-50 pointer-events-none space-y-1 text-left border border-slate-700">
+                                    <p class="font-bold text-red-400 border-b border-slate-800 pb-0.5">High Volume Busy Day (${d} ${m.name.split(' ')[0]})</p>
                                 </div>
                             `;
                         } else if (isNext4WorkingDays) {
