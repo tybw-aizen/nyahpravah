@@ -221,20 +221,36 @@
         let activeActionCaseId = null;
         let activeActionMode = null;
 
+        // Default database with multi-condition compliance criteria per case
         let globalDatabases = {
             "2026-9-12": [
-                { hearings: "H-01", time: "10:30 AM", assigned_caseid: "MH-CRL-2021-8891", litigant: "State vs. Vikram Rao", assigned_advocate: ADVOCATES[0], case_type: "Criminal Bail", status: "clear", reasons: [] },
-                { hearings: "H-02", time: "11:15 AM", assigned_caseid: "MH-CIV-2017-1029", litigant: "Patil Enterprises vs. MMRDA", assigned_advocate: ADVOCATES[1], case_type: "Civil Suit", status: "unresolved", reasons: ["Witnesses not present"] },
-                { hearings: "H-03", time: "12:00 PM", assigned_caseid: "MH-CRL-2023-5512", litigant: "Kulkarni vs. State of MH", assigned_advocate: ADVOCATES[2], case_type: "Writ Petition", status: "clear", reasons: [] },
-                { hearings: "H-04", time: "01:15 PM", assigned_caseid: "MH-COM-2024-3319", litigant: "Reliance vs. Apex Ltd", assigned_advocate: ADVOCATES[3], case_type: "Commercial Dispute", status: "unresolved", reasons: ["Counsel briefing pending"] },
-                { hearings: "H-05", time: "02:00 PM", assigned_caseid: "MH-CIV-2019-4412", litigant: "Deshmukh vs. Shinde", assigned_advocate: ADVOCATES[4], case_type: "Civil Suit", status: "clear", reasons: [] }
+                { 
+                    hearings: "H-01", time: "10:30 AM", assigned_caseid: "MH-CRL-2021-8891", litigant: "State vs. Vikram Rao", assigned_advocate: ADVOCATES[0], case_type: "Criminal Bail", status: "clear", 
+                    conditions: { "Affidavit Verified": true, "Counsel Present": true, "Evidence Filed": true, "Witnesses Summoned": true } 
+                },
+                { 
+                    hearings: "H-02", time: "11:15 AM", assigned_caseid: "MH-CIV-2017-1029", litigant: "Patil Enterprises vs. MMRDA", assigned_advocate: ADVOCATES[1], case_type: "Civil Suit", status: "unresolved", 
+                    conditions: { "Affidavit Verified": true, "Counsel Present": true, "Evidence Filed": false, "Witnesses Summoned": true } // 1 false keeps it unresolved
+                },
+                { 
+                    hearings: "H-03", time: "12:00 PM", assigned_caseid: "MH-CRL-2023-5512", litigant: "Kulkarni vs. State of MH", assigned_advocate: ADVOCATES[2], case_type: "Writ Petition", status: "clear", 
+                    conditions: { "Affidavit Verified": true, "Counsel Present": true, "Evidence Filed": true, "Witnesses Summoned": true } 
+                },
+                { 
+                    hearings: "H-04", time: "01:15 PM", assigned_caseid: "MH-COM-2024-3319", litigant: "Reliance vs. Apex Ltd", assigned_advocate: ADVOCATES[3], case_type: "Commercial Dispute", status: "unresolved", 
+                    conditions: { "Affidavit Verified": true, "Counsel Present": false, "Evidence Filed": true, "Witnesses Summoned": true } // 1 false keeps it unresolved
+                },
+                { 
+                    hearings: "H-05", time: "02:00 PM", assigned_caseid: "MH-CIV-2019-4412", litigant: "Deshmukh vs. Shinde", assigned_advocate: ADVOCATES[4], case_type: "Civil Suit", status: "clear", 
+                    conditions: { "Affidavit Verified": true, "Counsel Present": true, "Evidence Filed": true, "Witnesses Summoned": true } 
+                }
             ]
         };
 
         window.addEventListener('DOMContentLoaded', () => {
             const storedSession = localStorage.getItem('nyay_user_session');
             if (!storedSession) {
-                window.location.href = "index.html";
+                window.location.href = "login.html";
                 return;
             }
             session = JSON.parse(storedSession);
@@ -281,7 +297,7 @@
                 assigned_advocate: document.getElementById('addAdvocate').value,
                 case_type: document.getElementById('addCaseType').value,
                 status: "clear",
-                reasons: []
+                conditions: { "Affidavit Verified": true, "Counsel Present": true, "Evidence Filed": true, "Witnesses Summoned": true }
             };
 
             let recommendedDate = findNextFreeFutureDate(newCase.assigned_advocate);
@@ -320,11 +336,20 @@
                 for(let i=1; i<=count; i++) {
                     let type = types[Math.floor(Math.random() * types.length)];
                     let time = (type === "Criminal Bail") ? `10:${Math.floor(Math.random()*30+10).toString().padStart(2,'0')} AM` : `${Math.floor(Math.random()*5+1)}:${Math.floor(Math.random()*60).toString().padStart(2,'0')} PM`;
-                    let status = Math.random() > 0.4 ? "clear" : "unresolved";
+                    
+                    // Evaluate conditions: 4 criteria. If any is false, status is unresolved.
+                    let c1 = Math.random() > 0.3;
+                    let c2 = Math.random() > 0.3;
+                    let c3 = Math.random() > 0.3;
+                    let c4 = Math.random() > 0.3;
+                    let allTrue = c1 && c2 && c3 && c4;
+                    let status = allTrue ? "clear" : "unresolved";
+
                     cases.push({
                         hearings: `H-0${i}`, time: time, assigned_caseid: `MH-${type.substring(0,3).toUpperCase()}-2026-${Math.floor(Math.random()*9000+1000)}`,
                         litigant: litigantsList[Math.floor(Math.random()*litigantsList.length)], assigned_advocate: ADVOCATES[Math.floor(Math.random()*ADVOCATES.length)],
-                        case_type: type, status: status, reasons: status === "unresolved" ? ["Pending verification"] : []
+                        case_type: type, status: status,
+                        conditions: { "Affidavit Verified": c1, "Counsel Present": c2, "Evidence Filed": c3, "Witnesses Summoned": c4 }
                     });
                 }
                 globalDatabases[key] = cases;
@@ -453,9 +478,8 @@
             
             if(caseObj) {
                 caseObj.status = "pending";
-                caseObj.reasons = ["Rescheduled to " + targetDateStr];
                 let targetCases = getOrCreateDatabaseForDate(year, month, day);
-                targetCases.push({ ...caseObj, status: "unresolved", reasons: ["Postponed from previous hearing"] });
+                targetCases.push({ ...caseObj, status: "unresolved", conditions: { "Affidavit Verified": true, "Counsel Present": true, "Evidence Filed": false, "Witnesses Summoned": true } });
                 alert(`Success: Case ${activeActionCaseId} adjourned to ${targetDateStr}.`);
             }
             activeActionMode = null;
@@ -485,7 +509,26 @@
                 } else if(row.status === 'clear') {
                     statusHtml = `<span class="bg-emerald-100 text-emerald-900 px-3 py-1 rounded font-extrabold text-xs">Clear</span>`;
                 } else {
-                    statusHtml = `<span class="bg-rose-100 text-rose-900 px-3 py-1 rounded font-extrabold text-xs">Unresolved</span>`;
+                    // Build multi-condition audit list for tooltip
+                    let conds = row.conditions || {};
+                    let condListHtml = Object.entries(conds).map(([name, passed]) => {
+                        let icon = passed ? '✅' : '❌';
+                        let textColor = passed ? 'text-emerald-400' : 'text-rose-400';
+                        return `<li class="flex items-center justify-between space-x-3"><span class="text-slate-300">${name}</span><span class="${textColor} font-bold">${icon} ${passed ? 'Met' : 'Failed'}</span></li>`;
+                    }).join('');
+
+                    statusHtml = `
+                        <div class="tooltip-container relative inline-block">
+                            <span class="bg-rose-100 text-rose-900 px-3 py-1 rounded font-extrabold text-xs cursor-pointer inline-flex items-center space-x-1.5">
+                                <span class="w-1.5 h-1.5 bg-rose-600 rounded-full animate-pulse"></span>
+                                <span>Unresolved</span>
+                            </span>
+                            <div class="tooltip-box absolute left-0 bottom-full mb-2 w-72 bg-slate-900 text-white text-[11px] p-3.5 rounded-xl shadow-2xl z-50 pointer-events-none space-y-2 border border-slate-700">
+                                <p class="font-extrabold text-rose-400 border-b border-slate-800 pb-1 uppercase tracking-wider text-[10px]">Compliance Audit (1 Failed = Unresolved):</p>
+                                <ul class="space-y-1.5">${condListHtml}</ul>
+                            </div>
+                        </div>
+                    `;
                 }
 
                 tbody.innerHTML += `
@@ -514,7 +557,7 @@
 
         function initiateLogout() { document.getElementById('logoutModal').classList.remove('hidden'); }
         function closeLogoutModal() { document.getElementById('logoutModal').classList.add('hidden'); }
-        function confirmLogout() { localStorage.removeItem('nyay_user_session'); window.location.replace("index.html"); }
+        function confirmLogout() { localStorage.removeItem('nyay_user_session'); window.location.replace("login.html"); }
     </script>
 </body>
 </html>
