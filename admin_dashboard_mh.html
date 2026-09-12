@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Maharashtra Bench Clerk Portal | Nyay-Pravah</title>
+    <title>Maharashtra Master Admin Portal | Nyay-Pravah</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Lucide Icons -->
@@ -16,13 +16,6 @@
         .fade-in { animation: fadeIn 0.4s ease-in forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
         .tricolor-bar { background: linear-gradient(90deg, #FF9933 33.33%, #FFFFFF 33.33%, #FFFFFF 66.66%, #138808 66.66%); }
-        .action-dropdown { display: none; }
-        .action-container:hover .action-dropdown { display: flex; }
-        .tooltip-box { display: none; }
-        .tooltip-container:hover .tooltip-box { display: block; }
-        .cal-tooltip { display: none; }
-        .cal-day-busy:hover .cal-tooltip { display: block; }
-        .subtle-green-slot { background-color: #a7f3d0 !important; color: #064e3b !important; border-color: #34d399 !important; font-weight: 800 !important; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col justify-between">
@@ -36,14 +29,14 @@
                 <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-900 to-slate-900 text-white flex items-center justify-center text-2xl shadow-md border border-blue-800">⚖️</div>
                 <div>
                     <div class="flex items-center space-x-2.5">
-                        <span id="clerkCourtTitle" class="font-extrabold text-lg sm:text-xl text-blue-950 tracking-tight">MY COURT DOCKET</span>
-                        <span class="text-[11px] bg-blue-100 text-blue-900 px-3 py-0.5 rounded-full font-extrabold border border-blue-300">BENCH CLERK</span>
+                        <span class="font-extrabold text-lg sm:text-xl text-blue-950 tracking-tight">MAHARASHTRA JUDICIAL MASTER ADMIN</span>
+                        <span class="text-[11px] bg-purple-100 text-purple-900 px-3 py-0.5 rounded-full font-extrabold border border-purple-300">ADMIN CONTROL</span>
                     </div>
-                    <p id="userSubText" class="text-xs text-slate-500 font-semibold mt-0.5">Loading session info...</p>
+                    <p id="adminSubText" class="text-xs text-slate-500 font-semibold mt-0.5">Loading admin session...</p>
                 </div>
             </div>
 
-            <!-- TOP MIDDLE BOMBAY HIGH COURT & TODAYS HEARINGS -->
+            <!-- TOP MIDDLE BOMBAY HIGH COURT -->
             <div class="hidden lg:flex flex-col items-center justify-center text-center">
                 <div class="flex items-center space-x-2.5">
                     <span class="text-xl">🦁</span>
@@ -52,7 +45,7 @@
                 </div>
                 <div class="mt-1">
                     <span class="text-xs font-extrabold tracking-wide text-slate-700 uppercase">
-                        ACTIVE VIEW DATE: <span id="currentDateDisplay" class="text-blue-900 font-black text-sm">September 12, 2026</span>
+                        MASTER REGISTRY MANAGEMENT CONSOLE
                     </span>
                 </div>
             </div>
@@ -72,67 +65,31 @@
 
     <main class="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 py-8 space-y-6">
         
-        <!-- SINGLE BIG HOMEPAGE SECTION: MASTER HEARINGS DOCKET TABLE -->
+        <!-- REGISTRY MANAGEMENT SECTION -->
         <div class="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-xl shadow-slate-100 space-y-6 fade-in">
             <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
                 <div>
-                    <h2 class="text-xl sm:text-2xl font-black text-blue-950 tracking-tight" id="displayCourtHeading">Master Hearings Docket</h2>
-                    <p class="text-sm text-slate-500 font-medium mt-0.5" id="activeViewSub">Showing live database for September 12, 2026</p>
+                    <h2 class="text-xl sm:text-2xl font-black text-blue-950 tracking-tight">Registry Management & Clerk Court Assignment</h2>
+                    <p class="text-sm text-slate-500 font-medium mt-0.5">Register bench clerks and permanently bind them to Courtrooms 1 through 12.</p>
                 </div>
-                <div class="flex items-center space-x-3">
-                    <!-- Add Case Button -->
-                    <button onclick="openAddCaseModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold px-4 py-2.5 rounded-xl text-xs shadow transition flex items-center space-x-2 cursor-pointer">
-                        <i data-lucide="plus-circle" class="w-4 h-4"></i>
-                        <span>Add Case</span>
-                    </button>
-                    <!-- Toggle Smart Calendar Button -->
-                    <button onclick="toggleSmartCalendar()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold px-4 py-2.5 rounded-xl text-xs shadow transition flex items-center space-x-2 cursor-pointer">
-                        <i data-lucide="calendar-range" class="w-4 h-4"></i>
-                        <span>Toggle Smart Calendar</span>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Smart Calendar Panel (6-Column Grid: Mondays to Saturdays, Sundays Cut Off) -->
-            <div id="smartCalendarPanel" class="hidden bg-slate-50 border border-indigo-200 p-6 rounded-3xl shadow-inner space-y-6">
-                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-indigo-100 pb-4">
-                    <div class="flex items-center space-x-3">
-                        <div class="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center shadow-md">
-                            <i data-lucide="calendar" class="w-5 h-5"></i>
-                        </div>
-                        <div>
-                            <h3 class="text-base font-extrabold text-indigo-950" id="calendarModeTitle">Smart Calendar</h3>
-                            <p class="text-xs text-slate-500" id="calendarModeSubtitle">Click any date to inspect its live database. Saturdays kept, Sundays cut off.</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center space-x-4 text-xs font-extrabold" id="calendarLegend">
-                        <span class="flex items-center space-x-1.5 bg-emerald-50 text-emerald-800 border border-emerald-200 px-3 py-1 rounded-xl"><span class="w-2 h-2 bg-emerald-500 rounded-full"></span><span>Free Day</span></span>
-                        <span class="flex items-center space-x-1.5 bg-red-50 text-red-800 border border-red-200 px-3 py-1 rounded-xl"><span class="w-2 h-2 bg-red-500 rounded-full"></span><span>Busy Day</span></span>
-                        <span class="flex items-center space-x-1.5 bg-slate-100 text-slate-600 border border-slate-200 px-3 py-1 rounded-xl"><span class="w-2 h-2 bg-slate-400 rounded-full"></span><span>Accessible</span></span>
-                    </div>
-                </div>
-
-                <!-- 4 Months Grid Container -->
-                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6" id="multiMonthCalendarContainer">
-                    <!-- Populated dynamically via JS -->
-                </div>
+                <button onclick="openAddClerkModal()" class="bg-blue-900 hover:bg-blue-800 text-white font-extrabold px-4 py-2.5 rounded-xl text-xs shadow transition flex items-center space-x-2 cursor-pointer">
+                    <i data-lucide="user-plus" class="w-4 h-4"></i>
+                    <span>Register New Clerk</span>
+                </button>
             </div>
 
             <div class="overflow-x-auto">
                 <table class="w-full text-left text-xs sm:text-sm border-collapse">
                     <thead>
                         <tr class="bg-slate-100/80 text-slate-700 font-extrabold border-b border-slate-200 uppercase tracking-wider text-xs">
-                            <th class="py-4 px-4">Hearings</th>
-                            <th class="py-4 px-4">Time</th>
-                            <th class="py-4 px-4">assigned_caseid</th>
-                            <th class="py-4 px-4">Litigant</th>
-                            <th class="py-4 px-4">assigned_advocate</th>
-                            <th class="py-4 px-4">Case_type</th>
-                            <th class="py-4 px-4">status</th>
+                            <th class="py-4 px-4">User ID</th>
+                            <th class="py-4 px-4">Clerk Name</th>
+                            <th class="py-4 px-4">Assigned Courtroom (Fixed)</th>
+                            <th class="py-4 px-4">State Jurisdiction</th>
                             <th class="py-4 px-4 text-right">Actions</th>
                         </tr>
                     </thead>
-                    <tbody id="masterWorkScheduleBody" class="divide-y divide-slate-100">
+                    <tbody id="registryTableBody" class="divide-y divide-slate-100">
                         <!-- Populated dynamically -->
                     </tbody>
                 </table>
@@ -141,60 +98,52 @@
 
     </main>
 
-    <!-- ADD CASE MODAL -->
-    <div id="addCaseModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl space-y-5 border border-slate-200 modal-enter">
+    <!-- ADD / EDIT CLERK MODAL -->
+    <div id="clerkModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl space-y-5 border border-slate-200 modal-enter">
             <div class="flex items-center justify-between border-b pb-3">
                 <div class="flex items-center space-x-3 text-blue-950">
-                    <i data-lucide="folder-plus" class="w-6 h-6 text-emerald-600"></i>
-                    <h3 class="text-lg font-extrabold">Add New Case Record</h3>
+                    <i data-lucide="shield-check" class="w-6 h-6 text-blue-900"></i>
+                    <h3 class="text-lg font-extrabold" id="modalTitle">Register & Bind Courtroom</h3>
                 </div>
-                <button onclick="closeAddCaseModal()" class="text-slate-400 hover:text-slate-600 font-bold text-lg">&times;</button>
+                <button onclick="closeClerkModal()" class="text-slate-400 hover:text-slate-600 font-bold text-lg">&times;</button>
             </div>
             
-            <form onsubmit="handleAddNewCaseSubmit(event)" class="space-y-4">
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-[11px] font-extrabold uppercase text-slate-700 mb-1">Hearings Index</label>
-                        <input type="text" id="addHearings" required placeholder="e.g. H-04" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-xs font-bold">
-                    </div>
-                    <div>
-                        <label class="block text-[11px] font-extrabold uppercase text-slate-700 mb-1">Time Slot</label>
-                        <input type="text" id="addTime" required placeholder="e.g. 11:30 AM" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-xs font-bold mono">
-                    </div>
-                </div>
-
+            <form onsubmit="handleClerkFormSubmit(event)" class="space-y-4">
                 <div>
-                    <label class="block text-[11px] font-extrabold uppercase text-slate-700 mb-1">assigned_caseid</label>
-                    <input type="text" id="addCaseId" required value="MH-CIV-2026-9901" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-xs font-extrabold mono text-blue-900">
+                    <label class="block text-[11px] font-extrabold uppercase text-slate-700 mb-1">User ID</label>
+                    <input type="text" id="regUserId" required placeholder="e.g. 999888" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-3 text-xs font-bold mono">
                 </div>
-
                 <div>
-                    <label class="block text-[11px] font-extrabold uppercase text-slate-700 mb-1">Litigant</label>
-                    <input type="text" id="addLitigant" required placeholder="e.g. Shinde vs. State" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-xs font-bold">
+                    <label class="block text-[11px] font-extrabold uppercase text-slate-700 mb-1">Clerk Name</label>
+                    <input type="text" id="regName" required placeholder="e.g. Siddharth" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-3 text-xs font-bold">
                 </div>
-
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-[11px] font-extrabold uppercase text-slate-700 mb-1">assigned_advocate</label>
-                        <select id="addAdvocate" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-xs font-bold">
-                            <!-- Populated dynamically -->
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-[11px] font-extrabold uppercase text-slate-700 mb-1">Case_type</label>
-                        <select id="addCaseType" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-xs font-bold">
-                            <option value="Civil Suit">Civil Suit</option>
-                            <option value="Criminal Bail">Criminal Bail</option>
-                            <option value="Writ Petition">Writ Petition</option>
-                            <option value="Commercial Dispute">Commercial Dispute</option>
-                        </select>
-                    </div>
+                <div>
+                    <label class="block text-[11px] font-extrabold uppercase text-slate-700 mb-1">Password</label>
+                    <input type="text" id="regPass" required placeholder="e.g. Siddharth2008" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-3 text-xs font-bold">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-extrabold uppercase text-slate-700 mb-1">Fixed Courtroom Assignment (Court 1 to Court 12)</label>
+                    <select id="regCourt" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-3 text-xs font-bold">
+                        <option value="">Select Courtroom...</option>
+                        <option value="Courtroom 1">Courtroom 1</option>
+                        <option value="Courtroom 2">Courtroom 2</option>
+                        <option value="Courtroom 3">Courtroom 3</option>
+                        <option value="Courtroom 4">Courtroom 4</option>
+                        <option value="Courtroom 5">Courtroom 5</option>
+                        <option value="Courtroom 6">Courtroom 6</option>
+                        <option value="Courtroom 7">Courtroom 7</option>
+                        <option value="Courtroom 8">Courtroom 8</option>
+                        <option value="Courtroom 9">Courtroom 9</option>
+                        <option value="Courtroom 10">Courtroom 10</option>
+                        <option value="Courtroom 11">Courtroom 11</option>
+                        <option value="Courtroom 12">Courtroom 12</option>
+                    </select>
                 </div>
 
                 <div class="flex space-x-3 pt-3">
-                    <button type="button" onclick="closeAddCaseModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 rounded-2xl text-xs transition">Cancel</button>
-                    <button type="submit" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-2xl text-xs transition shadow-sm">Save & Recommend Free Day</button>
+                    <button type="button" onclick="closeClerkModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 rounded-2xl text-xs transition">Cancel</button>
+                    <button type="submit" class="flex-1 bg-blue-900 hover:bg-blue-800 text-white font-bold py-3 rounded-2xl text-xs transition shadow-sm">Save & Bind Registry</button>
                 </div>
             </form>
         </div>
@@ -207,7 +156,7 @@
                 <i data-lucide="log-out" class="w-6 h-6"></i>
                 <h3 class="text-lg font-bold text-slate-900">Secure Session Termination</h3>
             </div>
-            <p class="text-xs sm:text-sm text-slate-600 font-medium">Are you sure you want to securely log out of the National Judicial Portal?</p>
+            <p class="text-xs sm:text-sm text-slate-600 font-medium">Are you sure you want to securely log out of the Master Admin Portal?</p>
             <div class="flex space-x-3 pt-2">
                 <button type="button" onclick="closeLogoutModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 rounded-2xl text-xs sm:text-sm transition">Cancel</button>
                 <button type="button" onclick="confirmLogout()" class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-2xl text-xs sm:text-sm transition shadow-sm">Confirm Logout</button>
@@ -217,374 +166,98 @@
 
     <script>
         let session = null;
-        const ADVOCATES = ["Adv. George", "Adv. Aaron", "Adv. Cyrus", "Adv. Nived", "Adv. Jacob", "Adv. Chris", "Adv. Manu", "Adv. Midhun", "Adv. Zach", "Adv. Jake", "Adv. Priya", "Adv. Sneha"];
-        let activeViewDateKey = "2026-9-12"; // Default active date key: Sept 12, 2026
-        let activeActionCaseId = null;
-        let activeActionMode = null; // 'adjourned' or 'next_hearing'
-
-        // Centralized Mock Database for all dates
-        let globalDatabases = {
-            "2026-9-12": [
-                { hearings: "H-01", time: "10:30 AM", assigned_caseid: "MH-CRL-2021-8891", litigant: "State vs. Vikram Rao", assigned_advocate: ADVOCATES[0], case_type: "Criminal Bail", status: "clear", reasons: [] },
-                { hearings: "H-02", time: "11:15 AM", assigned_caseid: "MH-CIV-2017-1029", litigant: "Patil Enterprises vs. MMRDA", assigned_advocate: ADVOCATES[1], case_type: "Civil Suit", status: "unresolved", reasons: ["Witnesses not present"] },
-                { hearings: "H-03", time: "12:00 PM", assigned_caseid: "MH-CRL-2023-5512", litigant: "Kulkarni vs. State of MH", assigned_advocate: ADVOCATES[2], case_type: "Writ Petition", status: "clear", reasons: [] }
-            ]
-        };
 
         window.addEventListener('DOMContentLoaded', () => {
             const storedSession = localStorage.getItem('nyay_user_session');
             if (!storedSession) {
-                window.location.href = "login.html";
+                window.location.href = "index.html";
                 return;
             }
             session = JSON.parse(storedSession);
             
-            document.getElementById('userSubText').textContent = `Clerk: ${session.name} (ID: ${session.id})`;
-            document.getElementById('displayCourtHeading').textContent = `Master Hearings Docket — ${session.court}`;
-            
-            const advSelect = document.getElementById('addAdvocate');
-            ADVOCATES.forEach(adv => {
-                let opt = document.createElement('option');
-                opt.value = adv; opt.textContent = adv;
-                advSelect.appendChild(opt);
-            });
+            document.getElementById('adminSubText').textContent = `Master Admin: ${session.name} (ID: ${session.id})`;
 
             setInterval(() => {
                 document.getElementById('liveClock').textContent = new Date().toLocaleTimeString() + " IST";
             }, 1000);
 
-            renderMasterWorkSchedule();
-            buildMultiMonthCalendar();
+            renderRegistryTable();
             lucide.createIcons();
         });
 
-        function toggleSmartCalendar() {
-            const panel = document.getElementById('smartCalendarPanel');
-            panel.classList.toggle('hidden');
-            if(!panel.classList.contains('hidden')) {
-                activeActionMode = null;
-                document.getElementById('calendarModeTitle').textContent = "Smart Calendar";
-                document.getElementById('calendarModeSubtitle').textContent = "Click any date to inspect its live database. Saturdays kept, Sundays cut off.";
-                buildMultiMonthCalendar();
-            }
-        }
-
-        /* --- Add Case Modal Handlers --- */
-        function openAddCaseModal() {
-            document.getElementById('addCaseModal').classList.remove('hidden');
-        }
-        function closeAddCaseModal() {
-            document.getElementById('addCaseModal').classList.add('hidden');
-        }
-
-        function handleAddNewCaseSubmit(e) {
-            e.preventDefault();
-            let newCase = {
-                hearings: document.getElementById('addHearings').value.trim(),
-                time: document.getElementById('addTime').value.trim(),
-                assigned_caseid: document.getElementById('addCaseId').value.trim(),
-                litigant: document.getElementById('addLitigant').value.trim(),
-                assigned_advocate: document.getElementById('addAdvocate').value,
-                case_type: document.getElementById('addCaseType').value,
-                status: "clear",
-                reasons: []
-            };
-
-            // Find a recommended future free day (excluding Sundays, past dates, & advocate conflicts)
-            let recommendedDate = findNextFreeFutureDate(newCase.assigned_advocate);
-            let targetKey = `${recommendedDate.year}-${recommendedDate.month}-${recommendedDate.day}`;
-            let targetCases = getOrCreateDatabaseForDate(recommendedDate.year, recommendedDate.month, recommendedDate.day);
-            
-            targetCases.push(newCase);
-            closeAddCaseModal();
-
-            let recDateObj = new Date(recommendedDate.year, recommendedDate.month, recommendedDate.day);
-            alert(`Case successfully added! Recommended free future date assigned: ${recDateObj.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}.`);
-            
-            loadDateDatabase(recommendedDate.year, recommendedDate.month, recommendedDate.day);
-        }
-
-        function findNextFreeFutureDate(advocateName) {
-            let refDate = new Date(2026, 8, 12); // Sept 12, 2026
-            for(let i=1; i<=60; i++) {
-                let d = new Date(refDate);
-                d.setDate(refDate.getDate() + i);
-                let dayOfWeek = d.getDay(); // 0 = Sunday, 6 = Saturday
-                if(dayOfWeek === 0) continue; // Skip Sundays
-
-                let y = d.getFullYear();
-                let m = d.getMonth();
-                let day = d.getDate();
-                let key = `${y}-${m}-${day}`;
-                
-                let dayCases = globalDatabases[key] || [];
-                let isBusy = dayCases.length >= 5 || dayCases.some(c => c.assigned_advocate === advocateName && c.status !== 'closed');
-                
-                if(!isBusy) {
-                    return { year: y, month: m, day: day };
-                }
-            }
-            return { year: 2026, month: 8, day: 25 };
-        }
-
-        /* --- Generate Random Database for any Date --- */
-        function getOrCreateDatabaseForDate(year, month, day) {
-            let key = `${year}-${month}-${day}`;
-            if (!globalDatabases[key]) {
-                let count = Math.floor(Math.random() * 3) + 3; // 3 to 5 cases
-                let cases = [];
-                let types = ["Civil Suit", "Criminal Bail", "Writ Petition", "Commercial Dispute", "Land Acquisition", "Criminal Appeal"];
-                let litigantsList = ["Deshmukh vs. Shinde", "State vs. Patil", "Sharma vs. Municipal Corp", "Kulkarni vs. Union of India", "Nair vs. State of MH"];
-                
-                for(let i=1; i<=count; i++) {
-                    let type = types[Math.floor(Math.random() * types.length)];
-                    let time = (type === "Criminal Bail") ? `10:${Math.floor(Math.random()*30+10).toString().padStart(2,'0')} AM` : `${Math.floor(Math.random()*5+1)}:${Math.floor(Math.random()*60).toString().padStart(2,'0')} PM`;
-                    let status = Math.random() > 0.5 ? "clear" : "unresolved";
-                    cases.push({
-                        hearings: `H-0${i}`,
-                        time: time,
-                        assigned_caseid: `MH-${type.substring(0,3).toUpperCase()}-2026-${Math.floor(Math.random()*9000+1000)}`,
-                        litigant: litigantsList[Math.floor(Math.random()*litigantsList.length)],
-                        assigned_advocate: ADVOCATES[Math.floor(Math.random()*ADVOCATES.length)],
-                        case_type: type,
-                        status: status,
-                        reasons: status === "unresolved" ? ["Pending affidavit verification", "Witness summon unserved"] : []
-                    });
-                }
-                globalDatabases[key] = cases;
-            }
-            return globalDatabases[key];
-        }
-
-        /* --- Check if Advocate has a scheduling conflict on target date --- */
-        function isAdvocateBusyOnDate(advocateName, year, month, day) {
-            let key = `${year}-${month}-${day}`;
-            let cases = globalDatabases[key] || [];
-            return cases.some(c => c.assigned_advocate === advocateName && c.status !== 'closed');
-        }
-
-        /* --- Smart Calendar Builder (Sundays Cut Off, Saturdays Kept) --- */
-        function buildMultiMonthCalendar() {
-            const container = document.getElementById('multiMonthCalendarContainer');
-            if(!container) return;
-            container.innerHTML = "";
-
-            const monthsConfig = [
-                { name: "August 2026 (Past)", year: 2026, month: 7, days: 31, startDay: 6 },
-                { name: "September 2026 (Current)", year: 2026, month: 8, days: 30, startDay: 2 },
-                { name: "October 2026 (Future +1)", year: 2026, month: 9, days: 31, startDay: 4 },
-                { name: "November 2026 (Future +2)", year: 2026, month: 10, days: 30, startDay: 0 }
-            ];
-
-            let refDate = new Date(2026, 8, 12);
-
-            monthsConfig.forEach(m => {
-                let monthCard = document.createElement('div');
-                monthCard.className = "bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-3";
-                
-                let headerHtml = `<div class="text-xs font-black text-blue-950 uppercase tracking-wide text-center border-b pb-2">${m.name}</div>`;
-                // 6 Columns: Monday to Saturday (Sundays cut off entirely)
-                let daysHeader = `<div class="grid grid-cols-6 gap-1 text-center text-[10px] font-extrabold text-slate-400"><div>Mo</div><div>Tu</div><div>We</div><div>Th</div><div>Fr</div><div>Sa</div></div>`;
-                let daysGrid = `<div class="grid grid-cols-6 gap-1.5 text-center text-xs">`;
-                
-                // Adjust startDay since Sunday (0) is removed; Monday=1 becomes index 0, Saturday=6 becomes index 5
-                let rawStart = m.startDay; 
-                let adjustedStart = (rawStart === 0) ? 5 : rawStart - 1; 
-
-                for(let p=0; p<adjustedStart; p++) { daysGrid += `<div></div>`; }
-
-                for(let d=1; d<=m.days; d++) {
-                    let dayOfWeek = (rawStart + d - 1) % 7;
-                    if (dayOfWeek === 0) continue; // Skip Sundays entirely
-
-                    let isSeptember = (m.year === 2026 && m.month === 8);
-                    let isSept14to28 = isSeptember && (d >= 14 && d <= 28);
-                    let isOctoberOrLater = (m.year > 2026 || (m.year === 2026 && m.month >= 9));
-
-                    let cellDate = new Date(m.year, m.month, d);
-                    let isPastOrToday = cellDate <= refDate;
-
-                    let cls = "";
-                    let tooltipHtml = "";
-                    let clickAction = "";
-                    let isBusy = isSept14to28 || (d % 3 === 0 && !isOctoberOrLater);
-
-                    if (activeActionMode) {
-                        let currentCases = globalDatabases[activeViewDateKey] || [];
-                        let targetCase = currentCases.find(c => c.assigned_caseid === activeActionCaseId);
-                        let advocateName = targetCase ? targetCase.assigned_advocate : "";
-                        let hasAdvocateConflict = isAdvocateBusyOnDate(advocateName, m.year, m.month, d);
-
-                        if (isPastOrToday || isBusy || hasAdvocateConflict) {
-                            cls = "bg-slate-100 text-slate-300 border border-slate-200 cursor-not-allowed opacity-50";
-                            let reason = isPastOrToday ? "Past/Current date" : (isBusy ? "Busy day" : "Advocate conflict");
-                            clickAction = `alert('Unavailable date: ${reason}. Please select a future free day where the advocate is free.')`;
-                        } else {
-                            cls = "subtle-green-slot cursor-pointer transition shadow-sm";
-                            clickAction = `confirmTargetDate(${m.year}, ${m.month}, ${d})`;
-                        }
-                    } else {
-                        // Normal mode: Every date is fully accessible
-                        if (isBusy) {
-                            cls = "cal-day-busy bg-red-50 text-red-900 border border-red-300 font-extrabold cursor-pointer relative shadow-sm hover:bg-red-100";
-                            tooltipHtml = `
-                                <div class="cal-tooltip absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-48 bg-slate-900 text-white text-[10px] p-2.5 rounded-xl shadow-2xl z-50 pointer-events-none space-y-1 text-left border border-slate-700">
-                                    <p class="font-bold text-red-400 border-b border-slate-800 pb-0.5">Click to view ${d} ${m.name.split(' ')[0]} Docket</p>
-                                </div>
-                            `;
-                        } else if (dayOfWeek === 6) {
-                            cls = "bg-slate-50 text-slate-700 border border-slate-200 font-bold cursor-pointer hover:bg-slate-100 transition shadow-sm";
-                        } else {
-                            cls = "bg-emerald-50 text-emerald-900 border border-emerald-300 font-extrabold cursor-pointer hover:bg-emerald-100 transition shadow-sm";
-                        }
-                        clickAction = `loadDateDatabase(${m.year}, ${m.month}, ${d})`;
-                    }
-
-                    daysGrid += `
-                        <div onclick="${clickAction}" class="h-9 rounded-xl flex items-center justify-center font-bold text-xs transition relative ${cls}">
-                            ${d}
-                            ${tooltipHtml}
-                        </div>
-                    `;
-                }
-
-                daysGrid += `</div>`;
-                monthCard.innerHTML = headerHtml + daysHeader + daysGrid;
-                container.appendChild(monthCard);
-            });
-            lucide.createIcons();
-        }
-
-        /* --- Load Date Database Live View --- */
-        function loadDateDatabase(year, month, day) {
-            activeViewDateKey = `${year}-${month}-${day}`;
-            let dateObj = new Date(year, month, day);
-            document.getElementById('currentDateDisplay').textContent = dateObj.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-            document.getElementById('activeViewSub').textContent = `Showing live database for ${dateObj.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}` ;
-            
-            getOrCreateDatabaseForDate(year, month, day);
-            renderMasterWorkSchedule();
-            document.getElementById('smartCalendarPanel').classList.add('hidden');
-        }
-
-        /* --- Action Button Handlers --- */
-        function handleAdjourned(caseId) {
-            activeActionCaseId = caseId;
-            activeActionMode = 'adjourned';
-            document.getElementById('calendarModeTitle').textContent = "Select Future Adjournment Date";
-            document.getElementById('calendarModeSubtitle').textContent = "Showing future free days (Sundays excluded, advocate conflicts locked).";
-            document.getElementById('smartCalendarPanel').classList.remove('hidden');
-            buildMultiMonthCalendar();
-        }
-
-        function handleNextHearing(caseId) {
-            activeActionCaseId = caseId;
-            activeActionMode = 'next_hearing';
-            document.getElementById('calendarModeTitle').textContent = "Select Future Next Hearing Date";
-            document.getElementById('calendarModeSubtitle').textContent = "Showing future free days (Sundays excluded, advocate conflicts locked).";
-            document.getElementById('smartCalendarPanel').classList.remove('hidden');
-            buildMultiMonthCalendar();
-        }
-
-        function handleCloseCase(caseId) {
-            let cases = globalDatabases[activeViewDateKey];
-            let target = cases.find(c => c.assigned_caseid === caseId);
-            if(target) {
-                target.status = "closed";
-                renderMasterWorkSchedule();
-            }
-        }
-
-        function confirmTargetDate(year, month, day) {
-            let targetDateStr = new Date(year, month, day).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-
-            let currentCases = globalDatabases[activeViewDateKey];
-            let caseObj = currentCases.find(c => c.assigned_caseid === activeActionCaseId);
-            
-            if(caseObj) {
-                caseObj.status = "pending";
-                caseObj.reasons = ["Rescheduled to " + targetDateStr];
-
-                let targetCases = getOrCreateDatabaseForDate(year, month, day);
-                let movedCase = { ...caseObj, status: "unresolved", reasons: ["Postponed from previous hearing"] };
-                targetCases.push(movedCase);
-
-                alert(`Success: Case ${activeActionCaseId} adjourned/continued to ${targetDateStr}. Source status updated to Pending.`);
-            }
-
-            activeActionMode = null;
-            document.getElementById('smartCalendarPanel').classList.add('hidden');
-            renderMasterWorkSchedule();
-        }
-
-        /* --- Render Master Docket Table Live --- */
-        function renderMasterWorkSchedule() {
-            const tbody = document.getElementById('masterWorkScheduleBody');
+        function renderRegistryTable() {
+            const tbody = document.getElementById('registryTableBody');
             if(!tbody) return;
             tbody.innerHTML = "";
-            
-            let currentCases = globalDatabases[activeViewDateKey] || [];
 
-            if(currentCases.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="8" class="py-6 text-center text-slate-400 font-semibold">No hearings scheduled for this date.</td></tr>`;
-                return;
+            let dynamicUsers = JSON.parse(localStorage.getItem('nyay_dynamic_users') || '{}');
+            
+            if(Object.keys(dynamicUsers).length === 0) {
+                dynamicUsers["999888"] = { name: "Siddharth", pass: "Siddharth2008", role: "Bench Clerk", state: "Maharashtra", court: "Courtroom 4" };
+                localStorage.setItem('nyay_dynamic_users', JSON.stringify(dynamicUsers));
             }
 
-            currentCases.forEach(row => {
-                let statusHtml = '';
-                let rowStyle = '';
-
-                if(row.status === 'closed') {
-                    rowStyle = 'bg-slate-100 text-slate-400 opacity-60';
-                    statusHtml = `<span class="bg-slate-200 text-slate-600 border border-slate-300 px-3 py-1 rounded-full font-extrabold text-xs">Case Closed</span>`;
-                } else if(row.status === 'pending') {
-                    rowStyle = 'bg-slate-100 text-slate-500 opacity-75';
-                    statusHtml = `<span class="bg-amber-100 text-amber-900 border border-amber-300 px-3 py-1 rounded-full font-extrabold text-xs inline-flex items-center space-x-1.5"><span class="w-1.5 h-1.5 bg-amber-600 rounded-full"></span><span>Pending</span></span>`;
-                } else if(row.status === 'clear') {
-                    statusHtml = `<span class="bg-emerald-100 text-emerald-900 border border-emerald-300 px-3 py-1 rounded-full font-extrabold text-xs inline-flex items-center space-x-1.5"><span class="w-1.5 h-1.5 bg-emerald-600 rounded-full"></span><span>Clear</span></span>`;
-                } else {
-                    let reasonsList = (row.reasons || ["Unresolved conditions"]).map(r => `<li class="flex items-center space-x-1.5"><span class="w-1 h-1 bg-red-600 rounded-full"></span><span>${r}</span></li>`).join('');
-                    statusHtml = `
-                        <div class="tooltip-container relative inline-block">
-                            <span class="bg-red-100 text-red-900 border border-red-300 px-3 py-1 rounded-full font-extrabold text-xs inline-flex items-center space-x-1.5 cursor-pointer">
-                                <span class="w-1.5 h-1.5 bg-red-600 rounded-full"></span>
-                                <span>Unresolved</span>
-                            </span>
-                            <div class="tooltip-box absolute left-0 bottom-full mb-2 w-64 bg-slate-900 text-white text-[11px] p-3 rounded-xl shadow-2xl z-50 pointer-events-none space-y-1.5 border border-slate-700">
-                                <p class="font-bold text-red-400 border-b border-slate-800 pb-1 uppercase tracking-wider text-[10px]">Unfulfilled Conditions:</p>
-                                <ul class="space-y-1">${reasonsList}</ul>
-                            </div>
-                        </div>
-                    `;
-                }
-
+            for(let [id, user] of Object.entries(dynamicUsers)) {
                 tbody.innerHTML += `
-                    <tr class="hover:bg-slate-50/90 transition ${rowStyle}">
-                        <td class="py-4 px-4 font-bold text-slate-800">${row.hearings}</td>
-                        <td class="py-4 px-4 mono font-semibold text-slate-600">${row.time}</td>
-                        <td class="py-4 px-4 mono font-extrabold text-blue-900">${row.assigned_caseid}</td>
-                        <td class="py-4 px-4 font-semibold text-slate-900">${row.litigant}</td>
-                        <td class="py-4 px-4"><span class="bg-indigo-50 text-indigo-900 border border-indigo-200 px-3 py-1 rounded-xl font-extrabold text-xs">${row.assigned_advocate}</span></td>
-                        <td class="py-4 px-4"><span class="bg-slate-100 text-slate-800 border border-slate-200 px-3 py-1 rounded-full font-extrabold text-xs">${row.case_type}</span></td>
-                        <td class="py-4 px-4">${statusHtml}</td>
-                        <td class="py-4 px-4 text-right relative">
-                            <div class="action-container inline-block relative">
-                                <button class="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-extrabold rounded-lg tracking-widest text-sm transition cursor-pointer">...</button>
-                                <div class="action-dropdown absolute right-0 top-full mt-1 w-36 bg-white border border-slate-200 rounded-xl shadow-xl flex-col py-1.5 z-30 text-left">
-                                    <button onclick="handleAdjourned('${row.assigned_caseid}')" class="w-full text-left px-3.5 py-1.5 text-xs font-extrabold text-slate-700 hover:bg-amber-50 hover:text-amber-800 transition">Adjourned</button>
-                                    <button onclick="handleNextHearing('${row.assigned_caseid}')" class="w-full text-left px-3.5 py-1.5 text-xs font-extrabold text-slate-700 hover:bg-blue-50 hover:text-blue-800 transition">Next Hearing</button>
-                                    <button onclick="handleCloseCase('${row.assigned_caseid}')" class="w-full text-left px-3.5 py-1.5 text-xs font-extrabold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 transition">Close Case</button>
-                                </div>
-                            </div>
+                    <tr class="hover:bg-slate-50/90 transition">
+                        <td class="py-4 px-4 mono font-bold text-blue-900">${id}</td>
+                        <td class="py-4 px-4 font-extrabold text-slate-900">${user.name}</td>
+                        <td class="py-4 px-4"><span class="bg-indigo-50 text-indigo-900 border border-indigo-200 px-3 py-1 rounded-xl font-extrabold text-xs">🏛️ ${user.court}</span></td>
+                        <td class="py-4 px-4 font-semibold text-slate-600">${user.state}</td>
+                        <td class="py-4 px-4 text-right">
+                            <button onclick="deleteClerk('${id}')" class="text-xs font-extrabold text-red-600 hover:underline">Revoke Binding</button>
                         </td>
                     </tr>
                 `;
-            });
+            }
+        }
+
+        function openAddClerkModal() {
+            document.getElementById('regUserId').value = "";
+            document.getElementById('regName').value = "";
+            document.getElementById('regPass').value = "";
+            document.getElementById('regCourt').value = "";
+            document.getElementById('clerkModal').classList.remove('hidden');
+        }
+
+        function closeClerkModal() {
+            document.getElementById('clerkModal').classList.add('hidden');
+        }
+
+        function handleClerkFormSubmit(e) {
+            e.preventDefault();
+            let id = document.getElementById('regUserId').value.trim();
+            let name = document.getElementById('regName').value.trim();
+            let pass = document.getElementById('regPass').value.trim();
+            let court = document.getElementById('regCourt').value;
+
+            let dynamicUsers = JSON.parse(localStorage.getItem('nyay_dynamic_users') || '{}');
+            dynamicUsers[id] = {
+                name: name,
+                pass: pass,
+                role: "Bench Clerk",
+                state: "Maharashtra",
+                court: court
+            };
+
+            localStorage.setItem('nyay_dynamic_users', JSON.stringify(dynamicUsers));
+            closeClerkModal();
+            renderRegistryTable();
+            alert(`Success: Clerk ${name} successfully registered and permanently bound to ${court}!`);
+        }
+
+        function deleteClerk(id) {
+            if(confirm(`Are you sure you want to revoke binding for User ID ${id}?`)) {
+                let dynamicUsers = JSON.parse(localStorage.getItem('nyay_dynamic_users') || '{}');
+                delete dynamicUsers[id];
+                localStorage.setItem('nyay_dynamic_users', JSON.stringify(dynamicUsers));
+                renderRegistryTable();
+            }
         }
 
         function initiateLogout() { document.getElementById('logoutModal').classList.remove('hidden'); }
         function closeLogoutModal() { document.getElementById('logoutModal').classList.add('hidden'); }
-        function confirmLogout() { localStorage.removeItem('nyay_user_session'); window.location.replace("login.html"); }
+        function confirmLogout() { localStorage.removeItem('nyay_user_session'); window.location.replace("index.html"); }
     </script>
 </body>
 </html>
