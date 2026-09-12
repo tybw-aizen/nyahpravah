@@ -85,7 +85,7 @@
 
     <main class="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 py-6 space-y-6">
         
-        <!-- TAB 1: MY DOCKET & UNIFIED COLOR-CODED LAWYER WORK SCHEDULE -->
+        <!-- TAB 1: MY DOCKET & OPTION 1 MODERN MINIMALIST TABLE -->
         <div id="tab1-content" class="space-y-6">
             <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
                 <div class="flex items-center space-x-4">
@@ -111,32 +111,34 @@
                 </div>
             </div>
 
-            <!-- Unified Color-Coded Lawyer Work Schedule Section -->
+            <!-- Option 1: Modern Minimalist Hearings Docket Table -->
             <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-4">
                 <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b pb-3">
                     <div>
-                        <h3 class="text-sm font-extrabold text-blue-950">Master Advocate Work Schedule & Status Matrix</h3>
-                        <p class="text-xs text-slate-500">Live docket tracking for all designated counsel.</p>
+                        <h3 class="text-sm font-extrabold text-blue-950">Master Hearings Docket</h3>
+                        <p class="text-xs text-slate-500">Scheduled sequence for today's courtroom proceedings.</p>
                     </div>
-                    <div class="flex items-center space-x-3 text-[11px] font-bold">
-                        <span class="flex items-center space-x-1 bg-emerald-50 text-emerald-800 border border-emerald-200 px-2.5 py-1 rounded-lg"><span class="w-2 h-2 bg-emerald-500 rounded-full"></span><span>Completed</span></span>
-                        <span class="flex items-center space-x-1 bg-red-50 text-red-800 border border-red-200 px-2.5 py-1 rounded-lg"><span class="w-2 h-2 bg-red-500 rounded-full"></span><span>Urgent</span></span>
-                        <span class="flex items-center space-x-1 bg-amber-50 text-amber-800 border border-amber-200 px-2.5 py-1 rounded-lg"><span class="w-2 h-2 bg-amber-500 rounded-full"></span><span>Pending</span></span>
+                    <div class="flex items-center space-x-2 text-[11px] font-bold">
+                        <span class="bg-slate-100 text-slate-700 px-3 py-1 rounded-xl border border-slate-200">Live Active Session</span>
                     </div>
                 </div>
 
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left text-xs">
-                        <thead class="bg-slate-100 text-slate-700 font-extrabold">
-                            <tr>
-                                <th class="p-3">Advocate Name</th>
-                                <th class="p-3">Assigned Case ID</th>
-                                <th class="p-3">Scheduled Time Slot</th>
-                                <th class="p-3">Matter Urgency / Status</th>
-                                <th class="p-3 text-right">Action</th>
+                    <table class="w-full text-left text-xs border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50 text-slate-600 font-extrabold border-b border-slate-200 uppercase tracking-wider text-[11px]">
+                                <th class="p-3.5">Hearings</th>
+                                <th class="p-3.5">Time</th>
+                                <th class="p-3.5">assigned_caseid</th>
+                                <th class="p-3.5">Litigant</th>
+                                <th class="p-3.5">assigned_advocate</th>
+                                <th class="p-3.5">Case_type</th>
+                                <th class="p-3.5 text-right">Action</th>
                             </tr>
                         </thead>
-                        <tbody id="masterWorkScheduleBody" class="divide-y divide-slate-100"></tbody>
+                        <tbody id="masterWorkScheduleBody" class="divide-y divide-slate-100">
+                            <!-- Populated dynamically -->
+                        </tbody>
                     </table>
                 </div>
             </div>
@@ -333,23 +335,24 @@
             tbody.innerHTML = "";
             
             const scheduleData = [
-                { adv: ADVOCATES[0], caseId: "MH-CRL-2021-8891", time: "10:30 AM", status: "Urgent", type: "red" },
-                { adv: ADVOCATES[1], caseId: "MH-CIV-2017-1029", time: "11:15 AM", status: "Pending", type: "orange" },
-                { adv: ADVOCATES[2], caseId: "MH-CRL-2023-5512", time: "12:00 PM", status: "Completed", type: "green" },
-                { adv: ADVOCATES[3], caseId: "MH-CIV-2024-9910", time: "01:30 PM", status: "Urgent", type: "red" },
-                { adv: ADVOCATES[4], caseId: "MH-CRL-2022-3341", time: "02:15 PM", status: "Completed", type: "green" },
-                { adv: ADVOCATES[5], caseId: "MH-CIV-2019-7721", time: "03:00 PM", status: "Pending", type: "orange" }
+                { hearings: "H-01", time: "10:30 AM", assigned_caseid: "MH-CRL-2021-8891", litigant: "State vs. Vikram Rao", assigned_advocate: ADVOCATES[0], case_type: "Criminal Bail" },
+                { hearings: "H-02", time: "11:15 AM", assigned_caseid: "MH-CIV-2017-1029", litigant: "Patil Enterprises vs. MMRDA", assigned_advocate: ADVOCATES[1], case_type: "Civil Suit" },
+                { hearings: "H-03", time: "12:00 PM", assigned_caseid: "MH-CRL-2023-5512", litigant: "Kulkarni vs. State of MH", assigned_advocate: ADVOCATES[2], case_type: "Writ Petition" },
+                { hearings: "H-04", time: "01:30 PM", assigned_caseid: "MH-CIV-2024-9910", litigant: "Deshmukh vs. Shinde", assigned_advocate: ADVOCATES[3], case_type: "Commercial Dispute" },
+                { hearings: "H-05", time: "02:15 PM", assigned_caseid: "MH-CRL-2022-3341", litigant: "Republic vs. Khan", assigned_advocate: ADVOCATES[4], case_type: "Criminal Appeal" },
+                { hearings: "H-06", time: "03:00 PM", assigned_caseid: "MH-CIV-2019-7721", litigant: "Pune Corp vs. Jadhav", assigned_advocate: ADVOCATES[5], case_type: "Land Acquisition" }
             ];
 
             scheduleData.forEach(row => {
-                let badgeClass = row.type === "green" ? "bg-emerald-50 text-emerald-800 border-emerald-200" : (row.type === "red" ? "bg-red-50 text-red-800 border-red-200" : "bg-amber-50 text-amber-800 border-amber-200");
                 tbody.innerHTML += `
-                    <tr class="hover:bg-slate-50 transition">
-                        <td class="p-3 font-extrabold text-blue-950">${row.adv}</td>
-                        <td class="p-3 font-mono font-bold text-blue-900">${row.caseId}</td>
-                        <td class="p-3 mono text-slate-600">${row.time}</td>
-                        <td class="p-3"><span class="border px-2.5 py-1 rounded-full font-bold text-[10px] ${badgeClass}">● ${row.status}</span></td>
-                        <td class="p-3 text-right"><button onclick="alert('Viewing docket details for ${row.caseId}')" class="text-[11px] font-bold text-blue-800 hover:underline">Inspect</button></td>
+                    <tr class="hover:bg-slate-50/80 transition">
+                        <td class="p-3.5 font-bold text-slate-700">${row.hearings}</td>
+                        <td class="p-3.5 mono font-semibold text-slate-600">${row.time}</td>
+                        <td class="p-3.5 mono font-extrabold text-blue-900">${row.assigned_caseid}</td>
+                        <td class="p-3.5 font-semibold text-slate-900">${row.litigant}</td>
+                        <td class="p-3.5"><span class="bg-indigo-50 text-indigo-900 border border-indigo-200 px-2.5 py-1 rounded-lg font-bold text-[11px]">${row.assigned_advocate}</span></td>
+                        <td class="p-3.5"><span class="bg-slate-100 text-slate-800 border border-slate-200 px-2.5 py-1 rounded-full font-bold text-[10px]">${row.case_type}</span></td>
+                        <td class="p-3.5 text-right"><button onclick="alert('Inspecting docket file for ${row.assigned_caseid}')" class="text-[11px] font-bold text-blue-800 hover:underline">Inspect</button></td>
                     </tr>
                 `;
             });
