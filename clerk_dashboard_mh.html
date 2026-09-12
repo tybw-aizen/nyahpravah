@@ -100,13 +100,13 @@
                         </div>
                         <div>
                             <h3 class="text-base font-extrabold text-indigo-950">Smart Calendar</h3>
-                            <p class="text-xs text-slate-500">Click any date to lock previous timelines. Sunday to Saturday layout. Red = Busy (Hover for hearings), Green = Free.</p>
+                            <p class="text-xs text-slate-500">Click any date to lock previous timelines. Sunday to Saturday layout. Red = Busy (Hover for hearings), Green/White = Free.</p>
                         </div>
                     </div>
                     <div class="flex items-center space-x-4 text-xs font-extrabold">
                         <span class="flex items-center space-x-1.5 bg-emerald-50 text-emerald-800 border border-emerald-200 px-3 py-1 rounded-xl"><span class="w-2 h-2 bg-emerald-500 rounded-full"></span><span>Free Day</span></span>
                         <span class="flex items-center space-x-1.5 bg-red-50 text-red-800 border border-red-200 px-3 py-1 rounded-xl"><span class="w-2 h-2 bg-red-500 rounded-full"></span><span>Busy Day</span></span>
-                        <span class="flex items-center space-x-1.5 bg-slate-200 text-slate-600 border border-slate-300 px-3 py-1 rounded-xl"><span class="w-2 h-2 bg-slate-400 rounded-full"></span><span>Off / Past</span></span>
+                        <span class="flex items-center space-x-1.5 bg-slate-200 text-slate-600 border border-slate-300 px-3 py-1 rounded-xl"><span class="w-2 h-2 bg-slate-400 rounded-full"></span><span>Weekend Off</span></span>
                     </div>
                 </div>
 
@@ -215,7 +215,7 @@
                 
                 let daysGrid = `<div class="grid grid-cols-7 gap-1.5 text-center text-xs">`;
                 
-                // For Sunday start index: startDay 0=Sun, 1=Mon, ..., 6=Sat
+                // Sunday start index: startDay 0=Sun, 1=Mon, ..., 6=Sat
                 let adjustedStart = m.startDay; 
                 for(let p=0; p<adjustedStart; p++) {
                     daysGrid += `<div></div>`;
@@ -231,18 +231,22 @@
                     let tooltipHtml = "";
                     let isBusy = false;
 
-                    // Specific override for September 2026
+                    // Constraints checks
                     let isSeptember = (m.year === 2026 && m.month === 8);
-                    let isSept14to18 = isSeptember && (d >= 14 && d <= 18);
-                    let isSept30 = isSeptember && (d === 30);
+                    let isSept14to28 = isSeptember && (d >= 14 && d <= 28);
+                    
+                    let isOctoberOrLater = (m.year > 2026 || (m.year === 2026 && m.month >= 9));
 
-                    if (isWeekend || isPast) {
+                    if (isWeekend) {
+                        // Weekends are off (gray)
                         cls = "bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed opacity-75";
-                    } else if (isSept30) {
-                        // September 30 is explicitly green (free)
-                        cls = "bg-emerald-50 text-emerald-900 border border-emerald-300 font-extrabold cursor-pointer hover:bg-emerald-100 transition shadow-sm";
-                    } else if (isSept14to18) {
-                        // September 14-18 are explicitly red (busy)
+                    } else if (isOctoberOrLater) {
+                        // All days after October 1 are common white in color (not gray)
+                        cls = "bg-white text-slate-800 border border-slate-200 font-extrabold cursor-pointer hover:bg-slate-50 transition shadow-sm";
+                    } else if (isPast) {
+                        cls = "bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed opacity-75";
+                    } else if (isSept14to28) {
+                        // September 14 to September 28 (excluding weekends) are all red days
                         isBusy = true;
                         cls = "cal-day-busy bg-red-50 text-red-900 border border-red-300 font-extrabold cursor-pointer relative shadow-sm hover:bg-red-100";
                         tooltipHtml = `
@@ -253,28 +257,12 @@
                             </div>
                         `;
                     } else {
-                        // Progressive freedom for other days
-                        let busyChance = (m.month === 7 || m.month === 8) ? 0.35 : (m.month === 9 ? 0.20 : 0.08);
-                        if (!isWeekend && (d % 4 === 0) && Math.random() < busyChance + 0.1) {
-                            isBusy = true;
-                        }
-
-                        if (isBusy) {
-                            cls = "cal-day-busy bg-red-50 text-red-900 border border-red-300 font-extrabold cursor-pointer relative shadow-sm hover:bg-red-100";
-                            tooltipHtml = `
-                                <div class="cal-tooltip absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-48 bg-slate-900 text-white text-[10px] p-2.5 rounded-xl shadow-2xl z-50 pointer-events-none space-y-1 text-left border border-slate-700">
-                                    <p class="font-bold text-red-400 border-b border-slate-800 pb-0.5">Hearings on ${d} ${m.name.split(' ')[0]}:</p>
-                                    <p>• State vs. Vikram Rao (10:30 AM)</p>
-                                    <p>• Patil Ent. vs. MMRDA (11:15 AM)</p>
-                                </div>
-                            `;
-                        } else {
-                            cls = "bg-emerald-50 text-emerald-900 border border-emerald-300 font-extrabold cursor-pointer hover:bg-emerald-100 transition shadow-sm";
-                        }
+                        // Default free green days
+                        cls = "bg-emerald-50 text-emerald-900 border border-emerald-300 font-extrabold cursor-pointer hover:bg-emerald-100 transition shadow-sm";
                     }
 
                     daysGrid += `
-                        <div onclick="selectCalendarDate(${m.year}, ${m.month}, ${d}, ${isWeekend || isPast})" class="h-9 rounded-xl flex items-center justify-center font-bold text-xs transition relative ${cls}">
+                        <div onclick="selectCalendarDate(${m.year}, ${m.month}, ${d}, ${isWeekend})" class="h-9 rounded-xl flex items-center justify-center font-bold text-xs transition relative ${cls}">
                             ${d}
                             ${tooltipHtml}
                         </div>
@@ -294,9 +282,9 @@
             return date1 < date2;
         }
 
-        function selectCalendarDate(year, month, day, isDisabled) {
-            if(isDisabled) {
-                alert("Cannot select past dates or weekends (off days).");
+        function selectCalendarDate(year, month, day, isWeekend) {
+            if(isWeekend) {
+                alert("Cannot select weekends (off days).");
                 return;
             }
             selectedCutoffDate = { year, month, day };
