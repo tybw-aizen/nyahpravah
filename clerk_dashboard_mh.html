@@ -290,9 +290,7 @@
                 reasons: []
             };
 
-            // Find a recommended future free day (excluding Sundays, past dates, & advocate conflicts)
             let recommendedDate = findNextFreeFutureDate(newCase.assigned_advocate);
-            let targetKey = `${recommendedDate.year}-${recommendedDate.month}-${recommendedDate.day}`;
             let targetCases = getOrCreateDatabaseForDate(recommendedDate.year, recommendedDate.month, recommendedDate.day);
             
             targetCases.push(newCase);
@@ -306,10 +304,11 @@
 
         function findNextFreeFutureDate(advocateName) {
             let refDate = new Date(2026, 8, 12); // Sept 12, 2026
-            for(let i=1; i<=60; i++) {
+            // Start searching after the 14-day busy window (Sept 26, 2026 onwards)
+            for(let i=14; i<=60; i++) {
                 let d = new Date(refDate);
                 d.setDate(refDate.getDate() + i);
-                let dayOfWeek = d.getDay(); // 0 = Sunday, 6 = Saturday
+                let dayOfWeek = d.getDay(); 
                 if(dayOfWeek === 0) continue; // Skip Sundays
 
                 let y = d.getFullYear();
@@ -324,7 +323,7 @@
                     return { year: y, month: m, day: day };
                 }
             }
-            return { year: 2026, month: 8, day: 25 };
+            return { year: 2026, month: 8, day: 28 };
         }
 
         /* --- Generate Random Database for any Date --- */
@@ -363,7 +362,7 @@
             return cases.some(c => c.assigned_advocate === advocateName && c.status !== 'closed');
         }
 
-        /* --- Smart Calendar Builder (Sundays Cut Off, Saturdays Kept) --- */
+        /* --- Smart Calendar Builder with Custom Coloring Constraints --- */
         function buildMultiMonthCalendar() {
             const container = document.getElementById('multiMonthCalendarContainer');
             if(!container) return;
@@ -376,18 +375,35 @@
                 { name: "November 2026 (Future +2)", year: 2026, month: 10, days: 30, startDay: 0 }
             ];
 
-            let refDate = new Date(2026, 8, 12);
+            let today = new Date(2026, 8, 12); // September 12, 2026
+
+            // Calculate working days count for the 4 green days following the 14-day red window
+            // Today (Sept 12) + 13 days = Sept 25, 2026.
+            // Next 4 working days after Sept 25: Sept 26 (Sat), Sept 28 (Mon), Sept 29 (Tue), Sept 30 (Wed). (Sept 27 is Sunday).
+            let windowEndRed = new Date(2026, 8, 25);
+            
+            // Helper to count working days between Sept 25 and target date
+            function countWorkingDaysAfter(targetDate) {
+                let count = 0;
+                let curr = new Date(windowEndRed);
+                curr.setDate(curr.getDate() + 1);
+                while(curr <= targetDate) {
+                    if(curr.getDay() !== 0) { // Not Sunday
+                        count++;
+                    }
+                    curr.setDate(curr.getDate() + 1);
+                }
+                return count;
+            }
 
             monthsConfig.forEach(m => {
                 let monthCard = document.createElement('div');
                 monthCard.className = "bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-3";
                 
                 let headerHtml = `<div class="text-xs font-black text-blue-950 uppercase tracking-wide text-center border-b pb-2">${m.name}</div>`;
-                // 6 Columns: Monday to Saturday (Sundays cut off entirely)
                 let daysHeader = `<div class="grid grid-cols-6 gap-1 text-center text-[10px] font-extrabold text-slate-400"><div>Mo</div><div>Tu</div><div>We</div><div>Th</div><div>Fr</div><div>Sa</div></div>`;
                 let daysGrid = `<div class="grid grid-cols-6 gap-1.5 text-center text-xs">`;
                 
-                // Adjust startDay since Sunday (0) is removed; Monday=1 becomes index 0, Saturday=6 becomes index 5
                 let rawStart = m.startDay; 
                 let adjustedStart = (rawStart === 0) ? 5 : rawStart - 1; 
 
@@ -395,19 +411,17 @@
 
                 for(let d=1; d<=m.days; d++) {
                     let dayOfWeek = (rawStart + d - 1) % 7;
-                    if (dayOfWeek === 0) continue; // Skip Sundays entirely
-
-                    let isSeptember = (m.year === 2026 && m.month === 8);
-                    let isSept14to28 = isSeptember && (d >= 14 && d <= 28);
-                    let isOctoberOrLater = (m.year > 2026 || (m.year === 2026 && m.month >= 9));
+                    if (dayOfWeek === 0) continue; // Skip Sundays
 
                     let cellDate = new Date(m.year, m.month, d);
-                    let isPastOrToday = cellDate <= refDate;
-
                     let cls = "";
                     let tooltipHtml = "";
                     let clickAction = "";
-                    let isBusy = isSept14to28 || (d % 3 === 0 && !isOctoberOrLater);
+
+                    let isPastWorkingDay = (cellDate < today && dayOfWeek !== 0);
+                    let isInRedWindow = (cellDate >= today && cellDate <= windowEndRed);
+                    let workingDaysFromWindow = countWorkingDaysAfter(cellDate);
+                    let isNext4WorkingDays = (cellDate > windowEndRed && workingDaysFromWindow >= 1 && workingDaysFromWindow <= 4);
 
                     if (activeActionMode) {
                         let currentCases = globalDatabases[activeViewDateKey] || [];
@@ -415,27 +429,27 @@
                         let advocateName = targetCase ? targetCase.assigned_advocate : "";
                         let hasAdvocateConflict = isAdvocateBusyOnDate(advocateName, m.year, m.month, d);
 
-                        if (isPastOrToday || isBusy || hasAdvocateConflict) {
+                        let isRestricted = (isPastWorkingDay || isInRedWindow || hasAdvocateConflict);
+                        if (isRestricted) {
                             cls = "bg-slate-100 text-slate-300 border border-slate-200 cursor-not-allowed opacity-50";
-                            let reason = isPastOrToday ? "Past/Current date" : (isBusy ? "Busy day" : "Advocate conflict");
-                            clickAction = `alert('Unavailable date: ${reason}. Please select a future free day where the advocate is free.')`;
+                            clickAction = `alert('Unavailable date. Rescheduling is allowed on future free days (after the red window) with no advocate conflicts.')`;
                         } else {
                             cls = "subtle-green-slot cursor-pointer transition shadow-sm";
                             clickAction = `confirmTargetDate(${m.year}, ${m.month}, ${d})`;
                         }
                     } else {
-                        // Normal mode: Every date is fully accessible
-                        if (isBusy) {
+                        // Normal inspection mode based on requested coloring rules
+                        if (isPastWorkingDay || isInRedWindow) {
                             cls = "cal-day-busy bg-red-50 text-red-900 border border-red-300 font-extrabold cursor-pointer relative shadow-sm hover:bg-red-100";
                             tooltipHtml = `
-                                <div class="cal-tooltip absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-48 bg-slate-900 text-white text-[10px] p-2.5 rounded-xl shadow-2xl z-50 pointer-events-none space-y-1 text-left border border-slate-700">
-                                    <p class="font-bold text-red-400 border-b border-slate-800 pb-0.5">Click to view ${d} ${m.name.split(' ')[0]} Docket</p>
+                                .sup<div class="cal-tooltip absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-48 bg-slate-900 text-white text-[10px] p-2.5 rounded-xl shadow-2xl z-50 pointer-events-none space-y-1 text-left border border-slate-700">
+                                    <p class="font-bold text-red-400 border-b border-slate-800 pb-0.5">Busy Window / Past (${d} ${m.name.split(' ')[0]})</p>
                                 </div>
                             `;
-                        } else if (dayOfWeek === 6) {
-                            cls = "bg-slate-50 text-slate-700 border border-slate-200 font-bold cursor-pointer hover:bg-slate-100 transition shadow-sm";
-                        } else {
+                        } else if (isNext4WorkingDays) {
                             cls = "bg-emerald-50 text-emerald-900 border border-emerald-300 font-extrabold cursor-pointer hover:bg-emerald-100 transition shadow-sm";
+                        } else {
+                            cls = "bg-slate-50 text-slate-700 border border-slate-200 font-bold cursor-pointer hover:bg-slate-100 transition shadow-sm";
                         }
                         clickAction = `loadDateDatabase(${m.year}, ${m.month}, ${d})`;
                     }
@@ -472,7 +486,7 @@
             activeActionCaseId = caseId;
             activeActionMode = 'adjourned';
             document.getElementById('calendarModeTitle').textContent = "Select Future Adjournment Date";
-            document.getElementById('calendarModeSubtitle').textContent = "Showing future free days (Sundays excluded, advocate conflicts locked).";
+            document.getElementById('calendarModeSubtitle').textContent = "Past days & next 13 days are red (locked). Select from subsequent free working days.";
             document.getElementById('smartCalendarPanel').classList.remove('hidden');
             buildMultiMonthCalendar();
         }
@@ -481,7 +495,7 @@
             activeActionCaseId = caseId;
             activeActionMode = 'next_hearing';
             document.getElementById('calendarModeTitle').textContent = "Select Future Next Hearing Date";
-            document.getElementById('calendarModeSubtitle').textContent = "Showing future free days (Sundays excluded, advocate conflicts locked).";
+            document.getElementById('calendarModeSubtitle').textContent = "Past days & next 13 days are red (locked). Select from subsequent free working days.";
             document.getElementById('smartCalendarPanel').classList.remove('hidden');
             buildMultiMonthCalendar();
         }
