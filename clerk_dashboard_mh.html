@@ -20,6 +20,8 @@
         .action-container:hover .action-dropdown { display: flex; }
         .tooltip-box { display: none; }
         .tooltip-container:hover .tooltip-box { display: block; }
+        .cal-tooltip { display: none; }
+        .cal-day-busy:hover .cal-tooltip { display: block; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col justify-between">
@@ -89,16 +91,29 @@
                 </div>
             </div>
 
-            <!-- Placeholder Smart Calendar View (Toggled via button) -->
-            <div id="smartCalendarPanel" class="hidden bg-slate-50 border border-indigo-200 p-6 rounded-2xl shadow-inner space-y-3">
-                <div class="flex items-center justify-between">
-                    <h3 class="text-sm font-extrabold text-indigo-950 flex items-center space-x-2">
-                        <i data-lucide="sparkles" class="w-4 h-4 text-indigo-600"></i>
-                        <span>AI Smart Efficiency Calendar Panel</span>
-                    </h3>
-                    <span class="text-[10px] font-bold bg-indigo-100 text-indigo-800 px-2.5 py-1 rounded-lg">Ready for implementation</span>
+            <!-- AI Smart Efficiency Calendar Panel (Multi-Month View: Aug, Sep, Oct, Nov 2026) -->
+            <div id="smartCalendarPanel" class="hidden bg-slate-50 border border-indigo-200 p-6 rounded-3xl shadow-inner space-y-6">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-indigo-100 pb-4">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center shadow-md">
+                            <i data-lucide="sparkles" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-base font-extrabold text-indigo-950">AI Smart Efficiency Calendar</h3>
+                            <p class="text-xs text-slate-500">Click any date to lock previous timelines. Weekends (Sat/Sun) are off. Red = Busy (Hover for hearings), Green = Free.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-4 text-xs font-extrabold">
+                        <span class="flex items-center space-x-1.5 bg-emerald-50 text-emerald-800 border border-emerald-200 px-3 py-1 rounded-xl"><span class="w-2 h-2 bg-emerald-500 rounded-full"></span><span>Free Day</span></span>
+                        <span class="flex items-center space-x-1.5 bg-red-50 text-red-800 border border-red-200 px-3 py-1 rounded-xl"><span class="w-2 h-2 bg-red-500 rounded-full"></span><span>Busy Day</span></span>
+                        <span class="flex items-center space-x-1.5 bg-slate-200 text-slate-600 border border-slate-300 px-3 py-1 rounded-xl"><span class="w-2 h-2 bg-slate-400 rounded-full"></span><span>Off / Past</span></span>
+                    </div>
                 </div>
-                <p class="text-xs text-slate-600">Smart calendar view placeholder is currently toggled open.</p>
+
+                <!-- 4 Months Grid Container -->
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6" id="multiMonthCalendarContainer">
+                    <!-- Populated dynamically via JS -->
+                </div>
             </div>
 
             <div class="overflow-x-auto">
@@ -142,6 +157,7 @@
     <script>
         let session = null;
         const ADVOCATES = ["Adv. George", "Adv. Aaron", "Adv. Cyrus", "Adv. Nived", "Adv. Jacob", "Adv. Chris", "Adv. Manu", "Adv. Midhun", "Adv. Zach", "Adv. Jake"];
+        let selectedCutoffDate = { year: 2026, month: 8, day: 12 }; // Default selection: Sep 12, 2026
 
         window.addEventListener('DOMContentLoaded', () => {
             const storedSession = localStorage.getItem('nyay_user_session');
@@ -163,12 +179,110 @@
             }, 1000);
 
             renderMasterWorkSchedule();
+            buildMultiMonthCalendar();
             lucide.createIcons();
         });
 
         function toggleSmartCalendar() {
             const panel = document.getElementById('smartCalendarPanel');
             panel.classList.toggle('hidden');
+            if(!panel.classList.contains('hidden')) {
+                buildMultiMonthCalendar();
+            }
+        }
+
+        /* --- Multi-Month Smart Calendar Logic --- */
+        function buildMultiMonthCalendar() {
+            const container = document.getElementById('multiMonthCalendarContainer');
+            if(!container) return;
+            container.innerHTML = "";
+
+            // 4 Months: Past (August 2026), Current (September 2026), Future 1 (October 2026), Future 2 (November 2026)
+            const monthsConfig = [
+                { name: "August 2026 (Past)", year: 2026, month: 7, days: 31, startDay: 6 },
+                { name: "September 2026 (Current)", year: 2026, month: 8, days: 30, startDay: 2 },
+                { name: "October 2026 (Future +1)", year: 2026, month: 9, days: 31, startDay: 4 },
+                { name: "November 2026 (Future +2)", year: 2026, month: 10, days: 30, startDay: 0 }
+            ];
+
+            monthsConfig.forEach(m => {
+                let monthCard = document.createElement('div');
+                monthCard.className = "bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-3";
+                
+                let headerHtml = `<div class="text-xs font-black text-blue-950 uppercase tracking-wide text-center border-b pb-2">${m.name}</div>`;
+                let daysHeader = `<div class="grid grid-cols-7 gap-1 text-center text-[10px] font-extrabold text-slate-400"><div>M</div><div>T</div><div>W</div><div>T</div><div>F</div><div>S</div><div>S</div></div>`;
+                
+                let daysGrid = `<div class="grid grid-cols-7 gap-1.5 text-center text-xs">`;
+                
+                // Offset padding for start day
+                let adjustedStart = (m.startDay === 0) ? 6 : m.startDay - 1; // Monday start
+                for(let p=0; p<adjustedStart; p++) {
+                    daysGrid += `<div></div>`;
+                }
+
+                for(let d=1; d<=m.days; d++) {
+                    let dayOfWeek = (adjustedStart + d - 1) % 7;
+                    let isWeekend = (dayOfWeek === 5 || dayOfWeek === 6); // Saturday = 5, Sunday = 6
+                    
+                    // Check if date is before selected cutoff (past relative to selection)
+                    let isPast = isDateBefore(m.year, m.month, d, selectedCutoffDate.year, selectedCutoffDate.month, selectedCutoffDate.day);
+                    
+                    let cls = "";
+                    let tooltipHtml = "";
+                    let isBusy = false;
+
+                    if (isWeekend || isPast) {
+                        cls = "bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed opacity-75";
+                    } else {
+                        // Progressive freedom: Later months have more free days (green), earlier/current have more busy days (red)
+                        let busyChance = (m.month === 7 || m.month === 8) ? 0.45 : (m.month === 9 ? 0.25 : 0.10);
+                        // Make specific deterministic busy days for realism
+                        if (!isWeekend && (d % 3 === 0 || d % 7 === 0) && Math.random() < busyChance + 0.2) {
+                            isBusy = true;
+                        }
+
+                        if (isBusy) {
+                            cls = "cal-day-busy bg-red-50 text-red-900 border border-red-300 font-extrabold cursor-pointer relative shadow-sm hover:bg-red-100";
+                            tooltipHtml = `
+                                <div class="cal-tooltip absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-48 bg-slate-900 text-white text-[10px] p-2.5 rounded-xl shadow-2xl z-50 pointer-events-none space-y-1 text-left border border-slate-700">
+                                    <p class="font-bold text-red-400 border-b border-slate-800 pb-0.5">Hearings on ${d} ${m.name.split(' ')[0]}:</p>
+                                    <p>• State vs. Vikram Rao (10:30 AM)</p>
+                                    <p>• Patil Ent. vs. MMRDA (11:15 AM)</p>
+                                </div>
+                            `;
+                        } else {
+                            cls = "bg-emerald-50 text-emerald-900 border border-emerald-300 font-extrabold cursor-pointer hover:bg-emerald-100 transition shadow-sm";
+                        }
+                    }
+
+                    daysGrid += `
+                        <div onclick="selectCalendarDate(${m.year}, ${m.month}, ${d}, ${isWeekend || isPast})" class="h-9 rounded-xl flex items-center justify-center font-bold text-xs transition relative ${cls}">
+                            ${d}
+                            ${tooltipHtml}
+                        </div>
+                    `;
+                }
+
+                daysGrid += `</div>`;
+                monthCard.innerHTML = headerHtml + daysHeader + daysGrid;
+                container.appendChild(monthCard);
+            });
+            lucide.createIcons();
+        }
+
+        function isDateBefore(y1, m1, d1, y2, m2, d2) {
+            let date1 = new Date(y1, m1, d1);
+            let date2 = new Date(y2, m2, d2);
+            return date1 < date2;
+        }
+
+        function selectCalendarDate(year, month, day, isDisabled) {
+            if(isDisabled) {
+                alert("Cannot select past dates or weekends (off days).");
+                return;
+            }
+            selectedCutoffDate = { year, month, day };
+            buildMultiMonthCalendar();
         }
 
         /* --- Action Button Functions --- */
