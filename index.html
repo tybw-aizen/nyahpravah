@@ -164,16 +164,16 @@
     </div>
 
     <script>
-        // Pre-configured accounts with strict courtroom binding
         const MASTER_USERS = {
             "676968": { name: "Aaron", pass: "Aaron2008", role: "Master Admin", state: "Maharashtra", court: "Courtroom 1" }
         };
 
         function initializeDefaultUsers() {
             let dynamic = JSON.parse(localStorage.getItem('nyay_dynamic_users') || '{}');
-            if (!dynamic["999888"]) {
-                dynamic["999888"] = { name: "Siddharth", pass: "Siddharth2008", role: "Bench Clerk", state: "Maharashtra", court: "Courtroom 3" };
-            }
+            
+            // Forcefully update or initialize Siddharth to Courtroom 3
+            dynamic["999888"] = { name: "Siddharth", pass: "Siddharth2008", role: "Bench Clerk", state: "Maharashtra", court: "Courtroom 3" };
+            
             localStorage.setItem('nyay_dynamic_users', JSON.stringify(dynamic));
         }
 
@@ -249,7 +249,7 @@
 
             // Strict Courtroom Validation
             if (user.court !== selectedCourt) {
-                document.getElementById('credentialErrorText').textContent = `Access Denied: Incorrect courtroom selected for User ID ${id}.`;
+                document.getElementById('credentialErrorText').textContent = `Access Denied: User ID ${id} is assigned to ${user.court}, not ${selectedCourt}.`;
                 document.getElementById('credentialError').classList.remove('hidden');
                 generateNormalCaptcha();
                 return;
