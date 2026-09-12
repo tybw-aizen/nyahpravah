@@ -10,171 +10,180 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #F8FAFC; color: #334155; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #F1F5F9; color: #1E293B; }
         .mono { font-family: 'JetBrains Mono', monospace; }
         .modal-enter { animation: fadeIn 0.2s ease-out forwards; }
-        .fade-in { animation: fadeIn 0.4s ease-in forwards; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: translateY(0); } }
-        .judicial-stripe { background: linear-gradient(90deg, #D97706 33.33%, #F8FAFC 33.33%, #F8FAFC 66.66%, #1E3A8A 66.66%); }
+        .fade-in { animation: fadeIn 0.3s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+        .judicial-stripe { background: linear-gradient(90deg, #B45309 33.33%, #F8FAFC 33.33%, #F8FAFC 66.66%, #1E3A8A 66.66%); }
         .action-dropdown { display: none; }
         .action-container:hover .action-dropdown { display: flex; }
         .tooltip-box { display: none; }
         .tooltip-container:hover .tooltip-box { display: block; }
         .cal-tooltip { display: none; }
         .cal-day-busy:hover .cal-tooltip { display: block; }
-        .subtle-green-slot { background-color: #E2E8F0 !important; color: #065F46 !important; border-color: #A7F3D0 !important; font-weight: 700 !important; }
+        .subtle-green-slot { background-color: #D1FAE5 !important; color: #065F46 !important; border-color: #6EE7B7 !important; font-weight: 800 !important; }
+        
+        /* Custom Professional Scrollbar */
+        .custom-scroll::-webkit-scrollbar { width: 8px; height: 8px; }
+        .custom-scroll::-webkit-scrollbar-track { background: #F1F5F9; border-radius: 4px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #94A3B8; border-radius: 4px; }
+        .custom-scroll::-webkit-scrollbar-thumb:hover { background: #64748B; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between">
 
-    <div class="h-2 w-full judicial-stripe border-b border-slate-300"></div>
+    <div class="h-2.5 w-full judicial-stripe border-b border-slate-300"></div>
 
     <!-- Header -->
     <header class="bg-white border-b border-slate-300 sticky top-0 z-40 shadow-xs">
-        <div class="max-w-7xl mx-auto px-6 py-3.5 flex items-center justify-between">
-            <div class="flex items-center space-x-3.5">
-                <div class="w-10 h-10 rounded-lg bg-slate-900 text-amber-500 flex items-center justify-center text-lg shadow-xs border border-slate-700">⚖️</div>
+        <div class="max-w-7xl mx-auto px-8 py-4 flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+                <div class="w-12 h-12 rounded-xl bg-slate-900 text-amber-500 flex items-center justify-center text-xl shadow-sm border border-slate-700 font-bold">⚖️</div>
                 <div>
-                    <div class="flex items-center space-x-2.5">
-                        <span id="clerkCourtTitle" class="font-bold text-base text-slate-900 tracking-wide uppercase">Court Docket</span>
-                        <span class="text-[10px] bg-slate-100 text-slate-700 px-2.5 py-0.5 rounded font-bold border border-slate-300">BENCH CLERK</span>
+                    <div class="flex items-center space-x-3">
+                        <span id="clerkCourtTitle" class="font-black text-lg text-slate-900 tracking-wide uppercase">Court Docket</span>
+                        <span class="text-[11px] bg-slate-100 text-slate-800 px-3 py-1 rounded-md font-extrabold border border-slate-300">BENCH CLERK</span>
                     </div>
-                    <p id="userSubText" class="text-xs text-slate-500 font-medium mt-0.5">Loading session info...</p>
+                    <p id="userSubText" class="text-xs text-slate-600 font-semibold mt-0.5">Loading session info...</p>
                 </div>
             </div>
 
             <!-- TOP MIDDLE BOMBAY HIGH COURT -->
             <div class="hidden lg:flex flex-col items-center justify-center text-center">
-                <div class="flex items-center space-x-2">
-                    <span class="text-base">🏛️</span>
-                    <h1 class="text-sm font-extrabold tracking-widest text-slate-900 uppercase">BOMBAY HIGH COURT</h1>
-                    <span class="text-base">⚖️</span>
+                <div class="flex items-center space-x-2.5">
+                    <span class="text-lg">🏛️</span>
+                    <h1 class="text-base font-black tracking-widest text-slate-900 uppercase">BOMBAY HIGH COURT</h1>
+                    <span class="text-lg">⚖️</span>
                 </div>
-                <div class="mt-0.5">
-                    <span class="text-[11px] font-semibold text-slate-600 uppercase">
-                        ACTIVE VIEW: <span id="currentDateDisplay" class="text-slate-900 font-bold">September 12, 2026</span>
+                <div class="mt-1">
+                    <span class="text-xs font-bold text-slate-700 uppercase tracking-wide">
+                        ACTIVE VIEW: <span id="currentDateDisplay" class="text-blue-900 font-extrabold">September 12, 2026</span>
                     </span>
                 </div>
             </div>
 
-            <div class="flex items-center space-x-4">
+            <div class="flex items-center space-x-5">
                 <div class="hidden md:block text-right text-xs">
-                    <span class="text-slate-500 block">System Time</span>
-                    <span id="liveClock" class="mono font-semibold text-slate-700 text-xs">00:00:00 IST</span>
+                    <span class="text-slate-500 font-medium block">System Time</span>
+                    <span id="liveClock" class="mono font-bold text-slate-800 text-sm">00:00:00 IST</span>
                 </div>
-                <button type="button" onclick="initiateLogout()" class="bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 px-3.5 py-2 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition cursor-pointer">
-                    <i data-lucide="log-out" class="w-3.5 h-3.5 text-slate-500"></i>
+                <button type="button" onclick="initiateLogout()" class="bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 px-4 py-2.5 rounded-xl text-xs font-bold flex items-center space-x-2 transition cursor-pointer shadow-xs">
+                    <i data-lucide="log-out" class="w-4 h-4 text-slate-500"></i>
                     <span>Secure Logout</span>
                 </button>
             </div>
         </div>
     </header>
 
-    <main class="flex-1 max-w-7xl mx-auto w-full px-6 py-6 space-y-5">
+    <main class="flex-1 max-w-7xl mx-auto w-full px-8 py-8 space-y-6">
         
-        <!-- MASTER HEARINGS DOCKET TABLE -->
-        <div class="bg-white rounded-xl border border-slate-300 p-6 shadow-xs space-y-5 fade-in">
-            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-200 pb-4">
+        <!-- MASTER HEARINGS DOCKET TABLE CONTAINER -->
+        <div class="bg-white rounded-2xl border border-slate-300 p-8 shadow-sm space-y-6 fade-in">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-200 pb-5">
                 <div>
-                    <h2 class="text-lg font-bold text-slate-900 tracking-tight" id="displayCourtHeading">Master Hearings Docket</h2>
-                    <p class="text-xs text-slate-500 font-medium mt-0.5" id="activeViewSub">Showing live database for September 12, 2026</p>
+                    <h2 class="text-xl font-extrabold text-slate-900 tracking-tight" id="displayCourtHeading">Master Hearings Docket</h2>
+                    <p class="text-xs text-slate-600 font-medium mt-1" id="activeViewSub">Showing live database for September 12, 2026</p>
                 </div>
-                <div class="flex items-center space-x-2.5">
-                    <button onclick="openAddCaseModal()" class="bg-slate-900 hover:bg-slate-800 text-white font-semibold px-3.5 py-2 rounded-lg text-xs transition flex items-center space-x-1.5 cursor-pointer shadow-xs">
-                        <i data-lucide="plus-circle" class="w-3.5 h-3.5 text-amber-500"></i>
+                <div class="flex items-center space-x-3">
+                    <button onclick="openAddCaseModal()" class="bg-slate-900 hover:bg-slate-800 text-white font-bold px-4 py-2.5 rounded-xl text-xs transition flex items-center space-x-2 cursor-pointer shadow-xs">
+                        <i data-lucide="plus-circle" class="w-4 h-4 text-amber-400"></i>
                         <span>Add Case</span>
                     </button>
-                    <button onclick="toggleSmartCalendar()" class="bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 font-semibold px-3.5 py-2 rounded-lg text-xs shadow-xs transition flex items-center space-x-1.5 cursor-pointer">
-                        <i data-lucide="calendar-range" class="w-3.5 h-3.5 text-slate-600"></i>
+                    <button onclick="toggleSmartCalendar()" class="bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 font-bold px-4 py-2.5 rounded-xl text-xs shadow-xs transition flex items-center space-x-2 cursor-pointer">
+                        <i data-lucide="calendar-range" class="w-4 h-4 text-slate-600"></i>
                         <span>Toggle Smart Calendar</span>
                     </button>
                 </div>
             </div>
 
             <!-- Smart Calendar Panel -->
-            <div id="smartCalendarPanel" class="hidden bg-slate-50 border border-slate-300 p-5 rounded-xl shadow-inner space-y-5">
-                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-slate-200 pb-3">
-                    <div class="flex items-center space-x-2.5">
-                        <div class="w-8 h-8 rounded bg-slate-800 text-amber-400 flex items-center justify-center shadow-xs">
-                            <i data-lucide="calendar" class="w-4 h-4"></i>
+            <div id="smartCalendarPanel" class="hidden bg-slate-50 border border-slate-300 p-6 rounded-2xl shadow-inner space-y-5">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-slate-200 pb-4">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 rounded-xl bg-slate-900 text-amber-400 flex items-center justify-center shadow-xs">
+                            <i data-lucide="calendar" class="w-5 h-5"></i>
                         </div>
                         <div>
-                            <h3 class="text-sm font-bold text-slate-900" id="calendarModeTitle">Smart Calendar</h3>
-                            <p class="text-[11px] text-slate-500" id="calendarModeSubtitle">Click any date to inspect its live database. Saturdays kept, Sundays cut off.</p>
+                            <h3 class="text-sm font-extrabold text-slate-900" id="calendarModeTitle">Smart Calendar</h3>
+                            <p class="text-xs text-slate-600" id="calendarModeSubtitle">Click any date to inspect its live database. Saturdays kept, Sundays cut off.</p>
                         </div>
                     </div>
-                    <div class="flex items-center space-x-3 text-xs font-medium" id="calendarLegend">
-                        <span class="flex items-center space-x-1"><span class="w-2 h-2 bg-emerald-600 rounded-full"></span><span>Free Day</span></span>
-                        <span class="flex items-center space-x-1"><span class="w-2 h-2 bg-rose-600 rounded-full"></span><span>Busy Day</span></span>
-                        <span class="flex items-center space-x-1"><span class="w-2 h-2 bg-slate-400 rounded-full"></span><span>Accessible</span></span>
+                    <div class="flex items-center space-x-4 text-xs font-bold text-slate-700" id="calendarLegend">
+                        <span class="flex items-center space-x-1.5"><span class="w-2.5 h-2.5 bg-emerald-600 rounded-full"></span><span>Free Day</span></span>
+                        <span class="flex items-center space-x-1.5"><span class="w-2.5 h-2.5 bg-rose-600 rounded-full"></span><span>Busy Day</span></span>
+                        <span class="flex items-center space-x-1.5"><span class="w-2.5 h-2.5 bg-slate-400 rounded-full"></span><span>Accessible</span></span>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4" id="multiMonthCalendarContainer"></div>
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5" id="multiMonthCalendarContainer"></div>
             </div>
 
-            <div class="overflow-x-auto max-h-[520px] overflow-y-auto pr-1">
-                <table class="w-full text-left text-xs border-collapse">
-                    <thead class="sticky top-0 z-20 bg-slate-100">
-                        <tr class="text-slate-700 font-bold border-b border-slate-300 uppercase tracking-wider text-[11px]">
-                            <th class="py-3.5 px-3.5 bg-slate-100">Hearings</th>
-                            <th class="py-3.5 px-3.5 bg-slate-100">Time</th>
-                            <th class="py-3.5 px-3.5 bg-slate-100">assigned_caseid</th>
-                            <th class="py-3.5 px-3.5 bg-slate-100">Litigant</th>
-                            <th class="py-3.5 px-3.5 bg-slate-100">assigned_advocate</th>
-                            <th class="py-3.5 px-3.5 bg-slate-100">Case_type</th>
-                            <th class="py-3.5 px-3.5 bg-slate-100">status</th>
-                            <th class="py-3.5 px-3.5 bg-slate-100 text-right">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="masterWorkScheduleBody" class="divide-y divide-slate-200"></tbody>
-                </table>
+            <!-- Scrollable Table Wrapper -->
+            <div class="border border-slate-300 rounded-xl overflow-hidden shadow-xs">
+                <div class="max-h-[600px] overflow-y-auto custom-scroll relative">
+                    <table class="w-full text-left text-sm border-collapse">
+                        <thead class="sticky top-0 z-30 bg-slate-100 shadow-xs">
+                            <tr class="text-slate-800 font-extrabold border-b border-slate-300 uppercase tracking-wider text-xs">
+                                <th class="py-4 px-4 bg-slate-100">Hearings</th>
+                                <th class="py-4 px-4 bg-slate-100">Time</th>
+                                <th class="py-4 px-4 bg-slate-100">assigned_caseid</th>
+                                <th class="py-4 px-4 bg-slate-100">Litigant</th>
+                                <th class="py-4 px-4 bg-slate-100">assigned_advocate</th>
+                                <th class="py-4 px-4 bg-slate-100">Case_type</th>
+                                <th class="py-4 px-4 bg-slate-100">status</th>
+                                <th class="py-4 px-4 bg-slate-100 text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="masterWorkScheduleBody" class="divide-y divide-slate-200 bg-white"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
     </main>
 
     <!-- ADD CASE MODAL -->
-    <div id="addCaseModal" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-xl max-w-md w-full p-6 shadow-xl space-y-4 border border-slate-300 modal-enter">
-            <div class="flex items-center justify-between border-b border-slate-200 pb-3">
-                <div class="flex items-center space-x-2.5 text-slate-900">
-                    <i data-lucide="folder-plus" class="w-5 h-5 text-slate-700"></i>
-                    <h3 class="text-sm font-bold">Add New Case Record</h3>
+    <div id="addCaseModal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-lg w-full p-8 shadow-2xl space-y-5 border border-slate-300 modal-enter">
+            <div class="flex items-center justify-between border-b border-slate-200 pb-4">
+                <div class="flex items-center space-x-3 text-slate-900">
+                    <i data-lucide="folder-plus" class="w-6 h-6 text-slate-800"></i>
+                    <h3 class="text-base font-extrabold">Add New Case Record</h3>
                 </div>
-                <button onclick="closeAddCaseModal()" class="text-slate-400 hover:text-slate-600 font-bold text-base">&times;</button>
+                <button onclick="closeAddCaseModal()" class="text-slate-400 hover:text-slate-600 font-bold text-xl">&times;</button>
             </div>
             
-            <form onsubmit="handleAddNewCaseSubmit(event)" class="space-y-3.5 text-xs">
-                <div class="grid grid-cols-2 gap-3">
+            <form onsubmit="handleAddNewCaseSubmit(event)" class="space-y-4 text-xs">
+                <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block font-bold uppercase text-slate-600 mb-1">Hearings Index</label>
-                        <input type="text" id="addHearings" required placeholder="e.g. H-04" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 font-medium">
+                        <label class="block font-bold uppercase text-slate-700 mb-1.5">Hearings Index</label>
+                        <input type="text" id="addHearings" required placeholder="e.g. H-04" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 font-bold text-slate-900">
                     </div>
                     <div>
-                        <label class="block font-bold uppercase text-slate-600 mb-1">Time Slot</label>
-                        <input type="text" id="addTime" required placeholder="e.g. 11:30 AM" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 font-medium mono">
+                        <label class="block font-bold uppercase text-slate-700 mb-1.5">Time Slot</label>
+                        <input type="text" id="addTime" required placeholder="e.g. 11:30 AM" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 font-bold mono text-slate-900">
                     </div>
                 </div>
 
                 <div>
-                    <label class="block font-bold uppercase text-slate-600 mb-1">assigned_caseid</label>
-                    <input type="text" id="addCaseId" required value="MH-CIV-2026-9901" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 font-bold mono text-slate-900">
+                    <label class="block font-bold uppercase text-slate-700 mb-1.5">assigned_caseid</label>
+                    <input type="text" id="addCaseId" required value="MH-CIV-2026-9901" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 font-extrabold mono text-slate-900">
                 </div>
 
                 <div>
-                    <label class="block font-bold uppercase text-slate-600 mb-1">Litigant</label>
-                    <input type="text" id="addLitigant" required placeholder="e.g. Shinde vs. State" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 font-medium">
+                    <label class="block font-bold uppercase text-slate-700 mb-1.5">Litigant</label>
+                    <input type="text" id="addLitigant" required placeholder="e.g. Shinde vs. State" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 font-bold text-slate-900">
                 </div>
 
-                <div class="grid grid-cols-2 gap-3">
+                <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block font-bold uppercase text-slate-600 mb-1">assigned_advocate</label>
-                        <select id="addAdvocate" required class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 font-medium"></select>
+                        <label class="block font-bold uppercase text-slate-700 mb-1.5">assigned_advocate</label>
+                        <select id="addAdvocate" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 font-bold text-slate-900"></select>
                     </div>
                     <div>
-                        <label class="block font-bold uppercase text-slate-600 mb-1">Case_type</label>
-                        <select id="addCaseType" required class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 font-medium">
+                        <label class="block font-bold uppercase text-slate-700 mb-1.5">Case_type</label>
+                        <select id="addCaseType" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 font-bold text-slate-900">
                             <option value="Civil Suit">Civil Suit</option>
                             <option value="Criminal Bail">Criminal Bail</option>
                             <option value="Writ Petition">Writ Petition</option>
@@ -183,25 +192,25 @@
                     </div>
                 </div>
 
-                <div class="flex space-x-2.5 pt-2">
-                    <button type="button" onclick="closeAddCaseModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-2.5 rounded-lg transition">Cancel</button>
-                    <button type="submit" class="flex-1 bg-slate-900 hover:bg-slate-800 text-white font-semibold py-2.5 rounded-lg transition shadow-xs">Save & Recommend</button>
+                <div class="flex space-x-3 pt-3">
+                    <button type="button" onclick="closeAddCaseModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 rounded-xl transition cursor-pointer">Cancel</button>
+                    <button type="submit" class="flex-1 bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 rounded-xl transition shadow-xs cursor-pointer">Save & Recommend</button>
                 </div>
             </form>
         </div>
     </div>
 
     <!-- LOGOUT MODAL -->
-    <div id="logoutModal" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-xl max-w-sm w-full p-6 shadow-xl space-y-4 border border-slate-300 modal-enter">
-            <div class="flex items-center space-x-2.5 text-slate-900">
-                <i data-lucide="log-out" class="w-5 h-5 text-amber-600"></i>
-                <h3 class="text-sm font-bold">Secure Session Termination</h3>
+    <div id="logoutModal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-8 shadow-2xl space-y-4 border border-slate-300 modal-enter">
+            <div class="flex items-center space-x-3 text-slate-900">
+                <i data-lucide="log-out" class="w-6 h-6 text-amber-600"></i>
+                <h3 class="text-base font-extrabold">Secure Session Termination</h3>
             </div>
-            <p class="text-xs text-slate-600">Are you sure you want to securely log out of the portal?</p>
-            <div class="flex space-x-2 pt-1">
-                <button type="button" onclick="closeLogoutModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-2 rounded-lg text-xs transition">Cancel</button>
-                <button type="button" onclick="confirmLogout()" class="flex-1 bg-slate-900 hover:bg-slate-800 text-white font-semibold py-2 rounded-lg text-xs transition shadow-xs">Confirm Logout</button>
+            <p class="text-xs text-slate-600 font-medium">Are you sure you want to securely log out of the portal?</p>
+            <div class="flex space-x-3 pt-2">
+                <button type="button" onclick="closeLogoutModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2.5 rounded-xl text-xs transition cursor-pointer">Cancel</button>
+                <button type="button" onclick="confirmLogout()" class="flex-1 bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 rounded-xl text-xs transition shadow-xs cursor-pointer">Confirm Logout</button>
             </div>
         </div>
     </div>
@@ -352,10 +361,10 @@
 
             monthsConfig.forEach(m => {
                 let monthCard = document.createElement('div');
-                monthCard.className = "bg-white border border-slate-300 rounded-lg p-3.5 shadow-xs space-y-2.5";
-                let headerHtml = `<div class="text-[11px] font-bold text-slate-900 uppercase text-center border-b border-slate-200 pb-1.5">${m.name}</div>`;
+                monthCard.className = "bg-white border border-slate-300 rounded-xl p-4 shadow-xs space-y-3";
+                let headerHtml = `<div class="text-xs font-bold text-slate-900 uppercase text-center border-b border-slate-200 pb-2">${m.name}</div>`;
                 let daysHeader = `<div class="grid grid-cols-6 gap-1 text-center text-[10px] font-bold text-slate-400"><div>Mo</div><div>Tu</div><div>We</div><div>Th</div><div>Fr</div><div>Sa</div></div>`;
-                let daysGrid = `<div class="grid grid-cols-6 gap-1 text-center text-xs">`;
+                let daysGrid = `<div class="grid grid-cols-6 gap-1.5 text-center text-xs">`;
                 
                 let rawStart = m.startDay, adjustedStart = (rawStart === 0) ? 5 : rawStart - 1; 
                 for(let p=0; p<adjustedStart; p++) { daysGrid += `<div></div>`; }
@@ -365,7 +374,7 @@
                     if (dayOfWeek === 0) continue;
 
                     let cellDate = new Date(m.year, m.month, d);
-                    let cls = "", tooltipHtml = "", clickAction = "";
+                    let cls = "", clickAction = "";
 
                     let isPastWorkingDay = (cellDate < today && dayOfWeek !== 0);
                     let isInRedWindow = (cellDate >= today && cellDate <= windowEndRed);
@@ -396,7 +405,7 @@
                         clickAction = `loadDateDatabase(${m.year}, ${m.month}, ${d})`;
                     }
 
-                    daysGrid += `<div onclick="${clickAction}" class="h-8 rounded flex items-center justify-center font-bold text-xs transition relative ${cls}">${d}</div>`;
+                    daysGrid += `<div onclick="${clickAction}" class="h-9 rounded flex items-center justify-center font-bold text-xs transition relative ${cls}">${d}</div>`;
                 }
 
                 daysGrid += `</div>`;
@@ -462,7 +471,7 @@
             let currentCases = globalDatabases[activeViewDateKey] || [];
 
             if(currentCases.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="8" class="py-6 text-center text-slate-400 font-medium">No hearings scheduled for this date.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="8" class="py-8 text-center text-slate-400 font-medium text-sm">No hearings scheduled for this date.</td></tr>`;
                 return;
             }
 
@@ -470,32 +479,32 @@
                 let statusHtml = '', rowStyle = '';
                 if(row.status === 'closed') {
                     rowStyle = 'bg-slate-100 text-slate-400 opacity-60';
-                    statusHtml = `<span class="bg-slate-200 text-slate-600 px-2.5 py-1 rounded font-bold text-[10px]">Case Closed</span>`;
+                    statusHtml = `<span class="bg-slate-200 text-slate-700 px-3 py-1 rounded font-extrabold text-xs">Case Closed</span>`;
                 } else if(row.status === 'pending') {
                     rowStyle = 'bg-slate-100 text-slate-500 opacity-75';
-                    statusHtml = `<span class="bg-amber-100 text-amber-800 px-2.5 py-1 rounded font-bold text-[10px]">Pending</span>`;
+                    statusHtml = `<span class="bg-amber-100 text-amber-900 px-3 py-1 rounded font-extrabold text-xs">Pending</span>`;
                 } else if(row.status === 'clear') {
-                    statusHtml = `<span class="bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded font-bold text-[10px]">Clear</span>`;
+                    statusHtml = `<span class="bg-emerald-100 text-emerald-900 px-3 py-1 rounded font-extrabold text-xs">Clear</span>`;
                 } else {
-                    statusHtml = `<span class="bg-rose-100 text-rose-800 px-2.5 py-1 rounded font-bold text-[10px]">Unresolved</span>`;
+                    statusHtml = `<span class="bg-rose-100 text-rose-900 px-3 py-1 rounded font-extrabold text-xs">Unresolved</span>`;
                 }
 
                 tbody.innerHTML += `
                     <tr class="hover:bg-slate-50 transition ${rowStyle}">
-                        <td class="py-3 px-3.5 font-bold text-slate-800">${row.hearings}</td>
-                        <td class="py-3 px-3.5 mono text-slate-600">${row.time}</td>
-                        <td class="py-3 px-3.5 mono font-bold text-slate-900">${row.assigned_caseid}</td>
-                        <td class="py-3 px-3.5 font-medium text-slate-800">${row.litigant}</td>
-                        <td class="py-3 px-3.5"><span class="bg-slate-100 text-slate-800 px-2 py-0.5 rounded font-semibold text-[11px]">${row.assigned_advocate}</span></td>
-                        <td class="py-3 px-3.5"><span class="text-slate-600 font-medium">${row.case_type}</span></td>
-                        <td class="py-3 px-3.5">${statusHtml}</td>
-                        <td class="py-3 px-3.5 text-right relative">
+                        <td class="py-4 px-4 font-bold text-slate-900 text-sm">${row.hearings}</td>
+                        <td class="py-4 px-4 mono text-slate-700 text-sm">${row.time}</td>
+                        <td class="py-4 px-4 mono font-extrabold text-slate-900 text-sm">${row.assigned_caseid}</td>
+                        <td class="py-4 px-4 font-semibold text-slate-900 text-sm">${row.litigant}</td>
+                        <td class="py-4 px-4"><span class="bg-slate-100 text-slate-900 px-2.5 py-1 rounded-md font-bold text-xs">${row.assigned_advocate}</span></td>
+                        <td class="py-4 px-4"><span class="text-slate-700 font-medium text-sm">${row.case_type}</span></td>
+                        <td class="py-4 px-4">${statusHtml}</td>
+                        <td class="py-4 px-4 text-right relative">
                             <div class="action-container inline-block relative">
-                                <button class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded tracking-widest text-xs transition cursor-pointer">...</button>
-                                <div class="action-dropdown absolute right-0 top-full mt-1 w-32 bg-white border border-slate-300 rounded-lg shadow-lg flex-col py-1 z-30 text-left">
-                                    <button onclick="handleAdjourned('${row.assigned_caseid}')" class="w-full text-left px-3 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-100">Adjourned</button>
-                                    <button onclick="handleNextHearing('${row.assigned_caseid}')" class="w-full text-left px-3 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-100">Next Hearing</button>
-                                    <button onclick="handleCloseCase('${row.assigned_caseid}')" class="w-full text-left px-3 py-1 text-xs font-semibold text-rose-700 hover:bg-rose-50">Close Case</button>
+                                <button class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 font-extrabold rounded-lg tracking-widest text-xs transition cursor-pointer">...</button>
+                                <div class="action-dropdown absolute right-0 top-full mt-1 w-36 bg-white border border-slate-300 rounded-xl shadow-xl flex-col py-1.5 z-30 text-left">
+                                    <button onclick="handleAdjourned('${row.assigned_caseid}')" class="w-full text-left px-3.5 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-100 cursor-pointer">Adjourned</button>
+                                    <button onclick="handleNextHearing('${row.assigned_caseid}')" class="w-full text-left px-3.5 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-100 cursor-pointer">Next Hearing</button>
+                                    <button onclick="handleCloseCase('${row.assigned_caseid}')" class="w-full text-left px-3.5 py-1.5 text-xs font-bold text-rose-700 hover:bg-rose-50 cursor-pointer">Close Case</button>
                                 </div>
                             </div>
                         </td>
