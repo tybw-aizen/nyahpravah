@@ -18,6 +18,8 @@
         .tricolor-bar { background: linear-gradient(90deg, #FF9933 33.33%, #FFFFFF 33.33%, #FFFFFF 66.66%, #138808 66.66%); }
         .action-dropdown { display: none; }
         .action-container:hover .action-dropdown { display: flex; }
+        .tooltip-box { display: none; }
+        .tooltip-container:hover .tooltip-box { display: block; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col justify-between">
@@ -109,6 +111,7 @@
                             <th class="py-4 px-4">Litigant</th>
                             <th class="py-4 px-4">assigned_advocate</th>
                             <th class="py-4 px-4">Case_type</th>
+                            <th class="py-4 px-4">status</th>
                             <th class="py-4 px-4 text-right">Actions</th>
                         </tr>
                     </thead>
@@ -187,15 +190,34 @@
             tbody.innerHTML = "";
             
             const scheduleData = [
-                { hearings: "H-01", time: "10:30 AM", assigned_caseid: "MH-CRL-2021-8891", litigant: "State vs. Vikram Rao", assigned_advocate: ADVOCATES[0], case_type: "Criminal Bail" },
-                { hearings: "H-02", time: "11:15 AM", assigned_caseid: "MH-CIV-2017-1029", litigant: "Patil Enterprises vs. MMRDA", assigned_advocate: ADVOCATES[1], case_type: "Civil Suit" },
-                { hearings: "H-03", time: "12:00 PM", assigned_caseid: "MH-CRL-2023-5512", litigant: "Kulkarni vs. State of MH", assigned_advocate: ADVOCATES[2], case_type: "Writ Petition" },
-                { hearings: "H-04", time: "01:30 PM", assigned_caseid: "MH-CIV-2024-9910", litigant: "Deshmukh vs. Shinde", assigned_advocate: ADVOCATES[3], case_type: "Commercial Dispute" },
-                { hearings: "H-05", time: "02:15 PM", assigned_caseid: "MH-CRL-2022-3341", litigant: "Republic vs. Khan", assigned_advocate: ADVOCATES[4], case_type: "Criminal Appeal" },
-                { hearings: "H-06", time: "03:00 PM", assigned_caseid: "MH-CIV-2019-7721", litigant: "Pune Corp vs. Jadhav", assigned_advocate: ADVOCATES[5], case_type: "Land Acquisition" }
+                { hearings: "H-01", time: "10:30 AM", assigned_caseid: "MH-CRL-2021-8891", litigant: "State vs. Vikram Rao", assigned_advocate: ADVOCATES[0], case_type: "Criminal Bail", status: "clear", reasons: [] },
+                { hearings: "H-02", time: "11:15 AM", assigned_caseid: "MH-CIV-2017-1029", litigant: "Patil Enterprises vs. MMRDA", assigned_advocate: ADVOCATES[1], case_type: "Civil Suit", status: "unresolved", reasons: ["Witnesses not present", "Missing affidavit submissions"] },
+                { hearings: "H-03", time: "12:00 PM", assigned_caseid: "MH-CRL-2023-5512", litigant: "Kulkarni vs. State of MH", assigned_advocate: ADVOCATES[2], case_type: "Writ Petition", status: "clear", reasons: [] },
+                { hearings: "H-04", time: "01:30 PM", assigned_caseid: "MH-CIV-2024-9910", litigant: "Deshmukh vs. Shinde", assigned_advocate: ADVOCATES[3], case_type: "Commercial Dispute", status: "unresolved", reasons: ["Incomplete document filing"] },
+                { hearings: "H-05", time: "02:15 PM", assigned_caseid: "MH-CRL-2022-3341", litigant: "Republic vs. Khan", assigned_advocate: ADVOCATES[4], case_type: "Criminal Appeal", status: "clear", reasons: [] },
+                { hearings: "H-06", time: "03:00 PM", assigned_caseid: "MH-CIV-2019-7721", litigant: "Pune Corp vs. Jadhav", assigned_advocate: ADVOCATES[5], case_type: "Land Acquisition", status: "unresolved", reasons: ["Defendant counsel absent", "Medical certificate pending"] }
             ];
 
             scheduleData.forEach(row => {
+                let statusHtml = '';
+                if(row.status === 'clear') {
+                    statusHtml = `<span class="bg-emerald-100 text-emerald-900 border border-emerald-300 px-3 py-1 rounded-full font-extrabold text-xs inline-flex items-center space-x-1.5"><span class="w-1.5 h-1.5 bg-emerald-600 rounded-full"></span><span>Clear</span></span>`;
+                } else {
+                    let reasonsList = row.reasons.map(r => `<li class="flex items-center space-x-1.5"><span class="w-1 h-1 bg-red-600 rounded-full"></span><span>${r}</span></li>`).join('');
+                    statusHtml = `
+                        <div class="tooltip-container relative inline-block">
+                            <span class="bg-red-100 text-red-900 border border-red-300 px-3 py-1 rounded-full font-extrabold text-xs inline-flex items-center space-x-1.5 cursor-pointer">
+                                <span class="w-1.5 h-1.5 bg-red-600 rounded-full"></span>
+                                <span>Unresolved</span>
+                            </span>
+                            <div class="tooltip-box absolute left-0 bottom-full mb-2 w-64 bg-slate-900 text-white text-[11px] p-3 rounded-xl shadow-2xl z-50 pointer-events-none space-y-1.5 border border-slate-700">
+                                <p class="font-bold text-red-400 border-b border-slate-800 pb-1 uppercase tracking-wider text-[10px]">Unfulfilled Conditions:</p>
+                                <ul class="space-y-1">${reasonsList}</ul>
+                            </div>
+                        </div>
+                    `;
+                }
+
                 tbody.innerHTML += `
                     <tr class="hover:bg-slate-50/90 transition">
                         <td class="py-4 px-4 font-bold text-slate-800">${row.hearings}</td>
@@ -204,6 +226,7 @@
                         <td class="py-4 px-4 font-semibold text-slate-900">${row.litigant}</td>
                         <td class="py-4 px-4"><span class="bg-indigo-50 text-indigo-900 border border-indigo-200 px-3 py-1 rounded-xl font-extrabold text-xs">${row.assigned_advocate}</span></td>
                         <td class="py-4 px-4"><span class="bg-slate-100 text-slate-800 border border-slate-200 px-3 py-1 rounded-full font-extrabold text-xs">${row.case_type}</span></td>
+                        <td class="py-4 px-4">${statusHtml}</td>
                         <td class="py-4 px-4 text-right relative">
                             <div class="action-container inline-block relative">
                                 <button class="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-extrabold rounded-lg tracking-widest text-sm transition cursor-pointer">...</button>
