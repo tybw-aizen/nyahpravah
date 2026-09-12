@@ -18,16 +18,28 @@
         .judicial-stripe { background: linear-gradient(90deg, #B45309 33.33%, #F8FAFC 33.33%, #F8FAFC 66.66%, #1E3A8A 66.66%); }
         .action-dropdown { display: none; }
         .action-container:hover .action-dropdown { display: flex; }
+        
+        /* Stable Tooltip Fix */
         .tooltip-box { display: none; }
         .tooltip-container:hover .tooltip-box { display: block; }
+        
         .cal-tooltip { display: none; }
         .cal-day-busy:hover .cal-tooltip { display: block; }
         .subtle-green-slot { background-color: #D1FAE5 !important; color: #065F46 !important; border-color: #6EE7B7 !important; font-weight: 800 !important; }
         
-        .custom-scroll::-webkit-scrollbar { width: 8px; height: 8px; }
-        .custom-scroll::-webkit-scrollbar-track { background: #F1F5F9; border-radius: 4px; }
-        .custom-scroll::-webkit-scrollbar-thumb { background: #94A3B8; border-radius: 4px; }
-        .custom-scroll::-webkit-scrollbar-thumb:hover { background: #64748B; }
+        /* Bulletproof Clean Scroll Container */
+        .table-scroll-container {
+            max-height: 560px;
+            overflow-y: auto;
+            position: relative;
+        }
+        .table-scroll-container thead th {
+            position: sticky;
+            top: 0;
+            background-color: #F8FAFC;
+            z-spec: 20;
+            box-shadow: inset 0 -1px 0 #CBD5E1;
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between">
@@ -118,20 +130,20 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5" id="multiMonthCalendarContainer"></div>
             </div>
 
-            <!-- Scrollable Table Wrapper -->
-            <div class="border border-slate-300 rounded-xl overflow-hidden shadow-xs">
-                <div class="max-h-[600px] overflow-y-auto custom-scroll relative">
+            <!-- Stable Scrollable Table Wrapper -->
+            <div class="border border-slate-300 rounded-xl overflow-hidden shadow-xs bg-white">
+                <div class="table-scroll-container">
                     <table class="w-full text-left text-sm border-collapse">
-                        <thead class="sticky top-0 z-30 bg-slate-100 shadow-xs">
+                        <thead>
                             <tr class="text-slate-800 font-extrabold border-b border-slate-300 uppercase tracking-wider text-xs">
-                                <th class="py-4 px-4 bg-slate-100">Hearings</th>
-                                <th class="py-4 px-4 bg-slate-100">Time</th>
-                                <th class="py-4 px-4 bg-slate-100">assigned_caseid</th>
-                                <th class="py-4 px-4 bg-slate-100">Litigant</th>
-                                <th class="py-4 px-4 bg-slate-100">assigned_advocate</th>
-                                <th class="py-4 px-4 bg-slate-100">Case_type</th>
-                                <th class="py-4 px-4 bg-slate-100">status</th>
-                                <th class="py-4 px-4 bg-slate-100 text-right">Actions</th>
+                                <th class="py-4 px-4">Hearings</th>
+                                <th class="py-4 px-4">Time</th>
+                                <th class="py-4 px-4">assigned_caseid</th>
+                                <th class="py-4 px-4">Litigant</th>
+                                <th class="py-4 px-4">assigned_advocate</th>
+                                <th class="py-4 px-4">Case_type</th>
+                                <th class="py-4 px-4">status</th>
+                                <th class="py-4 px-4 text-right">Actions</th>
                             </tr>
                         </thead>
                         <tbody id="masterWorkScheduleBody" class="divide-y divide-slate-200 bg-white"></tbody>
@@ -221,7 +233,7 @@
         let activeActionCaseId = null;
         let activeActionMode = null;
 
-        // Default database with multi-condition compliance criteria per case
+        // Default database with explicit failed compliance criteria
         let globalDatabases = {
             "2026-9-12": [
                 { 
@@ -230,7 +242,7 @@
                 },
                 { 
                     hearings: "H-02", time: "11:15 AM", assigned_caseid: "MH-CIV-2017-1029", litigant: "Patil Enterprises vs. MMRDA", assigned_advocate: ADVOCATES[1], case_type: "Civil Suit", status: "unresolved", 
-                    conditions: { "Affidavit Verified": true, "Counsel Present": true, "Evidence Filed": false, "Witnesses Summoned": true } // 1 false keeps it unresolved
+                    conditions: { "Affidavit Verified": true, "Counsel Present": true, "Evidence Filed": false, "Witnesses Summoned": false } 
                 },
                 { 
                     hearings: "H-03", time: "12:00 PM", assigned_caseid: "MH-CRL-2023-5512", litigant: "Kulkarni vs. State of MH", assigned_advocate: ADVOCATES[2], case_type: "Writ Petition", status: "clear", 
@@ -238,7 +250,7 @@
                 },
                 { 
                     hearings: "H-04", time: "01:15 PM", assigned_caseid: "MH-COM-2024-3319", litigant: "Reliance vs. Apex Ltd", assigned_advocate: ADVOCATES[3], case_type: "Commercial Dispute", status: "unresolved", 
-                    conditions: { "Affidavit Verified": true, "Counsel Present": false, "Evidence Filed": true, "Witnesses Summoned": true } // 1 false keeps it unresolved
+                    conditions: { "Affidavit Verified": true, "Counsel Present": false, "Evidence Filed": true, "Witnesses Summoned": true } 
                 },
                 { 
                     hearings: "H-05", time: "02:00 PM", assigned_caseid: "MH-CIV-2019-4412", litigant: "Deshmukh vs. Shinde", assigned_advocate: ADVOCATES[4], case_type: "Civil Suit", status: "clear", 
@@ -337,7 +349,6 @@
                     let type = types[Math.floor(Math.random() * types.length)];
                     let time = (type === "Criminal Bail") ? `10:${Math.floor(Math.random()*30+10).toString().padStart(2,'0')} AM` : `${Math.floor(Math.random()*5+1)}:${Math.floor(Math.random()*60).toString().padStart(2,'0')} PM`;
                     
-                    // Evaluate conditions: 4 criteria. If any is false, status is unresolved.
                     let c1 = Math.random() > 0.3;
                     let c2 = Math.random() > 0.3;
                     let c3 = Math.random() > 0.3;
@@ -509,23 +520,26 @@
                 } else if(row.status === 'clear') {
                     statusHtml = `<span class="bg-emerald-100 text-emerald-900 px-3 py-1 rounded font-extrabold text-xs">Clear</span>`;
                 } else {
-                    // Build multi-condition audit list for tooltip
                     let conds = row.conditions || {};
                     let condListHtml = Object.entries(conds).map(([name, passed]) => {
                         let icon = passed ? '✅' : '❌';
-                        let textColor = passed ? 'text-emerald-400' : 'text-rose-400';
-                        return `<li class="flex items-center justify-between space-x-3"><span class="text-slate-300">${name}</span><span class="${textColor} font-bold">${icon} ${passed ? 'Met' : 'Failed'}</span></li>`;
+                        let textColor = passed ? 'text-emerald-400 font-semibold' : 'text-rose-400 font-extrabold';
+                        let statusText = passed ? 'Satisfied' : 'Failed (Problem)';
+                        return `<li class="flex items-center justify-between space-x-4 border-b border-slate-800 pb-1"><span class="text-slate-300 font-medium">${name}</span><span class="${textColor} text-right">${icon} ${statusText}</span></li>`;
                     }).join('');
 
                     statusHtml = `
                         <div class="tooltip-container relative inline-block">
-                            <span class="bg-rose-100 text-rose-900 px-3 py-1 rounded font-extrabold text-xs cursor-pointer inline-flex items-center space-x-1.5">
+                            <span class="bg-rose-100 text-rose-900 px-3 py-1 rounded font-extrabold text-xs cursor-pointer inline-flex items-center space-x-1.5 shadow-xs">
                                 <span class="w-1.5 h-1.5 bg-rose-600 rounded-full animate-pulse"></span>
                                 <span>Unresolved</span>
                             </span>
-                            <div class="tooltip-box absolute left-0 bottom-full mb-2 w-72 bg-slate-900 text-white text-[11px] p-3.5 rounded-xl shadow-2xl z-50 pointer-events-none space-y-2 border border-slate-700">
-                                <p class="font-extrabold text-rose-400 border-b border-slate-800 pb-1 uppercase tracking-wider text-[10px]">Compliance Audit (1 Failed = Unresolved):</p>
-                                <ul class="space-y-1.5">${condListHtml}</ul>
+                            <div class="tooltip-box absolute left-0 bottom-full mb-2 w-80 bg-slate-900 text-white text-[11px] p-4 rounded-xl shadow-2xl z-50 pointer-events-none space-y-2.5 border border-slate-700">
+                                <div class="border-b border-slate-800 pb-1.5">
+                                    <p class="font-extrabold text-rose-400 uppercase tracking-wider text-[10px]">Compliance Audit Failure:</p>
+                                    <p class="text-slate-400 text-[10px] mt-0.5">Even 1 failed condition keeps the case status Unresolved.</p>
+                                </div>
+                                <ul class="space-y-2">${condListHtml}</ul>
                             </div>
                         </div>
                     `;
