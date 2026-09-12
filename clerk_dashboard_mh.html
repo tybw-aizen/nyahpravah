@@ -272,7 +272,6 @@
                         cls = "bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed opacity-75";
                         clickAction = `alert('Weekend is an off-day.')`;
                     } else if (activeActionMode) {
-                        // Adjourned or Next Hearing Selection Mode
                         if (activeActionMode === 'adjourned') {
                             cls = "neon-green-adjourn font-extrabold cursor-pointer transition";
                         } else {
@@ -280,7 +279,6 @@
                         }
                         clickAction = `confirmTargetDate(${m.year}, ${m.month}, ${d})`;
                     } else {
-                        // Normal mode: Red busy days or white/green free days
                         if (isSept14to28 || (d % 3 === 0 && !isOctoberOrLater)) {
                             cls = "cal-day-busy bg-red-50 text-red-900 border border-red-300 font-extrabold cursor-pointer relative shadow-sm hover:bg-red-100";
                             tooltipHtml = `
@@ -357,19 +355,16 @@
             let targetKey = `${year}-${month}-${day}`;
             let targetDateStr = new Date(year, month, day).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 
-            // 1. Update current case status to "pending"
             let currentCases = globalDatabases[activeViewDateKey];
             let caseIndex = currentCases.findIndex(c => c.assigned_caseid === activeActionCaseId);
             
             if(caseIndex !== -1) {
                 let movedCase = { ...currentCases[caseIndex], status: "pending", reasons: ["Rescheduled to " + targetDateStr] };
                 
-                // Remove from current or update
                 currentCases.splice(caseIndex, 1);
 
-                // 2. Add to target date database with status "unresolved"
                 let targetCases = getOrCreateDatabaseForDate(year, month, day);
-                movedCase.status = "unresolved"; // Rule: target date status is unresolved
+                movedCase.status = "unresolved"; 
                 targetCases.push(movedCase);
 
                 alert(`Success: Case ${activeActionCaseId} successfully pushed to ${targetDateStr}. Status updated to Pending on current view, and Unresolved on target date.`);
@@ -398,7 +393,7 @@
                 let rowStyle = '';
 
                 if(row.status === 'closed') {
-                    rowstyle = 'bg-slate-100 text-slate-400 opacity-60';
+                    rowStyle = 'bg-slate-100 text-slate-400 opacity-60';
                     statusHtml = `<span class="bg-slate-200 text-slate-600 border border-slate-300 px-3 py-1 rounded-full font-extrabold text-xs">Case Closed</span>`;
                 } else if(row.status === 'pending') {
                     statusHtml = `<span class="bg-amber-100 text-amber-900 border border-amber-300 px-3 py-1 rounded-full font-extrabold text-xs inline-flex items-center space-x-1.5"><span class="w-1.5 h-1.5 bg-amber-600 rounded-full"></span><span>Pending</span></span>`;
@@ -421,7 +416,7 @@
                 }
 
                 tbody.innerHTML += `
-                    <tr class="hover:bg-slate-50/90 transition ${rowstyle}">
+                    <tr class="hover:bg-slate-50/90 transition ${rowStyle}">
                         <td class="py-4 px-4 font-bold text-slate-800">${row.hearings}</td>
                         <td class="py-4 px-4 mono font-semibold text-slate-600">${row.time}</td>
                         <td class="py-4 px-4 mono font-extrabold text-blue-900">${row.assigned_caseid}</td>
