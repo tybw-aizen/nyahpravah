@@ -22,8 +22,7 @@
         .tooltip-container:hover .tooltip-box { display: block; }
         .cal-tooltip { display: none; }
         .cal-day-busy:hover .cal-tooltip { display: block; }
-        .neon-green-adjourn { background-color: #00FF66 !important; color: #052e16 !important; border-color: #00cc52 !important; box-shadow: 0 0 10px rgba(0, 255, 102, 0.4); }
-        .lime-green-hearing { background-color: #39FF14 !important; color: #052e16 !important; border-color: #2ebc10 !important; box-shadow: 0 0 10px rgba(57, 255, 20, 0.4); }
+        .subtle-green-slot { background-color: #a7f3d0 !important; color: #064e3b !important; border-color: #34d399 !important; font-weight: 800 !important; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col justify-between">
@@ -107,7 +106,7 @@
                     </div>
                     <div class="flex items-center space-x-4 text-xs font-extrabold" id="calendarLegend">
                         <span class="flex items-center space-x-1.5 bg-emerald-50 text-emerald-800 border border-emerald-200 px-3 py-1 rounded-xl"><span class="w-2 h-2 bg-emerald-500 rounded-full"></span><span>Free Day</span></span>
-                        <span class="flex items-center space-x-1.5 bg-red-50 text-red-800 border border-red-200 px-3 py-1 rounded-xl"><span class="w-2 h-2 bg-red-500 rounded-full"></span><span>Busy Day (Click to View)</span></span>
+                        <span class="flex items-center space-x-1.5 bg-red-50 text-red-800 border border-red-200 px-3 py-1 rounded-xl"><span class="w-2 h-2 bg-red-500 rounded-full"></span><span>Busy Day</span></span>
                         <span class="flex items-center space-x-1.5 bg-slate-200 text-slate-600 border border-slate-300 px-3 py-1 rounded-xl"><span class="w-2 h-2 bg-slate-400 rounded-full"></span><span>Weekend Off</span></span>
                     </div>
                 </div>
@@ -214,7 +213,6 @@
                 
                 for(let i=1; i<=count; i++) {
                     let type = types[Math.floor(Math.random() * types.length)];
-                    // Criminal bail strictly before 11:00 AM
                     let time = (type === "Criminal Bail") ? `10:${Math.floor(Math.random()*30+10).toString().padStart(2,'0')} AM` : `${Math.floor(Math.random()*5+1)}:${Math.floor(Math.random()*60).toString().padStart(2,'0')} PM`;
                     let status = Math.random() > 0.5 ? "clear" : "unresolved";
                     cases.push({
@@ -267,19 +265,23 @@
                     let cls = "";
                     let tooltipHtml = "";
                     let clickAction = "";
+                    let isBusy = isSept14to28 || (d % 3 === 0 && !isOctoberOrLater);
 
                     if (isWeekend) {
                         cls = "bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed opacity-75";
                         clickAction = `alert('Weekend is an off-day.')`;
                     } else if (activeActionMode) {
-                        if (activeActionMode === 'adjourned') {
-                            cls = "neon-green-adjourn font-extrabold cursor-pointer transition";
+                        // Selection mode: Only free days are highlighted with subtle green; busy red days remain locked/unselectable
+                        if (isBusy) {
+                            cls = "bg-red-50 text-red-300 border border-red-200 cursor-not-allowed opacity-60";
+                            clickAction = `alert('Cannot select a busy red day for rescheduling.')`;
                         } else {
-                            cls = "lime-green-hearing font-extrabold cursor-pointer transition";
+                            cls = "subtle-green-slot cursor-pointer transition shadow-sm";
+                            clickAction = `confirmTargetDate(${m.year}, ${m.month}, ${d})`;
                         }
-                        clickAction = `confirmTargetDate(${m.year}, ${m.month}, ${d})`;
                     } else {
-                        if (isSept14to28 || (d % 3 === 0 && !isOctoberOrLater)) {
+                        // Normal mode
+                        if (isBusy) {
                             cls = "cal-day-busy bg-red-50 text-red-900 border border-red-300 font-extrabold cursor-pointer relative shadow-sm hover:bg-red-100";
                             tooltipHtml = `
                                 <div class="cal-tooltip absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-48 bg-slate-900 text-white text-[10px] p-2.5 rounded-xl shadow-2xl z-50 pointer-events-none space-y-1 text-left border border-slate-700">
@@ -328,7 +330,7 @@
             activeActionCaseId = caseId;
             activeActionMode = 'adjourned';
             document.getElementById('calendarModeTitle').textContent = "Select Adjournment Date";
-            document.getElementById('calendarModeSubtitle').textContent = "Highlighting optimal available slots in Neon Green.";
+            document.getElementById('calendarModeSubtitle').textContent = "Only available free days are highlighted in subtle green. Select one to push case.";
             document.getElementById('smartCalendarPanel').classList.remove('hidden');
             buildMultiMonthCalendar();
         }
@@ -337,7 +339,7 @@
             activeActionCaseId = caseId;
             activeActionMode = 'next_hearing';
             document.getElementById('calendarModeTitle').textContent = "Select Next Hearing Date";
-            document.getElementById('calendarModeSubtitle').textContent = "Highlighting available slots in Lime Green.";
+            document.getElementById('calendarModeSubtitle').textContent = "Only available free days are highlighted in subtle green. Select one to push case.";
             document.getElementById('smartCalendarPanel').classList.remove('hidden');
             buildMultiMonthCalendar();
         }
@@ -356,18 +358,19 @@
             let targetDateStr = new Date(year, month, day).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 
             let currentCases = globalDatabases[activeViewDateKey];
-            let caseIndex = currentCases.findIndex(c => c.assigned_caseid === activeActionCaseId);
+            let caseObj = currentCases.find(c => c.assigned_caseid === activeActionCaseId);
             
-            if(caseIndex !== -1) {
-                let movedCase = { ...currentCases[caseIndex], status: "pending", reasons: ["Rescheduled to " + targetDateStr] };
-                
-                currentCases.splice(caseIndex, 1);
+            if(caseObj) {
+                // 1. Update source case status to "pending" (row turns gray)
+                caseObj.status = "pending";
+                caseObj.reasons = ["Rescheduled to " + targetDateStr];
 
+                // 2. Add copy to target date database with status "unresolved"
                 let targetCases = getOrCreateDatabaseForDate(year, month, day);
-                movedCase.status = "unresolved"; 
+                let movedCase = { ...caseObj, status: "unresolved", reasons: ["Postponed from previous hearing"] };
                 targetCases.push(movedCase);
 
-                alert(`Success: Case ${activeActionCaseId} successfully pushed to ${targetDateStr}. Status updated to Pending on current view, and Unresolved on target date.`);
+                alert(`Success: Case ${activeActionCaseId} adjourned/continued to ${targetDateStr}. Source status updated to Pending.`);
             }
 
             activeActionMode = null;
@@ -396,6 +399,7 @@
                     rowStyle = 'bg-slate-100 text-slate-400 opacity-60';
                     statusHtml = `<span class="bg-slate-200 text-slate-600 border border-slate-300 px-3 py-1 rounded-full font-extrabold text-xs">Case Closed</span>`;
                 } else if(row.status === 'pending') {
+                    rowStyle = 'bg-slate-100 text-slate-500 opacity-75';
                     statusHtml = `<span class="bg-amber-100 text-amber-900 border border-amber-300 px-3 py-1 rounded-full font-extrabold text-xs inline-flex items-center space-x-1.5"><span class="w-1.5 h-1.5 bg-amber-600 rounded-full"></span><span>Pending</span></span>`;
                 } else if(row.status === 'clear') {
                     statusHtml = `<span class="bg-emerald-100 text-emerald-900 border border-emerald-300 px-3 py-1 rounded-full font-extrabold text-xs inline-flex items-center space-x-1.5"><span class="w-1.5 h-1.5 bg-emerald-600 rounded-full"></span><span>Clear</span></span>`;
