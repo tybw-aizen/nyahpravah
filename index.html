@@ -10,137 +10,155 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #F8FAFC; color: #334155; }
         .mono { font-family: 'JetBrains Mono', monospace; }
         canvas { user-select: none; }
-        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-        .animate-slide-in { animation: slideIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-        .tricolor-bar { background: linear-gradient(90deg, #FF9933 33.33%, #FFFFFF 33.33%, #FFFFFF 66.66%, #138808 66.66%); }
+        @keyframes slideIn { from { transform: translateX(20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        .animate-slide-in { animation: slideIn 0.4s ease-out forwards; }
+        .judicial-stripe { background: linear-gradient(90deg, #D97706 33.33%, #F8FAFC 33.33%, #F8FAFC 66.66%, #1E3A8A 66.66%); }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col justify-between overflow-x-hidden">
+<body class="min-h-screen flex flex-col justify-between overflow-x-hidden">
 
-    <div class="h-2 w-full tricolor-bar border-b border-slate-200"></div>
+    <div class="h-2 w-full judicial-stripe border-b border-slate-300"></div>
 
-    <header class="bg-white border-b border-slate-200 shadow-sm">
-        <div class="max-w-4xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-                <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-blue-900 to-slate-900 text-white flex items-center justify-center text-xl shadow-md border border-blue-800">⚖️</div>
-                <div>
-                    <div class="flex items-center space-x-2">
-                        <span class="font-extrabold text-lg text-blue-950 tracking-tight">NYAY-PRAVAH</span>
-                        <span class="text-[10px] bg-blue-50 text-blue-800 px-2.5 py-0.5 rounded-full font-extrabold border border-blue-200 uppercase">NATIONAL JUDICIAL PORTAL</span>
-                    </div>
-                    <p class="text-xs text-slate-500 font-medium">Department of Justice • e-Courts Gateway</p>
-                </div>
-            </div>
-            <div class="text-right text-xs text-slate-500 font-semibold">
-                <span>Secure Entry Portal</span>
-            </div>
-        </div>
-    </header>
-
-    <main class="flex-1 max-w-md mx-auto w-full px-4 py-10">
-        <div class="bg-white rounded-2xl border border-slate-200 shadow-xl shadow-slate-100 overflow-hidden relative">
-            <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-orange-500 via-blue-900 to-emerald-600"></div>
+    <main class="flex-1 flex items-center justify-center p-6 lg:p-12">
+        <div class="max-w-5xl w-full bg-white rounded-2xl border border-slate-300 shadow-xl overflow-hidden grid grid-cols-1 lg:grid-cols-12">
             
-            <div class="bg-slate-50/75 border-b border-slate-200 p-6 text-center">
-                <h1 class="text-xl font-extrabold text-blue-950">Judicial System Login</h1>
-                <p class="text-xs text-slate-500 mt-1 font-medium">Enter credentials, verified courtroom, and solve verification</p>
-            </div>
-
-            <!-- STEP 1: CREDENTIALS, COURTROOM & CAPTCHA -->
-            <div id="step1-credentials" class="p-6 sm:p-8 space-y-4">
-                <form onsubmit="handleCredentialSubmit(event)" class="space-y-3.5">
+            <!-- LEFT SIDE: SYSTEM BRANDING & COURT AURA (Laptop Optimized) -->
+            <div class="lg:col-span-5 bg-slate-900 text-white p-8 lg:p-12 flex flex-col justify-between border-r border-slate-800">
+                <div class="space-y-6">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-12 h-12 rounded-xl bg-amber-500 text-slate-950 flex items-center justify-center text-xl shadow-md font-bold">⚖️</div>
+                        <div>
+                            <span class="font-black text-lg text-white tracking-widest block">NYAY-PRAVAH</span>
+                            <span class="text-[10px] text-amber-400 font-bold uppercase tracking-wider">National Judicial Portal</span>
+                        </div>
+                    </div>
                     
-                    <div>
-                        <label class="block text-xs font-extrabold uppercase tracking-wider text-slate-700 mb-1">User ID</label>
-                        <div class="relative">
-                            <i data-lucide="user" class="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5 pointer-events-none"></i>
-                            <input id="userId" type="text" required placeholder="Enter ID" class="w-full bg-slate-50 border border-slate-300 rounded-xl pl-10 pr-3 py-2.5 text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-900">
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-extrabold uppercase tracking-wider text-slate-700 mb-1">Password</label>
-                        <div class="relative">
-                            <i data-lucide="lock" class="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5 pointer-events-none"></i>
-                            <input id="userPass" type="password" required placeholder="••••••••" class="w-full bg-slate-50 border border-slate-300 rounded-xl pl-10 pr-10 py-2.5 text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-900">
-                            <button type="button" onclick="togglePasswordVisibility()" class="absolute right-3.5 top-3 text-slate-400 hover:text-slate-600">
-                                <i id="eyeIcon" data-lucide="eye" class="w-4 h-4"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Unique Assigned Courtroom Selection (1 to 12) -->
-                    <div>
-                        <label class="block text-xs font-extrabold uppercase tracking-wider text-slate-700 mb-1">Assigned Unique Courtroom (1 - 12)</label>
-                        <div class="relative">
-                            <i data-lucide="building-2" class="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5 pointer-events-none"></i>
-                            <select id="userCourtSelect" required class="w-full bg-slate-50 border border-slate-300 rounded-xl pl-10 pr-3 py-2.5 text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-900">
-                                <option value="">Select Courtroom...</option>
-                                <option value="Courtroom 1">Courtroom 1</option>
-                                <option value="Courtroom 2">Courtroom 2</option>
-                                <option value="Courtroom 3">Courtroom 3</option>
-                                <option value="Courtroom 4">Courtroom 4</option>
-                                <option value="Courtroom 5">Courtroom 5</option>
-                                <option value="Courtroom 6">Courtroom 6</option>
-                                <option value="Courtroom 7">Courtroom 7</option>
-                                <option value="Courtroom 8">Courtroom 8</option>
-                                <option value="Courtroom 9">Courtroom 9</option>
-                                <option value="Courtroom 10">Courtroom 10</option>
-                                <option value="Courtroom 11">Courtroom 11</option>
-                                <option value="Courtroom 12">Courtroom 12</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <!-- Standard CAPTCHA Box -->
-                    <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 space-y-2">
-                        <div class="flex items-center justify-between text-xs font-extrabold uppercase text-slate-700">
-                            <span>Security Code</span>
-                            <span class="text-[10px] text-slate-400 font-normal">Case-sensitive</span>
-                        </div>
-                        <div class="flex items-center space-x-2">
-                            <canvas id="captchaCanvas" width="140" height="38" class="rounded-lg bg-slate-100 border border-slate-300"></canvas>
-                            <button onclick="generateNormalCaptcha()" type="button" class="p-2 hover:bg-slate-200 rounded-lg text-slate-700 transition" title="Refresh Code">
-                                <i data-lucide="rotate-cw" class="w-4 h-4"></i>
-                            </button>
-                        </div>
-                        <input id="captchaInput" type="text" maxlength="6" required placeholder="Enter code" class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-sm text-slate-900 mono font-bold tracking-widest focus:outline-none focus:ring-2 focus:ring-blue-900">
-                    </div>
-
-                    <div id="credentialError" class="hidden text-xs text-red-600 font-semibold bg-red-50 p-2.5 rounded-xl border border-red-200">
-                        <span id="credentialErrorText">Invalid entries. Please check details & CAPTCHA.</span>
-                    </div>
-
-                    <button type="submit" class="w-full bg-gradient-to-r from-blue-900 to-slate-900 hover:from-blue-800 text-white font-extrabold py-3 rounded-xl text-sm transition flex items-center justify-center space-x-2 shadow-lg shadow-blue-900/20 mt-1">
-                        <span>Authenticate & Send OTP</span><i data-lucide="arrow-right" class="w-4 h-4"></i>
-                    </button>
-                </form>
-            </div>
-
-            <!-- STEP 2: OTP -->
-            <div id="step2-otp" class="hidden p-6 sm:p-8 space-y-4">
-                <div class="bg-blue-50 border border-blue-200 rounded-xl p-3.5 flex items-start space-x-3">
-                    <i data-lucide="mail-check" class="w-5 h-5 text-blue-700 mt-0.5 flex-shrink-0"></i>
-                    <div>
-                        <h3 class="text-xs font-extrabold text-blue-950">OTP Sent Successfully</h3>
-                        <p class="text-[11px] text-blue-900 mt-0.5">Official email: <span id="targetEmailDisplay" class="font-bold mono bg-blue-100 px-1.5 py-0.5 rounded border border-blue-200"></span></p>
+                    <div class="space-y-3 pt-6 border-t border-slate-800">
+                        <h2 class="text-xl font-bold tracking-tight text-slate-100">Secure Judicial Gateway</h2>
+                        <p class="text-xs text-slate-400 leading-relaxed font-medium">Authorized access point for bench clerks and judicial officers across assigned courtrooms.</p>
                     </div>
                 </div>
-                <form onsubmit="handleOtpSubmit(event)" class="space-y-4">
+
+                <div class="space-y-2 pt-8 text-[11px] text-slate-400">
+                    <p class="font-semibold text-slate-300">Department of Justice • e-Courts System</p>
+                    <p>Protected under Judicial Information Security Protocols.</p>
+                </div>
+            </div>
+
+            <!-- RIGHT SIDE: LOGIN FORM & ICONS LEFT-ALIGNED -->
+            <div class="lg:col-span-7 p-8 lg:p-12 flex flex-col justify-center bg-white">
+                <div class="max-w-md w-full mx-auto space-y-6">
                     <div>
-                        <label class="block text-xs font-extrabold uppercase tracking-wider text-slate-700 mb-1.5 text-center">Enter 6-Digit OTP</label>
-                        <input id="otpInput" type="text" maxlength="6" required placeholder="------" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-2xl tracking-[0.5em] text-center font-extrabold mono text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-900 shadow-inner">
+                        <h1 class="text-xl font-bold text-slate-900">System Sign-In</h1>
+                        <p class="text-xs text-slate-500 mt-0.5">Enter credentials and verify courtroom assignment.</p>
                     </div>
-                    <div id="otpError" class="hidden text-xs text-red-600 font-semibold text-center bg-red-50 p-2.5 rounded-xl border border-red-200">Incorrect OTP.</div>
-                    <button type="submit" class="w-full bg-gradient-to-r from-emerald-700 to-emerald-800 text-white font-extrabold py-3 rounded-xl text-sm transition flex items-center justify-center space-x-2 shadow-lg">
-                        <span>Verify & Launch Portal</span><i data-lucide="shield-check" class="w-4 h-4"></i>
-                    </button>
-                </form>
-                <div class="text-center pt-1">
-                    <button onclick="resetToStep1()" type="button" class="text-xs font-bold text-slate-600 hover:text-blue-900">← Back to Login</button>
+
+                    <!-- STEP 1: CREDENTIALS, COURTROOM & CAPTCHA -->
+                    <div id="step1-credentials" class="space-y-4">
+                        <form onsubmit="handleCredentialSubmit(event)" class="space-y-3.5">
+                            
+                            <!-- User ID Field with Left-Aligned Icon -->
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-slate-700 mb-1">User ID</label>
+                                <div class="relative flex items-center">
+                                    <span class="absolute left-3 text-slate-400 pointer-events-none flex items-center">
+                                        <i data-lucide="user" class="w-4 h-4"></i>
+                                    </span>
+                                    <input id="userId" type="text" required placeholder="Enter ID" class="w-full bg-white border border-slate-300 rounded-lg pl-9 pr-3 py-2 text-xs font-semibold text-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900">
+                                </div>
+                            </div>
+
+                            <!-- Password Field with Left-Aligned Icon -->
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-slate-700 mb-1">Password</label>
+                                <div class="relative flex items-center">
+                                    <span class="absolute left-3 text-slate-400 pointer-events-none flex items-center">
+                                        <i data-lucide="lock" class="w-4 h-4"></i>
+                                    </span>
+                                    <input id="userPass" type="password" required placeholder="••••••••" class="w-full bg-white border border-slate-300 rounded-lg pl-9 pr-10 py-2 text-xs font-semibold text-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900">
+                                    <button type="button" onclick="togglePasswordVisibility()" class="absolute right-3 text-slate-400 hover:text-slate-600 cursor-pointer">
+                                        <i id="eyeIcon" data-lucide="eye" class="w-4 h-4"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Assigned Courtroom Selection with Left-Aligned Icon -->
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-slate-700 mb-1">Assigned Courtroom (1 - 12)</label>
+                                <div class="relative flex items-center">
+                                    <span class="absolute left-3 text-slate-400 pointer-events-none flex items-center">
+                                        <i data-lucide="building-2" class="w-4 h-4"></i>
+                                    </span>
+                                    <select id="userCourtSelect" required class="w-full bg-white border border-slate-300 rounded-lg pl-9 pr-3 py-2 text-xs font-semibold text-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900">
+                                        <option value="">Select Courtroom...</option>
+                                        <option value="Courtroom 1">Courtroom 1</option>
+                                        <option value="Courtroom 2">Courtroom 2</option>
+                                        <option value="Courtroom 3">Courtroom 3</option>
+                                        <option value="Courtroom 4">Courtroom 4</option>
+                                        <option value="Courtroom 5">Courtroom 5</option>
+                                        <option value="Courtroom 6">Courtroom 6</option>
+                                        <option value="Courtroom 7">Courtroom 7</option>
+                                        <option value="Courtroom 8">Courtroom 8</option>
+                                        <option value="Courtroom 9">Courtroom 9</option>
+                                        <option value="Courtroom 10">Courtroom 10</option>
+                                        <option value="Courtroom 11">Courtroom 11</option>
+                                        <option value="Courtroom 12">Courtroom 12</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Security Code Box -->
+                            <div class="bg-slate-50 border border-slate-200 rounded-lg p-3 space-y-2">
+                                <div class="flex items-center justify-between text-[11px] font-bold uppercase text-slate-700">
+                                    <span>Security Code</span>
+                                    <span class="text-[10px] text-slate-400 font-normal">Case-sensitive</span>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <canvas id="captchaCanvas" width="130" height="34" class="rounded bg-white border border-slate-300"></canvas>
+                                    <button onclick="generateNormalCaptcha()" type="button" class="p-2 hover:bg-slate-200 rounded text-slate-700 transition cursor-pointer" title="Refresh Code">
+                                        <i data-lucide="rotate-cw" class="w-3.5 h-3.5"></i>
+                                    </button>
+                                </div>
+                                <input id="captchaInput" type="text" maxlength="6" required placeholder="Enter code" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-1.5 text-xs text-slate-900 mono font-bold tracking-widest focus:outline-none focus:ring-1 focus:ring-slate-900">
+                            </div>
+
+                            <div id="credentialError" class="hidden text-xs text-rose-700 font-semibold bg-rose-50 p-2.5 rounded-lg border border-rose-200">
+                                <span id="credentialErrorText">Invalid entries. Please check details & CAPTCHA.</span>
+                            </div>
+
+                            <button type="submit" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 rounded-lg text-xs transition flex items-center justify-center space-x-2 shadow-xs cursor-pointer mt-2">
+                                <span>Authenticate & Send OTP</span><i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- STEP 2: OTP -->
+                    <div id="step2-otp" class="hidden space-y-4">
+                        <div class="bg-slate-50 border border-slate-200 rounded-lg p-3.5 flex items-start space-x-3">
+                            <i data-lucide="mail-check" class="w-4 h-4 text-slate-700 mt-0.5 flex-shrink-0"></i>
+                            <div>
+                                <h3 class="text-xs font-bold text-slate-900">OTP Sent Successfully</h3>
+                                <p class="text-[11px] text-slate-600 mt-0.5">Official email: <span id="targetEmailDisplay" class="font-bold mono bg-slate-200 px-1.5 py-0.5 rounded"></span></p>
+                            </div>
+                        </div>
+                        <form onsubmit="handleOtpSubmit(event)" class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5 text-center">Enter 6-Digit OTP</label>
+                                <input id="otpInput" type="text" maxlength="6" required placeholder="------" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-4 py-2.5 text-xl tracking-[0.4em] text-center font-bold mono text-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900">
+                            </div>
+                            <div id="otpError" class="hidden text-xs text-rose-700 font-semibold text-center bg-rose-50 p-2 rounded-lg border border-rose-200">Incorrect OTP.</div>
+                            <button type="submit" class="w-full bg-emerald-800 hover:bg-emerald-900 text-white font-bold py-2.5 rounded-lg text-xs transition flex items-center justify-center space-x-2 shadow-xs cursor-pointer">
+                                <span>Verify & Launch Portal</span><i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
+                            </button>
+                        </form>
+                        <div class="text-center pt-1">
+                            <button onclick="resetToStep1()" type="button" class="text-xs font-semibold text-slate-600 hover:text-slate-900 cursor-pointer">← Back to Login</button>
+                        </div>
+                    </div>
+
                 </div>
             </div>
 
@@ -148,32 +166,31 @@
     </main>
 
     <!-- TOAST EMAIL MOCK -->
-    <div id="mockEmailToast" class="hidden fixed top-6 right-6 max-w-sm w-full bg-white border border-slate-200 rounded-2xl shadow-2xl overflow-hidden z-50">
-        <div class="bg-blue-950 text-white px-4 py-3 flex items-center space-x-2 border-b border-blue-900">
-            <i data-lucide="mail" class="w-4 h-4 text-orange-400"></i><span class="text-xs font-extrabold tracking-wide">JUDICIARY MAIL SERVER</span>
+    <div id="mockEmailToast" class="hidden fixed top-6 right-6 max-w-sm w-full bg-white border border-slate-300 rounded-xl shadow-xl overflow-hidden z-50">
+        <div class="bg-slate-900 text-white px-4 py-2.5 flex items-center space-x-2 border-b border-slate-800">
+            <i data-lucide="mail" class="w-4 h-4 text-amber-400"></i><span class="text-xs font-bold tracking-wide">JUDICIARY MAIL SERVER</span>
         </div>
         <div class="p-4 bg-slate-50">
             <p class="text-[10px] font-bold text-slate-500 uppercase">To: <span id="toastEmailDisplay"></span></p>
-            <p class="text-xs font-extrabold text-slate-900 mt-1">Nyay-Pravah Security Code</p>
+            <p class="text-xs font-bold text-slate-900 mt-1">Nyay-Pravah Security Code</p>
             <p class="text-xs text-slate-600 mt-2">Hello <span id="toastName" class="font-bold"></span>, your OTP is:</p>
             <div class="mt-3 text-center">
-                <span id="toastOtpCode" class="text-2xl font-extrabold mono tracking-widest text-blue-950 bg-white border px-4 py-2 rounded-xl inline-block shadow-sm"></span>
+                <span id="toastOtpCode" class="text-xl font-bold mono tracking-widest text-slate-900 bg-white border border-slate-300 px-4 py-1.5 rounded-lg inline-block shadow-xs"></span>
             </div>
-            <div class="text-right mt-3"><button onclick="closeToast()" class="text-[10px] font-bold text-slate-500">Dismiss</button></div>
+            <div class="text-right mt-3"><button onclick="closeToast()" class="text-[10px] font-bold text-slate-500 cursor-pointer">Dismiss</button></div>
         </div>
     </div>
 
     <script>
         const MASTER_USERS = {
-            "676968": { name: "Aaron", pass: "Aaron2008", role: "Master Admin", state: "Maharashtra", court: "Courtroom 2" }
+            "676968": { name: "Aaron", pass: "Aaron2008", role: "Master Admin", state: "Maharashtra", court: "Courtroom 1" }
         };
 
         function initializeDefaultUsers() {
             let dynamic = JSON.parse(localStorage.getItem('nyay_dynamic_users') || '{}');
-            
-            // Updated Siddharth's courtroom to Courtroom 4
-            dynamic["999888"] = { name: "Siddharth", pass: "Siddharth2008", role: "Bench Clerk", state: "Maharashtra", court: "Courtroom 4" };
-            
+            if (!dynamic["999888"]) {
+                dynamic["999888"] = { name: "Siddharth", pass: "Siddharth2008", role: "Bench Clerk", state: "Maharashtra", court: "Courtroom 4" };
+            }
             localStorage.setItem('nyay_dynamic_users', JSON.stringify(dynamic));
         }
 
@@ -188,7 +205,7 @@
         function generateNormalCaptcha() {
             const canvas = document.getElementById('captchaCanvas');
             const ctx = canvas.getContext('2d');
-            ctx.fillStyle = "#f1f5f9";
+            ctx.fillStyle = "#f8fafc";
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             
             const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789";
@@ -199,10 +216,10 @@
             const letterSpacing = (canvas.width - 20) / 5;
             for (let i = 0; i < code.length; i++) {
                 ctx.save();
-                ctx.font = "bold 20px 'JetBrains Mono', monospace";
-                ctx.fillStyle = "#1e3a8a";
-                ctx.translate(10 + (i * letterSpacing), 26);
-                ctx.rotate((Math.random() * 10 - 5) * Math.PI / 180);
+                ctx.font = "bold 18px 'JetBrains Mono', monospace";
+                ctx.fillStyle = "#0f172a";
+                ctx.translate(10 + (i * letterSpacing), 23);
+                ctx.rotate((Math.random() * 8 - 4) * Math.PI / 180);
                 ctx.fillText(code[i], 0, 0);
                 ctx.restore();
             }
@@ -247,7 +264,6 @@
                 return;
             }
 
-            // Strict Courtroom Validation
             if (user.court !== selectedCourt) {
                 document.getElementById('credentialErrorText').textContent = `Access Denied: User ID ${id} is assigned to ${user.court}, not ${selectedCourt}.`;
                 document.getElementById('credentialError').classList.remove('hidden');
