@@ -118,18 +118,18 @@
                 </div>
             </div>
 
-            <div class="overflow-x-auto">
+            <div class="overflow-x-auto max-h-[550px] overflow-y-auto pr-1">
                 <table class="w-full text-left text-xs sm:text-sm border-collapse">
-                    <thead>
-                        <tr class="bg-slate-100/80 text-slate-700 font-extrabold border-b border-slate-200 uppercase tracking-wider text-xs">
-                            <th class="py-4 px-4">Hearings</th>
-                            <th class="py-4 px-4">Time</th>
-                            <th class="py-4 px-4">assigned_caseid</th>
-                            <th class="py-4 px-4">Litigant</th>
-                            <th class="py-4 px-4">assigned_advocate</th>
-                            <th class="py-4 px-4">Case_type</th>
-                            <th class="py-4 px-4">status</th>
-                            <th class="py-4 px-4 text-right">Actions</th>
+                    <thead class="sticky top-0 z-20 bg-slate-100">
+                        <tr class="text-slate-700 font-extrabold border-b border-slate-200 uppercase tracking-wider text-xs">
+                            <th class="py-4 px-4 bg-slate-100">Hearings</th>
+                            <th class="py-4 px-4 bg-slate-100">Time</th>
+                            <th class="py-4 px-4 bg-slate-100">assigned_caseid</th>
+                            <th class="py-4 px-4 bg-slate-100">Litigant</th>
+                            <th class="py-4 px-4 bg-slate-100">assigned_advocate</th>
+                            <th class="py-4 px-4 bg-slate-100">Case_type</th>
+                            <th class="py-4 px-4 bg-slate-100">status</th>
+                            <th class="py-4 px-4 bg-slate-100 text-right">Actions</th>
                         </tr>
                     </thead>
                     <tbody id="masterWorkScheduleBody" class="divide-y divide-slate-100">
@@ -341,7 +341,6 @@
                 let isInRedWindow = (cellDate >= today && cellDate <= windowEndRed);
                 let isRedDay = isPastWorkingDay || isInRedWindow;
 
-                // Red days get high volume (6 to 9 cases), Green days get light volume (2 to 3 cases)
                 let count = isRedDay ? (Math.floor(Math.random() * 4) + 6) : (Math.floor(Math.random() * 2) + 2);
                 
                 let cases = [];
