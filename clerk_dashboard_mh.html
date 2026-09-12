@@ -16,6 +16,8 @@
         .fade-in { animation: fadeIn 0.4s ease-in forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
         .tricolor-bar { background: linear-gradient(90deg, #FF9933 33.33%, #FFFFFF 33.33%, #FFFFFF 66.66%, #138808 66.66%); }
+        .action-dropdown { display: none; }
+        .action-container:hover .action-dropdown { display: flex; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col justify-between">
@@ -36,7 +38,7 @@
                 </div>
             </div>
 
-            <!-- TOP MIDDLE BOMBAY HIGH COURT & TODAYS HEARINGS (Larger headings) -->
+            <!-- TOP MIDDLE BOMBAY HIGH COURT & TODAYS HEARINGS -->
             <div class="hidden lg:flex flex-col items-center justify-center text-center">
                 <div class="flex items-center space-x-2.5">
                     <span class="text-xl">🦁</span>
@@ -73,11 +75,28 @@
                     <p class="text-sm text-slate-500 font-medium mt-0.5" id="specificJurisdictionSub">Live courtroom session active sequence for proceedings.</p>
                 </div>
                 <div class="flex items-center space-x-3">
+                    <!-- Toggle Smart Calendar Button -->
+                    <button onclick="toggleSmartCalendar()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold px-4 py-2.5 rounded-xl text-xs shadow transition flex items-center space-x-2 cursor-pointer">
+                        <i data-lucide="calendar-range" class="w-4 h-4"></i>
+                        <span>Toggle Smart Calendar</span>
+                    </button>
                     <span class="bg-emerald-50 text-emerald-800 border border-emerald-200 px-3.5 py-1.5 rounded-xl font-extrabold text-xs flex items-center space-x-1.5">
                         <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
                         <span>Live Session Connected</span>
                     </span>
                 </div>
+            </div>
+
+            <!-- Placeholder Smart Calendar View (Toggled via button) -->
+            <div id="smartCalendarPanel" class="hidden bg-slate-50 border border-indigo-200 p-6 rounded-2xl shadow-inner space-y-3">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-sm font-extrabold text-indigo-950 flex items-center space-x-2">
+                        <i data-lucide="sparkles" class="w-4 h-4 text-indigo-600"></i>
+                        <span>AI Smart Efficiency Calendar Panel</span>
+                    </h3>
+                    <span class="text-[10px] font-bold bg-indigo-100 text-indigo-800 px-2.5 py-1 rounded-lg">Ready for implementation</span>
+                </div>
+                <p class="text-xs text-slate-600">Smart calendar view placeholder is currently toggled open.</p>
             </div>
 
             <div class="overflow-x-auto">
@@ -90,7 +109,7 @@
                             <th class="py-4 px-4">Litigant</th>
                             <th class="py-4 px-4">assigned_advocate</th>
                             <th class="py-4 px-4">Case_type</th>
-                            <th class="py-4 px-4 text-right">Action</th>
+                            <th class="py-4 px-4 text-right">Actions</th>
                         </tr>
                     </thead>
                     <tbody id="masterWorkScheduleBody" class="divide-y divide-slate-100">
@@ -144,6 +163,24 @@
             lucide.createIcons();
         });
 
+        function toggleSmartCalendar() {
+            const panel = document.getElementById('smartCalendarPanel');
+            panel.classList.toggle('hidden');
+        }
+
+        /* --- Action Button Functions --- */
+        function handleAdjourned(caseId) {
+            alert(`Action Triggered [Adjourned]: Case ${caseId} marked as adjourned.`);
+        }
+
+        function handleNextHearing(caseId) {
+            alert(`Action Triggered [Next Hearing]: Scheduling next hearing date for Case ${caseId}.`);
+        }
+
+        function handleCloseCase(caseId) {
+            alert(`Action Triggered [Close Case]: Case ${caseId} marked as closed.`);
+        }
+
         function renderMasterWorkSchedule() {
             const tbody = document.getElementById('masterWorkScheduleBody');
             if(!tbody) return;
@@ -167,7 +204,16 @@
                         <td class="py-4 px-4 font-semibold text-slate-900">${row.litigant}</td>
                         <td class="py-4 px-4"><span class="bg-indigo-50 text-indigo-900 border border-indigo-200 px-3 py-1 rounded-xl font-extrabold text-xs">${row.assigned_advocate}</span></td>
                         <td class="py-4 px-4"><span class="bg-slate-100 text-slate-800 border border-slate-200 px-3 py-1 rounded-full font-extrabold text-xs">${row.case_type}</span></td>
-                        <td class="py-4 px-4 text-right"><button onclick="alert('Inspecting docket file for ${row.assigned_caseid}')" class="text-xs font-extrabold text-blue-800 hover:underline">Inspect</button></td>
+                        <td class="py-4 px-4 text-right relative">
+                            <div class="action-container inline-block relative">
+                                <button class="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-extrabold rounded-lg tracking-widest text-sm transition cursor-pointer">...</button>
+                                <div class="action-dropdown absolute right-0 top-full mt-1 w-36 bg-white border border-slate-200 rounded-xl shadow-xl flex-col py-1.5 z-30 text-left">
+                                    <button onclick="handleAdjourned('${row.assigned_caseid}')" class="w-full text-left px-3.5 py-1.5 text-xs font-extrabold text-slate-700 hover:bg-amber-50 hover:text-amber-800 transition">Adjourned</button>
+                                    <button onclick="handleNextHearing('${row.assigned_caseid}')" class="w-full text-left px-3.5 py-1.5 text-xs font-extrabold text-slate-700 hover:bg-blue-50 hover:text-blue-800 transition">Next Hearing</button>
+                                    <button onclick="handleCloseCase('${row.assigned_caseid}')" class="w-full text-left px-3.5 py-1.5 text-xs font-extrabold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 transition">Close Case</button>
+                                </div>
+                            </div>
+                        </td>
                     </tr>
                 `;
             });
