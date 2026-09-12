@@ -165,14 +165,14 @@
 
     <script>
         const MASTER_USERS = {
-            "676968": { name: "Aaron", pass: "Aaron2008", role: "Master Admin", state: "Maharashtra", court: "Courtroom 1" }
+            "676968": { name: "Aaron", pass: "Aaron2008", role: "Master Admin", state: "Maharashtra", court: "Courtroom 2" }
         };
 
         function initializeDefaultUsers() {
             let dynamic = JSON.parse(localStorage.getItem('nyay_dynamic_users') || '{}');
             
-            // Forcefully update or initialize Siddharth to Courtroom 3
-            dynamic["999888"] = { name: "Siddharth", pass: "Siddharth2008", role: "Bench Clerk", state: "Maharashtra", court: "Courtroom 3" };
+            // Updated Siddharth's courtroom to Courtroom 4
+            dynamic["999888"] = { name: "Siddharth", pass: "Siddharth2008", role: "Bench Clerk", state: "Maharashtra", court: "Courtroom 4" };
             
             localStorage.setItem('nyay_dynamic_users', JSON.stringify(dynamic));
         }
