@@ -22,6 +22,8 @@
         .tooltip-container:hover .tooltip-box { display: block; }
         .cal-tooltip { display: none; }
         .cal-day-busy:hover .cal-tooltip { display: block; }
+        .neon-green-adjourn { background-color: #00FF66 !important; color: #052e16 !important; border-color: #00cc52 !important; box-shadow: 0 0 10px rgba(0, 255, 102, 0.4); }
+        .lime-green-hearing { background-color: #39FF14 !important; color: #052e16 !important; border-color: #2ebc10 !important; box-shadow: 0 0 10px rgba(57, 255, 20, 0.4); }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col justify-between">
@@ -51,7 +53,7 @@
                 </div>
                 <div class="mt-1">
                     <span class="text-xs font-extrabold tracking-wide text-slate-700 uppercase">
-                        TODAYS HEARINGS: <span id="currentDateDisplay" class="text-blue-900 font-black text-sm"></span>
+                        ACTIVE VIEW DATE: <span id="currentDateDisplay" class="text-blue-900 font-black text-sm">September 12, 2026</span>
                     </span>
                 </div>
             </div>
@@ -76,7 +78,7 @@
             <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
                 <div>
                     <h2 class="text-xl sm:text-2xl font-black text-blue-950 tracking-tight" id="displayCourtHeading">Master Hearings Docket</h2>
-                    <p class="text-sm text-slate-500 font-medium mt-0.5" id="specificJurisdictionSub">Live courtroom session active sequence for proceedings.</p>
+                    <p class="text-sm text-slate-500 font-medium mt-0.5" id="activeViewSub">Showing live database for September 12, 2026</p>
                 </div>
                 <div class="flex items-center space-x-3">
                     <!-- Toggle Smart Calendar Button -->
@@ -86,12 +88,12 @@
                     </button>
                     <span class="bg-emerald-50 text-emerald-800 border border-emerald-200 px-3.5 py-1.5 rounded-xl font-extrabold text-xs flex items-center space-x-1.5">
                         <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
-                        <span>Live Session Connected</span>
+                        <span>Real-Time Sync Active</span>
                     </span>
                 </div>
             </div>
 
-            <!-- Smart Calendar Panel (Multi-Month View: Aug, Sep, Oct, Nov 2026) -->
+            <!-- Smart Calendar Panel (Multi-Month View) -->
             <div id="smartCalendarPanel" class="hidden bg-slate-50 border border-indigo-200 p-6 rounded-3xl shadow-inner space-y-6">
                 <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-indigo-100 pb-4">
                     <div class="flex items-center space-x-3">
@@ -99,13 +101,13 @@
                             <i data-lucide="calendar" class="w-5 h-5"></i>
                         </div>
                         <div>
-                            <h3 class="text-base font-extrabold text-indigo-950">Smart Calendar</h3>
-                            <p class="text-xs text-slate-500">Click any date to lock previous timelines. Sunday to Saturday layout. Red = Busy (Hover for hearings), Green/White = Free.</p>
+                            <h3 class="text-base font-extrabold text-indigo-950" id="calendarModeTitle">Smart Calendar</h3>
+                            <p class="text-xs text-slate-500" id="calendarModeSubtitle">Click any red busy date to view its live docket table. Sunday to Saturday layout.</p>
                         </div>
                     </div>
-                    <div class="flex items-center space-x-4 text-xs font-extrabold">
+                    <div class="flex items-center space-x-4 text-xs font-extrabold" id="calendarLegend">
                         <span class="flex items-center space-x-1.5 bg-emerald-50 text-emerald-800 border border-emerald-200 px-3 py-1 rounded-xl"><span class="w-2 h-2 bg-emerald-500 rounded-full"></span><span>Free Day</span></span>
-                        <span class="flex items-center space-x-1.5 bg-red-50 text-red-800 border border-red-200 px-3 py-1 rounded-xl"><span class="w-2 h-2 bg-red-500 rounded-full"></span><span>Busy Day</span></span>
+                        <span class="flex items-center space-x-1.5 bg-red-50 text-red-800 border border-red-200 px-3 py-1 rounded-xl"><span class="w-2 h-2 bg-red-500 rounded-full"></span><span>Busy Day (Click to View)</span></span>
                         <span class="flex items-center space-x-1.5 bg-slate-200 text-slate-600 border border-slate-300 px-3 py-1 rounded-xl"><span class="w-2 h-2 bg-slate-400 rounded-full"></span><span>Weekend Off</span></span>
                     </div>
                 </div>
@@ -156,8 +158,19 @@
 
     <script>
         let session = null;
-        const ADVOCATES = ["Adv. George", "Adv. Aaron", "Adv. Cyrus", "Adv. Nived", "Adv. Jacob", "Adv. Chris", "Adv. Manu", "Adv. Midhun", "Adv. Zach", "Adv. Jake"];
-        let selectedCutoffDate = { year: 2026, month: 8, day: 12 }; // Default selection: Sep 12, 2026
+        const ADVOCATES = ["Adv. George", "Adv. Aaron", "Adv. Cyrus", "Adv. Nived", "Adv. Jacob", "Adv. Chris", "Adv. Manu", "Adv. Midhun", "Adv. Zach", "Adv. Jake", "Adv. Priya", "Adv. Sneha"];
+        let activeViewDateKey = "2026-9-12"; // Default active date key
+        let activeActionCaseId = null;
+        let activeActionMode = null; // 'adjourned' or 'next_hearing'
+
+        // Centralized Mock Database for all dates
+        let globalDatabases = {
+            "2026-9-12": [
+                { hearings: "H-01", time: "10:30 AM", assigned_caseid: "MH-CRL-2021-8891", litigant: "State vs. Vikram Rao", assigned_advocate: ADVOCATES[0], case_type: "Criminal Bail", status: "clear", reasons: [] },
+                { hearings: "H-02", time: "11:15 AM", assigned_caseid: "MH-CIV-2017-1029", litigant: "Patil Enterprises vs. MMRDA", assigned_advocate: ADVOCATES[1], case_type: "Civil Suit", status: "unresolved", reasons: ["Witnesses not present"] },
+                { hearings: "H-03", time: "12:00 PM", assigned_caseid: "MH-CRL-2023-5512", litigant: "Kulkarni vs. State of MH", assigned_advocate: ADVOCATES[2], case_type: "Writ Petition", status: "clear", reasons: [] }
+            ]
+        };
 
         window.addEventListener('DOMContentLoaded', () => {
             const storedSession = localStorage.getItem('nyay_user_session');
@@ -169,11 +182,7 @@
             
             document.getElementById('userSubText').textContent = `Clerk: ${session.name} (ID: ${session.id})`;
             document.getElementById('displayCourtHeading').textContent = `Master Hearings Docket — ${session.court}`;
-            document.getElementById('specificJurisdictionSub').textContent = `Active Secure Session: Bombay High Court (${session.court})`;
             
-            const options = { year: 'numeric', month: 'long', day: 'numeric' };
-            document.getElementById('currentDateDisplay').textContent = new Date().toLocaleDateString('en-US', options);
-
             setInterval(() => {
                 document.getElementById('liveClock').textContent = new Date().toLocaleTimeString() + " IST";
             }, 1000);
@@ -187,17 +196,49 @@
             const panel = document.getElementById('smartCalendarPanel');
             panel.classList.toggle('hidden');
             if(!panel.classList.contains('hidden')) {
+                activeActionMode = null;
+                document.getElementById('calendarModeTitle').textContent = "Smart Calendar";
+                document.getElementById('calendarModeSubtitle').textContent = "Click any red busy date to view its live docket table. Sunday to Saturday layout.";
                 buildMultiMonthCalendar();
             }
         }
 
-        /* --- Smart Calendar Logic (Sunday to Saturday Order) --- */
+        /* --- Generate Random Database for any Date --- */
+        function getOrCreateDatabaseForDate(year, month, day) {
+            let key = `${year}-${month}-${day}`;
+            if (!globalDatabases[key]) {
+                let count = Math.floor(Math.random() * 3) + 3; // 3 to 5 cases
+                let cases = [];
+                let types = ["Civil Suit", "Criminal Bail", "Writ Petition", "Commercial Dispute", "Land Acquisition", "Criminal Appeal"];
+                let litigantsList = ["Deshmukh vs. Shinde", "State vs. Patil", "Sharma vs. Municipal Corp", "Kulkarni vs. Union of India", "Nair vs. State of MH"];
+                
+                for(let i=1; i<=count; i++) {
+                    let type = types[Math.floor(Math.random() * types.length)];
+                    // Criminal bail strictly before 11:00 AM
+                    let time = (type === "Criminal Bail") ? `10:${Math.floor(Math.random()*30+10).toString().padStart(2,'0')} AM` : `${Math.floor(Math.random()*5+1)}:${Math.floor(Math.random()*60).toString().padStart(2,'0')} PM`;
+                    let status = Math.random() > 0.5 ? "clear" : "unresolved";
+                    cases.push({
+                        hearings: `H-0${i}`,
+                        time: time,
+                        assigned_caseid: `MH-${type.substring(0,3).toUpperCase()}-2026-${Math.floor(Math.random()*9000+1000)}`,
+                        litigant: litigantsList[Math.floor(Math.random()*litigantsList.length)],
+                        assigned_advocate: ADVOCATES[Math.floor(Math.random()*ADVOCATES.length)],
+                        case_type: type,
+                        status: status,
+                        reasons: status === "unresolved" ? ["Pending affidavit verification", "Witness summon unserved"] : []
+                    });
+                }
+                globalDatabases[key] = cases;
+            }
+            return globalDatabases[key];
+        }
+
+        /* --- Smart Calendar Builder with Adjournment/Next Hearing Mode --- */
         function buildMultiMonthCalendar() {
             const container = document.getElementById('multiMonthCalendarContainer');
             if(!container) return;
             container.innerHTML = "";
 
-            // 4 Months: Past (August 2026), Current (September 2026), Future 1 (October 2026), Future 2 (November 2026)
             const monthsConfig = [
                 { name: "August 2026 (Past)", year: 2026, month: 7, days: 31, startDay: 6 },
                 { name: "September 2026 (Current)", year: 2026, month: 8, days: 30, startDay: 2 },
@@ -210,59 +251,55 @@
                 monthCard.className = "bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-3";
                 
                 let headerHtml = `<div class="text-xs font-black text-blue-950 uppercase tracking-wide text-center border-b pb-2">${m.name}</div>`;
-                // Sunday to Saturday layout
                 let daysHeader = `<div class="grid grid-cols-7 gap-1 text-center text-[10px] font-extrabold text-slate-400"><div>Su</div><div>Mo</div><div>Tu</div><div>We</div><div>Th</div><div>Fr</div><div>Sa</div></div>`;
-                
                 let daysGrid = `<div class="grid grid-cols-7 gap-1.5 text-center text-xs">`;
                 
-                // Sunday start index: startDay 0=Sun, 1=Mon, ..., 6=Sat
                 let adjustedStart = m.startDay; 
-                for(let p=0; p<adjustedStart; p++) {
-                    daysGrid += `<div></div>`;
-                }
+                for(let p=0; p<adjustedStart; p++) { daysGrid += `<div></div>`; }
 
                 for(let d=1; d<=m.days; d++) {
                     let dayOfWeek = (adjustedStart + d - 1) % 7;
                     let isWeekend = (dayOfWeek === 0 || dayOfWeek === 6); // Sunday = 0, Saturday = 6
-                    
-                    let isPast = isDateBefore(m.year, m.month, d, selectedCutoffDate.year, selectedCutoffDate.month, selectedCutoffDate.day);
-                    
-                    let cls = "";
-                    let tooltipHtml = "";
-                    let isBusy = false;
-
-                    // Constraints checks
                     let isSeptember = (m.year === 2026 && m.month === 8);
                     let isSept14to28 = isSeptember && (d >= 14 && d <= 28);
-                    
                     let isOctoberOrLater = (m.year > 2026 || (m.year === 2026 && m.month >= 9));
 
+                    let cls = "";
+                    let tooltipHtml = "";
+                    let clickAction = "";
+
                     if (isWeekend) {
-                        // Weekends are off (gray)
                         cls = "bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed opacity-75";
-                    } else if (isOctoberOrLater) {
-                        // All days after October 1 are common white in color (not gray)
-                        cls = "bg-white text-slate-800 border border-slate-200 font-extrabold cursor-pointer hover:bg-slate-50 transition shadow-sm";
-                    } else if (isPast) {
-                        cls = "bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed opacity-75";
-                    } else if (isSept14to28) {
-                        // September 14 to September 28 (excluding weekends) are all red days
-                        isBusy = true;
-                        cls = "cal-day-busy bg-red-50 text-red-900 border border-red-300 font-extrabold cursor-pointer relative shadow-sm hover:bg-red-100";
-                        tooltipHtml = `
-                            <div class="cal-tooltip absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-48 bg-slate-900 text-white text-[10px] p-2.5 rounded-xl shadow-2xl z-50 pointer-events-none space-y-1 text-left border border-slate-700">
-                                <p class="font-bold text-red-400 border-b border-slate-800 pb-0.5">Hearings on ${d} Sep:</p>
-                                <p>• State vs. Vikram Rao (10:30 AM)</p>
-                                <p>• Patil Ent. vs. MMRDA (11:15 AM)</p>
-                            </div>
-                        `;
+                        clickAction = `alert('Weekend is an off-day.')`;
+                    } else if (activeActionMode) {
+                        // Adjourned or Next Hearing Selection Mode
+                        if (activeActionMode === 'adjourned') {
+                            cls = "neon-green-adjourn font-extrabold cursor-pointer transition";
+                        } else {
+                            cls = "lime-green-hearing font-extrabold cursor-pointer transition";
+                        }
+                        clickAction = `confirmTargetDate(${m.year}, ${m.month}, ${d})`;
                     } else {
-                        // Default free green days
-                        cls = "bg-emerald-50 text-emerald-900 border border-emerald-300 font-extrabold cursor-pointer hover:bg-emerald-100 transition shadow-sm";
+                        // Normal mode: Red busy days or white/green free days
+                        if (isSept14to28 || (d % 3 === 0 && !isOctoberOrLater)) {
+                            cls = "cal-day-busy bg-red-50 text-red-900 border border-red-300 font-extrabold cursor-pointer relative shadow-sm hover:bg-red-100";
+                            tooltipHtml = `
+                                <div class="cal-tooltip absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-48 bg-slate-900 text-white text-[10px] p-2.5 rounded-xl shadow-2xl z-50 pointer-events-none space-y-1 text-left border border-slate-700">
+                                    <p class="font-bold text-red-400 border-b border-slate-800 pb-0.5">Click to view ${d} ${m.name.split(' ')[0]} Docket</p>
+                                </div>
+                            `;
+                            clickAction = `loadDateDatabase(${m.year}, ${m.month}, ${d})`;
+                        } else if (isOctoberOrLater) {
+                            cls = "bg-white text-slate-800 border border-slate-200 font-extrabold cursor-pointer hover:bg-slate-50 transition shadow-sm";
+                            clickAction = `loadDateDatabase(${m.year}, ${m.month}, ${d})`;
+                        } else {
+                            cls = "bg-emerald-50 text-emerald-900 border border-emerald-300 font-extrabold cursor-pointer hover:bg-emerald-100 transition shadow-sm";
+                            clickAction = `loadDateDatabase(${m.year}, ${m.month}, ${d})`;
+                        }
                     }
 
                     daysGrid += `
-                        <div onclick="selectCalendarDate(${m.year}, ${m.month}, ${d}, ${isWeekend})" class="h-9 rounded-xl flex items-center justify-center font-bold text-xs transition relative ${cls}">
+                        <div onclick="${clickAction}" class="h-9 rounded-xl flex items-center justify-center font-bold text-xs transition relative ${cls}">
                             ${d}
                             ${tooltipHtml}
                         </div>
@@ -276,54 +313,99 @@
             lucide.createIcons();
         }
 
-        function isDateBefore(y1, m1, d1, y2, m2, d2) {
-            let date1 = new Date(y1, m1, d1);
-            let date2 = new Date(y2, m2, d2);
-            return date1 < date2;
+        /* --- Load Date Database Live View --- */
+        function loadDateDatabase(year, month, day) {
+            activeViewDateKey = `${year}-${month}-${day}`;
+            let dateObj = new Date(year, month, day);
+            document.getElementById('currentDateDisplay').textContent = dateObj.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+            document.getElementById('activeViewSub').textContent = `Showing live database for ${dateObj.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}` ;
+            
+            getOrCreateDatabaseForDate(year, month, day);
+            renderMasterWorkSchedule();
+            document.getElementById('smartCalendarPanel').classList.add('hidden');
         }
 
-        function selectCalendarDate(year, month, day, isWeekend) {
-            if(isWeekend) {
-                alert("Cannot select weekends (off days).");
-                return;
-            }
-            selectedCutoffDate = { year, month, day };
+        /* --- Action Button Handlers --- */
+        function handleAdjourned(caseId) {
+            activeActionCaseId = caseId;
+            activeActionMode = 'adjourned';
+            document.getElementById('calendarModeTitle').textContent = "Select Adjournment Date";
+            document.getElementById('calendarModeSubtitle').textContent = "Highlighting optimal available slots in Neon Green.";
+            document.getElementById('smartCalendarPanel').classList.remove('hidden');
             buildMultiMonthCalendar();
         }
 
-        /* --- Action Button Functions --- */
-        function handleAdjourned(caseId) {
-            alert(`Action Triggered [Adjourned]: Case ${caseId} marked as adjourned.`);
-        }
-
         function handleNextHearing(caseId) {
-            alert(`Action Triggered [Next Hearing]: Scheduling next hearing date for Case ${caseId}.`);
+            activeActionCaseId = caseId;
+            activeActionMode = 'next_hearing';
+            document.getElementById('calendarModeTitle').textContent = "Select Next Hearing Date";
+            document.getElementById('calendarModeSubtitle').textContent = "Highlighting available slots in Lime Green.";
+            document.getElementById('smartCalendarPanel').classList.remove('hidden');
+            buildMultiMonthCalendar();
         }
 
         function handleCloseCase(caseId) {
-            alert(`Action Triggered [Close Case]: Case ${caseId} marked as closed.`);
+            let cases = globalDatabases[activeViewDateKey];
+            let target = cases.find(c => c.assigned_caseid === caseId);
+            if(target) {
+                target.status = "closed";
+                renderMasterWorkSchedule();
+            }
         }
 
+        function confirmTargetDate(year, month, day) {
+            let targetKey = `${year}-${month}-${day}`;
+            let targetDateStr = new Date(year, month, day).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+
+            // 1. Update current case status to "pending"
+            let currentCases = globalDatabases[activeViewDateKey];
+            let caseIndex = currentCases.findIndex(c => c.assigned_caseid === activeActionCaseId);
+            
+            if(caseIndex !== -1) {
+                let movedCase = { ...currentCases[caseIndex], status: "pending", reasons: ["Rescheduled to " + targetDateStr] };
+                
+                // Remove from current or update
+                currentCases.splice(caseIndex, 1);
+
+                // 2. Add to target date database with status "unresolved"
+                let targetCases = getOrCreateDatabaseForDate(year, month, day);
+                movedCase.status = "unresolved"; // Rule: target date status is unresolved
+                targetCases.push(movedCase);
+
+                alert(`Success: Case ${activeActionCaseId} successfully pushed to ${targetDateStr}. Status updated to Pending on current view, and Unresolved on target date.`);
+            }
+
+            activeActionMode = null;
+            document.getElementById('smartCalendarPanel').classList.add('hidden');
+            renderMasterWorkSchedule();
+        }
+
+        /* --- Render Master Docket Table Live --- */
         function renderMasterWorkSchedule() {
             const tbody = document.getElementById('masterWorkScheduleBody');
             if(!tbody) return;
             tbody.innerHTML = "";
             
-            const scheduleData = [
-                { hearings: "H-01", time: "10:30 AM", assigned_caseid: "MH-CRL-2021-8891", litigant: "State vs. Vikram Rao", assigned_advocate: ADVOCATES[0], case_type: "Criminal Bail", status: "clear", reasons: [] },
-                { hearings: "H-02", time: "11:15 AM", assigned_caseid: "MH-CIV-2017-1029", litigant: "Patil Enterprises vs. MMRDA", assigned_advocate: ADVOCATES[1], case_type: "Civil Suit", status: "unresolved", reasons: ["Witnesses not present", "Missing affidavit submissions"] },
-                { hearings: "H-03", time: "12:00 PM", assigned_caseid: "MH-CRL-2023-5512", litigant: "Kulkarni vs. State of MH", assigned_advocate: ADVOCATES[2], case_type: "Writ Petition", status: "clear", reasons: [] },
-                { hearings: "H-04", time: "01:30 PM", assigned_caseid: "MH-CIV-2024-9910", litigant: "Deshmukh vs. Shinde", assigned_advocate: ADVOCATES[3], case_type: "Commercial Dispute", status: "unresolved", reasons: ["Incomplete document filing"] },
-                { hearings: "H-05", time: "02:15 PM", assigned_caseid: "MH-CRL-2022-3341", litigant: "Republic vs. Khan", assigned_advocate: ADVOCATES[4], case_type: "Criminal Appeal", status: "clear", reasons: [] },
-                { hearings: "H-06", time: "03:00 PM", assigned_caseid: "MH-CIV-2019-7721", litigant: "Pune Corp vs. Jadhav", assigned_advocate: ADVOCATES[5], case_type: "Land Acquisition", status: "unresolved", reasons: ["Defendant counsel absent", "Medical certificate pending"] }
-            ];
+            let currentCases = globalDatabases[activeViewDateKey] || [];
 
-            scheduleData.forEach(row => {
+            if(currentCases.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" class="py-6 text-center text-slate-400 font-semibold">No hearings scheduled for this date.</td></tr>`;
+                return;
+            }
+
+            currentCases.forEach(row => {
                 let statusHtml = '';
-                if(row.status === 'clear') {
+                let rowStyle = '';
+
+                if(row.status === 'closed') {
+                    rowstyle = 'bg-slate-100 text-slate-400 opacity-60';
+                    statusHtml = `<span class="bg-slate-200 text-slate-600 border border-slate-300 px-3 py-1 rounded-full font-extrabold text-xs">Case Closed</span>`;
+                } else if(row.status === 'pending') {
+                    statusHtml = `<span class="bg-amber-100 text-amber-900 border border-amber-300 px-3 py-1 rounded-full font-extrabold text-xs inline-flex items-center space-x-1.5"><span class="w-1.5 h-1.5 bg-amber-600 rounded-full"></span><span>Pending</span></span>`;
+                } else if(row.status === 'clear') {
                     statusHtml = `<span class="bg-emerald-100 text-emerald-900 border border-emerald-300 px-3 py-1 rounded-full font-extrabold text-xs inline-flex items-center space-x-1.5"><span class="w-1.5 h-1.5 bg-emerald-600 rounded-full"></span><span>Clear</span></span>`;
                 } else {
-                    let reasonsList = row.reasons.map(r => `<li class="flex items-center space-x-1.5"><span class="w-1 h-1 bg-red-600 rounded-full"></span><span>${r}</span></li>`).join('');
+                    let reasonsList = (row.reasons || ["Unresolved conditions"]).map(r => `<li class="flex items-center space-x-1.5"><span class="w-1 h-1 bg-red-600 rounded-full"></span><span>${r}</span></li>`).join('');
                     statusHtml = `
                         <div class="tooltip-container relative inline-block">
                             <span class="bg-red-100 text-red-900 border border-red-300 px-3 py-1 rounded-full font-extrabold text-xs inline-flex items-center space-x-1.5 cursor-pointer">
@@ -339,7 +421,7 @@
                 }
 
                 tbody.innerHTML += `
-                    <tr class="hover:bg-slate-50/90 transition">
+                    <tr class="hover:bg-slate-50/90 transition ${rowstyle}">
                         <td class="py-4 px-4 font-bold text-slate-800">${row.hearings}</td>
                         <td class="py-4 px-4 mono font-semibold text-slate-600">${row.time}</td>
                         <td class="py-4 px-4 mono font-extrabold text-blue-900">${row.assigned_caseid}</td>
